@@ -1,4 +1,4 @@
 from pydantic import BaseModel
 
-class ProblemResponse(BaseModel):
+class AIResponse(BaseModel):
     description: str

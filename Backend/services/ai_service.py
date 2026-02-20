@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
 from models.request.ai_request import AIRequest
-from models.response.problem import ProblemResponse
+from models.response.ai_response import AIResponse
 import os
 
 class AIService:
@@ -14,26 +14,17 @@ class AIService:
             }
         )
 
-    async def generate_problem_description(self, ai_request: AIRequest) -> ProblemResponse:
-        """Generates a programming problem description based on the given prompt."""
-        fallbacks = [
-                "meta-llama/llama-3.3-70b-instruct:free", # Massive and smart
-                "google/gemini-2.0-flash-001:free",       # Extremely fast
-                "deepseek/deepseek-r1:free"               # High-level reasoning
-            ]
+    async def generate_description(self, ai_request: AIRequest) -> AIResponse:
         response = await self.client.chat.completions.create(
-            model="qwen/qwen3-coder:free",
-            
-            extra_body={
-                "models": fallbacks, # OpenRouter handles the fallback automatically
-                "route": "fallback"   # Tells OpenRouter to prioritize your order
-            },
+            model="stepfun/step-3.5-flash:free",
             messages=[
-                {"role": "system", "content": "You are a supportive CS Tutor."},
-                {"role": "user", "content": ai_request.prompt}
+                {
+                    "role": "user",
+                    "content": ai_request.prompt
+                }
             ]
         )
         description = response.choices[0].message.content.strip()
-        return ProblemResponse(description=description)
+        return AIResponse(description=description)
 
 
