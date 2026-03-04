@@ -6,7 +6,6 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from models.user import User  # your User model
-from repository.user_repository import get_user_by_username
 import os
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -45,7 +44,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise credentials_exception
     
-    user = get_user_by_username(db, username)
+    user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise credentials_exception
     return user

@@ -9,5 +9,5 @@ router = APIRouter(prefix="/chat", tags=["Chat"])
 async def send_message(chat_request: AIRequest):
     """Endpoint to generate a response to a chat message."""
     ai_service = AIService()
-    ai_response = await ai_service.generate_description(chat_request)
+    ai_response = AIResponse(description=await ai_service.generate_description(chat_request))
     return ai_response

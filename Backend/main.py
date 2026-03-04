@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 from dotenv import load_dotenv
+from database import engine, Base
 
 # Load environment variables from .env file
 load_dotenv()
@@ -29,6 +30,8 @@ app.add_middleware(
 
 # Include API router
 app.include_router(api_router, prefix="/api")
+
+Base.metadata.create_all(bind=engine)
 
 
 
