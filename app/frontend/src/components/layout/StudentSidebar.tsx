@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+
+const SIDEBAR_COLLAPSE_STORAGE_KEY = 'student-sidebar-collapsed'
 
 export type StudentSidebarChild = {
     id: string
@@ -47,7 +49,14 @@ export function StudentSidebar({
     defaultExpandedIds,
     className,
 }: StudentSidebarProps) {
-    const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+
+        const stored = window.localStorage.getItem(SIDEBAR_COLLAPSE_STORAGE_KEY)
+        return stored === 'true'
+    })
     const [expandedItems, setExpandedItems] = useState<string[]>(defaultExpandedIds ?? [])
     const expandedWidth = 'clamp(15.5rem, 19vw, 19.5rem)'
     const collapsedWidth = 'clamp(4.5rem, 6vw, 5.25rem)'
@@ -62,6 +71,14 @@ export function StudentSidebar({
             prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
         )
     }
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return
+        }
+
+        window.localStorage.setItem(SIDEBAR_COLLAPSE_STORAGE_KEY, String(isCollapsed))
+    }, [isCollapsed])
 
     return (
         <motion.aside
