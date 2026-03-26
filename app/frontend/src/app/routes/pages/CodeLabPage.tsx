@@ -1,9 +1,10 @@
-import { DashboardLayout } from '../../../components/layout/DashboardLayout'
+import { StudentLayout } from '../../../components/layout/StudentLayout'
 import { AiPanel } from '../../../components/panels/AiPanel'
 
 export function CodeLabPage() {
     return (
-        <DashboardLayout
+        <StudentLayout
+            currentPage="codelab"
             title="Code Lab"
             subtitle="Practice in a focused environment with real-time execution placeholders and AI guidance panel."
         >
@@ -24,7 +25,7 @@ export function CodeLabPage() {
                         </div>
                     </div>
 
-                    <div className="mt-4 h-[380px] rounded-lg border border-dashed border-border bg-background p-4">
+                    <div className="mt-4 h-96 rounded-lg border border-dashed border-border bg-background p-4">
                         <p className="text-sm text-muted-foreground">Code editor design placeholder.</p>
                     </div>
 
@@ -36,6 +37,6 @@ export function CodeLabPage() {
 
                 <AiPanel />
             </div>
-        </DashboardLayout>
+        </StudentLayout>
     )
 }
