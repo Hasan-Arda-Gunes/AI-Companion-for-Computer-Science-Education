@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { StudentLayout } from '../../../components/layout/StudentLayout'
 import { createProblem } from '../../../features/problems/api/problemsApi'
 import type { CreateProblemRequest } from '../../../features/problems/types'
@@ -45,6 +46,7 @@ function loadDraftFromStorage(): CreateQuestionDraft {
 
 export function StudentCreateQuestionTempPage() {
     const [draft, setDraft] = useState<CreateQuestionDraft>(() => loadDraftFromStorage())
+    const [descriptionView, setDescriptionView] = useState<'write' | 'preview'>('write')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
@@ -52,6 +54,13 @@ export function StudentCreateQuestionTempPage() {
     useEffect(() => {
         window.localStorage.setItem(CREATE_QUESTION_DRAFT_KEY, JSON.stringify(draft))
     }, [draft])
+
+    const insertMarkdownSnippet = (snippet: string) => {
+        setDraft((prev) => ({
+            ...prev,
+            description: prev.description ? `${prev.description}\n${snippet}` : snippet,
+        }))
+    }
 
     const handleCreateProblem = async () => {
         const title = draft.title.trim()
@@ -180,15 +189,118 @@ export function StudentCreateQuestionTempPage() {
                             />
                         </label>
 
-                        <label className="block space-y-2 lg:col-span-2">
+                        <section className="space-y-2 lg:col-span-2">
                             <span className="text-sm text-muted-foreground">Description</span>
-                            <textarea
-                                value={draft.description}
-                                onChange={(event) => setDraft((prev) => ({ ...prev, description: event.target.value }))}
-                                className="h-32 w-full rounded-lg border border-input bg-input-background px-3 py-2 text-sm"
-                                placeholder="Describe the problem statement and constraints."
-                            />
-                        </label>
+
+                            <div className="overflow-hidden rounded-lg border border-input">
+                                <div className="flex items-center justify-between border-b border-border bg-secondary/30 p-1">
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setDescriptionView('write')}
+                                            className={[
+                                                'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                                                descriptionView === 'write'
+                                                    ? 'bg-card text-foreground'
+                                                    : 'text-muted-foreground hover:text-foreground',
+                                            ].join(' ')}
+                                        >
+                                            Write
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDescriptionView('preview')}
+                                            className={[
+                                                'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                                                descriptionView === 'preview'
+                                                    ? 'bg-card text-foreground'
+                                                    : 'text-muted-foreground hover:text-foreground',
+                                            ].join(' ')}
+                                        >
+                                            Preview
+                                        </button>
+                                    </div>
+
+                                    {descriptionView === 'write' ? (
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => insertMarkdownSnippet('## Section Title')}
+                                                className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                                            >
+                                                H2
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => insertMarkdownSnippet('**bold text**')}
+                                                className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                                            >
+                                                Bold
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => insertMarkdownSnippet('- item one\n- item two')}
+                                                className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                                            >
+                                                List
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => insertMarkdownSnippet('```python\n# code here\n```')}
+                                                className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                                            >
+                                                Code
+                                            </button>
+                                        </div>
+                                    ) : null}
+                                </div>
+
+                                {descriptionView === 'write' ? (
+                                    <textarea
+                                        value={draft.description}
+                                        onChange={(event) => setDraft((prev) => ({ ...prev, description: event.target.value }))}
+                                        className="h-40 w-full border-0 bg-input-background px-3 py-2 text-sm outline-none"
+                                        placeholder="Describe the problem statement and constraints with Markdown."
+                                    />
+                                ) : (
+                                    <div className="h-40 overflow-y-auto bg-input-background p-3">
+                                        {draft.description.trim() ? (
+                                            <div className="max-w-none space-y-3 text-sm text-foreground">
+                                                <ReactMarkdown
+                                                    components={{
+                                                        h1: ({ children }) => <h1 className="mb-2 text-lg font-semibold">{children}</h1>,
+                                                        h2: ({ children }) => <h2 className="mb-2 mt-4 text-base font-semibold">{children}</h2>,
+                                                        p: ({ children }) => <p className="mb-2 leading-6 text-muted-foreground">{children}</p>,
+                                                        ul: ({ children }) => <ul className="mb-2 list-inside list-disc space-y-1 text-muted-foreground">{children}</ul>,
+                                                        code: ({ className, children, ...props }) => {
+                                                            const isInline = !className
+
+                                                            if (isInline) {
+                                                                return (
+                                                                    <code className="rounded bg-secondary px-1 py-0.5 text-xs text-primary" {...props}>
+                                                                        {children}
+                                                                    </code>
+                                                                )
+                                                            }
+
+                                                            return (
+                                                                <pre className="mb-2 overflow-x-auto rounded-md bg-background p-3 text-xs">
+                                                                    <code>{children}</code>
+                                                                </pre>
+                                                            )
+                                                        },
+                                                    }}
+                                                >
+                                                    {draft.description}
+                                                </ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">Nothing to preview yet.</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </section>
 
                         <div className="flex gap-3 lg:col-span-2">
                             <button type="button" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
