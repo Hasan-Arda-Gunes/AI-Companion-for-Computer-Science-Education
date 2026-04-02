@@ -61,10 +61,10 @@ export function StudentSidebar({
     })
     const [expandedItems, setExpandedItems] = useState<string[]>(defaultExpandedIds ?? [])
     const expandedWidth = 'clamp(15.5rem, 19vw, 19.5rem)'
-    const collapsedWidth = 'clamp(4.5rem, 6vw, 5.25rem)'
+    const collapsedWidth = 'clamp(4.75rem, 7.5vw, 5.25rem)'
 
     const resolvedClassName = useMemo(
-        () => ['relative flex h-full min-h-screen flex-col overflow-hidden border-r border-sidebar-border bg-sidebar py-6', className ?? ''].join(' ').trim(),
+        () => ['relative flex h-full min-h-screen flex-col overflow-visible border-r border-sidebar-border bg-sidebar py-6', className ?? ''].join(' ').trim(),
         [className],
     )
 
@@ -90,15 +90,18 @@ export function StudentSidebar({
             className={resolvedClassName}
             style={{ backdropFilter: 'blur(10px)' }}
         >
-            <div className="mb-8 flex items-start gap-2 px-4">
+            <div className="mb-8 flex items-start px-4">
                 <AnimatePresence mode="wait">
                     {!isCollapsed ? (
-                        <motion.div
+                        <motion.button
                             key="brand-full"
+                            type="button"
+                            onClick={() => setIsCollapsed((prev) => !prev)}
+                            title="Collapse Sidebar"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex min-w-0 flex-1 items-center gap-3"
+                            className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left transition-colors hover:bg-secondary/40"
                         >
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary to-purple-600 shadow-[0_0_24px_var(--electric-purple-glow)]">
                                 <svg viewBox="0 0 24 24" className="h-6 w-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -111,14 +114,17 @@ export function StudentSidebar({
                                 <h2 className="truncate text-xl font-semibold leading-tight text-foreground">{brand.title}</h2>
                                 <p className="mt-0.5 truncate text-sm text-muted-foreground">{brand.subtitle}</p>
                             </div>
-                        </motion.div>
+                        </motion.button>
                     ) : (
-                        <motion.div
+                        <motion.button
                             key="brand-icon"
+                            type="button"
+                            onClick={() => setIsCollapsed((prev) => !prev)}
+                            title="Expand Sidebar"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex flex-1 justify-center"
+                            className="flex flex-1 justify-center rounded-lg transition-colors hover:bg-secondary/40"
                         >
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-primary to-purple-600 shadow-[0_0_24px_var(--electric-purple-glow)]">
                                 <svg viewBox="0 0 24 24" className="h-6 w-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -127,23 +133,9 @@ export function StudentSidebar({
                                     <path d="m14 5-4 14" />
                                 </svg>
                             </div>
-                        </motion.div>
+                        </motion.button>
                     )}
                 </AnimatePresence>
-
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsCollapsed((prev) => !prev)}
-                    className="ml-auto mt-1 shrink-0 rounded-full border border-sidebar-border bg-secondary p-2 text-foreground transition-colors hover:border-primary hover:bg-primary"
-                    title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-                >
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <path d="M4 6h16" />
-                        <path d="M4 12h16" />
-                        <path d="M4 18h16" />
-                    </svg>
-                </motion.button>
             </div>
 
             <nav className="flex-1 space-y-1.5 px-3">
