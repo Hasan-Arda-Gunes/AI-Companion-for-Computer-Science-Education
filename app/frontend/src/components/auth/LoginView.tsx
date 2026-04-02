@@ -66,7 +66,7 @@ export function LoginView({
                     </motion.div>
 
                     <h1 className="relative z-10 mt-5 text-center text-4xl font-semibold leading-tight text-foreground sm:text-[2.25rem]">
-                        Welcome to <span className="text-primary">EvolutionAI</span>
+                        Welcome to <span className="text-primary">AIMentor</span>
                     </h1>
                     <p className="relative z-10 mt-2 text-center text-[1.02rem] text-muted-foreground">
                         Sign in to continue your journey

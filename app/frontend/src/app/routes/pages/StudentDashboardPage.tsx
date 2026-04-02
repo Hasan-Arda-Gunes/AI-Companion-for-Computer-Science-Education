@@ -18,6 +18,7 @@ import {
     RadarChart,
     ResponsiveContainer,
 } from 'recharts'
+import { useAuthSession } from '../../../features/auth/context/useAuthSession'
 
 type Milestone = {
     id: string
@@ -35,6 +36,9 @@ type EvolutionHistory = {
 }
 
 export function StudentDashboardPage() {
+    const { user } = useAuthSession()
+    const displayName = user?.full_name?.trim() || user?.username || 'Learner'
+
     const proficiencyData = [
         { subject: 'Correctness', value: 85, fullMark: 100 },
         { subject: 'Efficiency', value: 72, fullMark: 100 },
@@ -99,7 +103,7 @@ export function StudentDashboardPage() {
                 <div className="border-b border-border bg-card/80 px-8 py-6">
                     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                         <h1 className="text-4xl font-semibold text-foreground">
-                            Welcome back, <span className="text-primary">Student</span>
+                            Welcome back, <span className="text-primary">{displayName}</span>
                         </h1>
                         <p className="mt-2 text-2xl text-muted-foreground">
                             Continue your coding evolution journey

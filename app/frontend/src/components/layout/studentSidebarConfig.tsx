@@ -5,13 +5,13 @@ import type {
 } from './StudentSidebar'
 
 export const defaultStudentSidebarBrand: StudentSidebarBrand = {
-    title: 'EvolutionAI',
+    title: 'AIMentor',
     subtitle: 'Code Evolution',
 }
 
 export const defaultStudentSidebarProfile: StudentProfile = {
     initials: 'S',
-    name: 'Student Name',
+    name: 'Learner',
     meta: 'Level 12 • 1,340 XP',
 }
 
@@ -81,6 +81,31 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
         ),
     },
     {
+        id: 'problems',
+        label: 'Problems',
+        page: 'problems',
+        icon: (
+            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <path d="M8 8h8" />
+                <path d="M8 12h8" />
+                <path d="M8 16h5" />
+            </svg>
+        ),
+    },
+    {
+        id: 'create-question',
+        label: 'Create Question',
+        page: 'create-question',
+        icon: (
+            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+            </svg>
+        ),
+    },
+    {
         id: 'achievements',
         label: 'Achievements',
         page: 'achievements',
@@ -107,8 +132,10 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
 export const defaultStudentSidebarPagePathMap: Record<string, string> = {
     studentdashboard: '/student/dashboard',
     codelab: '/code-lab',
+    problems: '/student/problems',
+    'create-question': '/student/create-question',
     achievements: '/student/dashboard',
-    settings: '/student/dashboard',
+    settings: '/student/settings',
     'course-ds': '/student/dashboard',
     'course-algo': '/student/dashboard',
 }

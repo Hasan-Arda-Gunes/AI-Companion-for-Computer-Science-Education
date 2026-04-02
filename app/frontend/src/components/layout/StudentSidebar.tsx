@@ -33,6 +33,7 @@ export type StudentSidebarBrand = {
 type StudentSidebarProps = {
     currentPage: string
     onNavigate: (page: string) => void
+    onLogout: () => void
     navItems: StudentSidebarItem[]
     profile: StudentProfile
     brand: StudentSidebarBrand
@@ -43,6 +44,7 @@ type StudentSidebarProps = {
 export function StudentSidebar({
     currentPage,
     onNavigate,
+    onLogout,
     navItems,
     profile,
     brand,
@@ -290,6 +292,39 @@ export function StudentSidebar({
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <div className="mt-3 px-3">
+                <motion.button
+                    whileHover={{ x: 2 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={onLogout}
+                    className={[
+                        'flex w-full items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm font-medium transition-colors',
+                        'text-red-400 hover:bg-red-500/10 hover:text-red-300',
+                        isCollapsed ? 'justify-center' : '',
+                    ].join(' ')}
+                    title={isCollapsed ? 'Logout' : undefined}
+                >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <path d="m16 17 5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    <AnimatePresence>
+                        {!isCollapsed ? (
+                            <motion.span
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: 'auto' }}
+                                exit={{ opacity: 0, width: 0 }}
+                                className="whitespace-nowrap"
+                            >
+                                Logout
+                            </motion.span>
+                        ) : null}
+                    </AnimatePresence>
+                </motion.button>
+            </div>
         </motion.aside>
     )
 }

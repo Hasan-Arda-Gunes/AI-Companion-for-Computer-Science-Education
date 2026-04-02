@@ -1,7 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CodeLabWorkspace } from '../../../components/codelab/CodeLabWorkspace'
 import { StudentLayout } from '../../../components/layout/StudentLayout'
+import { chatWithAi, explainError, requestHint } from '../../../features/ai/api/aiApi'
+import { getProblemById } from '../../../features/problems/api/problemsApi'
+import { getDefaultEditorLanguage } from '../../../features/settings/editorPreferences'
+import { startSession } from '../../../features/sessions/api/sessionsApi'
+import {
+    completeAndClearActiveLearningSession,
+    getActiveLearningSession,
+    setActiveLearningSession,
+} from '../../../features/sessions/sessionLifecycle'
+import { getSubmission, submitCode } from '../../../features/submissions/api/submissionsApi'
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, ConsoleLog, EvolutionStage, MentorData, QuestionData } from '../../../components/codelab/types'
+import type { SubmissionDetails } from '../../../features/submissions/types'
 
 const sampleStages: EvolutionStage[] = [
     { id: 'stage-1', label: 'Stage 1', active: true },
@@ -60,7 +72,7 @@ Can you come up with an algorithm that is less than O(n^2) time complexity?
 
 const sampleEditor: CodeEditorData = {
     fileBaseName: 'solution',
-    defaultLanguageId: 'javascript',
+    defaultLanguageId: 'python',
     runButtonLabel: 'Run Evolution',
     languages: [
         { id: 'javascript', name: 'JavaScript', extension: '.js' },
@@ -237,14 +249,36 @@ const sampleMentor: MentorData = {
 }
 
 export function CodeLabPage() {
+    const [searchParams] = useSearchParams()
+    const selectedProblemId = searchParams.get('problemId')
     const [mentorOpen, setMentorOpen] = useState(true)
     const [isRunning, setIsRunning] = useState(false)
+    const [hintLevel, setHintLevel] = useState(1)
+    const [starterCode, setStarterCode] = useState<string | null>(null)
+    const [currentCode, setCurrentCode] = useState(sampleEditor.codeTemplates.python)
+    const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
+    const [questionData, setQuestionData] = useState<QuestionData>(sampleQuestion)
     const [consoleData, setConsoleData] = useState<ConsoleData>(sampleConsole)
     const [headerData, setHeaderData] = useState<CodeLabHeaderData>({
         isLoggedIn: true,
         username: 'Student',
         xp: 1280,
     })
+    const [defaultLanguageId, setDefaultLanguageId] = useState(() => getDefaultEditorLanguage())
+
+    const resolvedEditor = useMemo<CodeEditorData>(() => {
+        const languageExists = sampleEditor.languages.some((language) => language.id === defaultLanguageId)
+        const resolvedDefaultLanguage = languageExists ? defaultLanguageId : 'python'
+
+        return {
+            ...sampleEditor,
+            defaultLanguageId: resolvedDefaultLanguage,
+            codeTemplates: {
+                ...sampleEditor.codeTemplates,
+                python: starterCode?.trim() ? starterCode : sampleEditor.codeTemplates.python,
+            },
+        }
+    }, [defaultLanguageId, starterCode])
 
     const createLog = (type: ConsoleLog['type'], message: string): ConsoleLog => ({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -287,18 +321,135 @@ export function CodeLabPage() {
     }
 
     const handleRunCode = (code: string, languageId: string) => {
-        setIsRunning(true)
-        appendLogs([createLog('info', `Running ${languageId} solution...`)])
+        const resolvedProblemId = Number(selectedProblemId)
+        if (!Number.isFinite(resolvedProblemId) || resolvedProblemId <= 0) {
+            appendLogs([createLog('error', 'Select a problem before submitting code.')])
+            return
+        }
 
-        window.setTimeout(() => {
+        if (!activeSessionId) {
+            appendLogs([createLog('error', 'Session is not ready yet. Please wait and try again.')])
+            return
+        }
+
+        const normalizedLanguageMap: Record<string, string> = {
+            javascript: 'javascript',
+            typescript: 'typescript',
+            python: 'python',
+            java: 'java',
+            cpp: 'cpp',
+            csharp: 'csharp',
+            go: 'go',
+            rust: 'rust',
+            ruby: 'ruby',
+            php: 'php',
+        }
+        const backendLanguage = normalizedLanguageMap[languageId] ?? languageId
+
+        const toDisplayText = (value: unknown) => {
+            if (typeof value === 'string') {
+                return value
+            }
+            try {
+                return JSON.stringify(value)
+            } catch {
+                return String(value)
+            }
+        }
+
+        const isTerminalStatus = (status: string) => !['pending', 'running'].includes(status)
+
+        const pollSubmission = async (submissionId: number): Promise<SubmissionDetails> => {
+            const maxAttempts = 15
+            const delayMs = 1200
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+                const details = await getSubmission(submissionId)
+                appendLogs([createLog('log', `Submission #${submissionId} status: ${details.status} (check ${attempt}/${maxAttempts})`)])
+
+                if (isTerminalStatus(details.status)) {
+                    return details
+                }
+
+                await new Promise((resolve) => {
+                    window.setTimeout(resolve, delayMs)
+                })
+            }
+
+            return await getSubmission(submissionId)
+        }
+
+        const runSubmission = async () => {
+            setIsRunning(true)
             appendLogs([
-                createLog('log', `Language: ${languageId}`),
-                createLog('success', 'Execution completed (UI placeholder)'),
-                createLog('info', `Code length: ${code.length} chars`),
-                createLog('log', 'Ready for backend execution hook.'),
+                createLog('info', `Submitting ${backendLanguage} solution for problem #${resolvedProblemId}...`),
+                createLog('log', `Session ID: ${activeSessionId}`),
             ])
-            setIsRunning(false)
-        }, 900)
+
+            try {
+                const submission = await submitCode({
+                    problem_id: resolvedProblemId,
+                    code,
+                    language: backendLanguage,
+                    session_id: activeSessionId,
+                })
+
+                appendLogs([
+                    createLog('success', `Submission created: #${submission.id}`),
+                    createLog('info', 'Fetching evaluation result...'),
+                ])
+
+                const details = await pollSubmission(submission.id)
+                const summaryType = details.status === 'correct' ? 'success' : details.status === 'error' ? 'error' : 'info'
+                appendLogs([
+                    createLog(summaryType, `Final status: ${details.status}`),
+                    ...(typeof details.score === 'number' ? [createLog('log', `Score: ${details.score}`)] : []),
+                    ...(typeof details.execution_time === 'number'
+                        ? [createLog('log', `Execution time: ${details.execution_time} ms`)]
+                        : []),
+                ])
+
+                if (details.test_results?.length) {
+                    appendLogs([createLog('info', `Test results (${details.test_results.length}):`)])
+                    appendLogs(
+                        details.test_results.map((test) =>
+                            createLog(
+                                test.passed ? 'success' : 'error',
+                                `${test.test_id}: ${test.passed ? 'PASSED' : 'FAILED'} | expected=${toDisplayText(test.expected)} | actual=${toDisplayText(test.actual)}`,
+                            ),
+                        ),
+                    )
+                }
+
+                if (details.ai_feedback?.overall_assessment) {
+                    appendLogs([createLog('info', `AI: ${details.ai_feedback.overall_assessment}`)])
+                }
+
+                if (typeof details.score === 'number') {
+                    const active = getActiveLearningSession()
+                    if (active && active.id === activeSessionId) {
+                        setActiveLearningSession({
+                            ...active,
+                            bestScore: Math.max(active.bestScore, details.score),
+                        })
+                    }
+                }
+
+                if (details.ai_feedback?.suggestions?.length) {
+                    appendLogs([
+                        createLog('info', 'AI Suggestions:'),
+                        ...details.ai_feedback.suggestions.map((suggestion) => createLog('log', `- ${suggestion}`)),
+                    ])
+                }
+            } catch (error) {
+                const message = error instanceof Error ? error.message : 'Submission failed'
+                appendLogs([createLog('error', message)])
+            } finally {
+                setIsRunning(false)
+            }
+        }
+
+        void runSubmission()
     }
 
     const handleClearConsole = () => {
@@ -307,6 +458,188 @@ export function CodeLabPage() {
             logs: [],
         }))
     }
+
+    const handleMentorRequestHint = async () => {
+        const resolvedProblemId = Number(selectedProblemId)
+        if (!Number.isFinite(resolvedProblemId) || resolvedProblemId <= 0) {
+            throw new Error('Select a problem to request a hint.')
+        }
+
+        if (!activeSessionId) {
+            throw new Error('Session is not ready yet. Please wait and try again.')
+        }
+
+        const result = await requestHint({
+            problem_id: resolvedProblemId,
+            session_id: activeSessionId,
+            current_code: currentCode,
+            hint_level: hintLevel,
+        })
+
+        setHintLevel(result.hint_level + 1)
+        appendLogs([
+            createLog('info', `Hint level ${result.hint_level} received (${result.remaining_hints} remaining).`),
+        ])
+
+        return result.hint
+    }
+
+    const handleMentorChat = async (message: string) => {
+        const result = await chatWithAi({
+            message,
+            context: {
+                current_code: currentCode,
+            },
+        })
+
+        return result.response
+    }
+
+    const handleMentorExplainError = async () => {
+        const lastErrorLog = [...consoleData.logs].reverse().find((log) => log.type === 'error')
+
+        if (!lastErrorLog) {
+            throw new Error('No error output found in console to explain.')
+        }
+
+        const result = await explainError({
+            error_message: lastErrorLog.message,
+            code: currentCode,
+        })
+
+        const explanation = result.explanation ?? result.response
+        if (!explanation) {
+            throw new Error('No explanation returned by AI.')
+        }
+
+        appendLogs([createLog('info', 'Received AI error explanation.')])
+        return explanation
+    }
+
+    useEffect(() => {
+        if (!selectedProblemId) {
+            setQuestionData(sampleQuestion)
+            setStarterCode(null)
+            setCurrentCode(sampleEditor.codeTemplates.python)
+            setHintLevel(1)
+            setActiveSessionId(null)
+            setDefaultLanguageId(getDefaultEditorLanguage())
+            return
+        }
+
+        const parsedProblemId = Number(selectedProblemId)
+        if (!Number.isFinite(parsedProblemId) || parsedProblemId <= 0) {
+            setQuestionData(sampleQuestion)
+            appendLogs([createLog('error', 'Invalid problem id in URL.')])
+            return
+        }
+
+        let isMounted = true
+
+        const formatUnknown = (value: unknown) => {
+            if (typeof value === 'string') {
+                return value
+            }
+
+            try {
+                return JSON.stringify(value)
+            } catch {
+                return String(value)
+            }
+        }
+
+        const loadProblem = async () => {
+            appendLogs([createLog('info', `Loading problem ${parsedProblemId}...`)])
+
+            try {
+                const activeSession = getActiveLearningSession()
+                if (activeSession && activeSession.problemId === parsedProblemId) {
+                    setActiveSessionId(activeSession.id)
+                } else {
+                    if (activeSession && activeSession.problemId !== parsedProblemId) {
+                        await completeAndClearActiveLearningSession()
+                    }
+
+                    const createdSession = await startSession(parsedProblemId)
+                    setActiveLearningSession({
+                        id: createdSession.id,
+                        problemId: parsedProblemId,
+                        bestScore: 0,
+                    })
+                    setActiveSessionId(createdSession.id)
+                    appendLogs([createLog('success', `Started session #${createdSession.id}`)])
+                }
+
+                const detail = await getProblemById(parsedProblemId)
+                if (!isMounted) {
+                    return
+                }
+
+                const constraintsList = detail.constraints
+                    ? Object.entries(detail.constraints).map(([key, value]) => `- ${key}: ${formatUnknown(value)}`)
+                    : []
+
+                const examplesMarkdown = (detail.examples ?? []).map((example, index) => {
+                    return [
+                        `### Example ${index + 1}`,
+                        '',
+                        '```',
+                        `Input: ${formatUnknown(example.input)}`,
+                        `Expected Output: ${formatUnknown(example.expected_output)}`,
+                        '```',
+                    ].join('\n')
+                })
+
+                const markdownSections = [
+                    `# ${detail.title}`,
+                    '',
+                    detail.description,
+                    '',
+                    ...(examplesMarkdown.length > 0 ? ['## Examples', '', ...examplesMarkdown, ''] : []),
+                    ...(constraintsList.length > 0 ? ['## Constraints', '', ...constraintsList, ''] : []),
+                    ...(detail.hints && detail.hints.length > 0 ? ['## Hints', '', ...detail.hints.map((hint) => `- ${hint}`), ''] : []),
+                ]
+
+                const mappedQuestion: QuestionData = {
+                    title: detail.title,
+                    description: detail.description,
+                    examples: (detail.examples ?? []).map((example, index) => ({
+                        id: `api-example-${index + 1}`,
+                        input: formatUnknown(example.input),
+                        output: formatUnknown(example.expected_output),
+                    })),
+                    constraints: detail.constraints
+                        ? Object.entries(detail.constraints).map(([key, value]) => `${key}: ${formatUnknown(value)}`)
+                        : [],
+                    markdownContent: markdownSections.join('\n').trim(),
+                    complexityTarget: {
+                        time: 'N/A',
+                        space: 'N/A',
+                    },
+                }
+
+                setQuestionData(mappedQuestion)
+                setStarterCode(detail.starter_code?.trim() ? detail.starter_code : null)
+                setCurrentCode(detail.starter_code?.trim() ? detail.starter_code : sampleEditor.codeTemplates.python)
+                setHintLevel(1)
+                setDefaultLanguageId(getDefaultEditorLanguage())
+                appendLogs([createLog('success', `Loaded problem: ${detail.title}`)])
+            } catch (error) {
+                if (!isMounted) {
+                    return
+                }
+
+                const message = error instanceof Error ? error.message : 'Failed to load problem details'
+                appendLogs([createLog('error', message)])
+            }
+        }
+
+        loadProblem()
+
+        return () => {
+            isMounted = false
+        }
+    }, [selectedProblemId])
 
     return (
         <StudentLayout
@@ -320,8 +653,8 @@ export function CodeLabPage() {
                     title="Code Evolution Lab"
                     stages={sampleStages}
                     headerData={headerData}
-                    question={sampleQuestion}
-                    editor={sampleEditor}
+                    question={questionData}
+                    editor={resolvedEditor}
                     consoleData={consoleData}
                     mentor={sampleMentor}
                     mentorOpen={mentorOpen}
@@ -331,7 +664,11 @@ export function CodeLabPage() {
                     onLogout={handleLogout}
                     isRunning={isRunning}
                     onRunCode={handleRunCode}
+                    onEditorCodeChange={(code) => setCurrentCode(code)}
                     onClearConsole={handleClearConsole}
+                    onMentorRequestHint={handleMentorRequestHint}
+                    onMentorChat={handleMentorChat}
+                    onMentorExplainError={handleMentorExplainError}
                 />
             </div>
         </StudentLayout>

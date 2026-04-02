@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, Play } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import Editor from '@monaco-editor/react'
@@ -8,11 +8,12 @@ type EditorPanelProps = {
     editor: CodeEditorData
     isRunning?: boolean
     onRunCode?: (code: string, languageId: string) => void
+    onCodeChange?: (code: string, languageId: string) => void
 }
 
 const FALLBACK_TEMPLATE = '// Write your code here'
 
-export function EditorPanel({ editor, isRunning = false, onRunCode }: EditorPanelProps) {
+export function EditorPanel({ editor, isRunning = false, onRunCode, onCodeChange }: EditorPanelProps) {
     const initialLanguage = useMemo(
         () => editor.languages.find((language) => language.id === editor.defaultLanguageId) ?? editor.languages[0],
         [editor.defaultLanguageId, editor.languages],
@@ -21,6 +22,16 @@ export function EditorPanel({ editor, isRunning = false, onRunCode }: EditorPane
     const [selectedLanguage, setSelectedLanguage] = useState<CodeLanguageOption>(initialLanguage)
     const [code, setCode] = useState(editor.codeTemplates[initialLanguage.id] ?? FALLBACK_TEMPLATE)
     const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+
+    useEffect(() => {
+        const nextLanguage = editor.languages.find((language) => language.id === editor.defaultLanguageId) ?? editor.languages[0]
+        setSelectedLanguage(nextLanguage)
+        setCode(editor.codeTemplates[nextLanguage.id] ?? FALLBACK_TEMPLATE)
+    }, [editor.defaultLanguageId, editor.languages, editor.codeTemplates])
+
+    useEffect(() => {
+        onCodeChange?.(code, selectedLanguage.id)
+    }, [code, selectedLanguage.id, onCodeChange])
 
     const currentFileName = `${editor.fileBaseName}${selectedLanguage.extension}`
 

@@ -22,7 +22,11 @@ type CodeLabWorkspaceProps = {
     onLogout: () => void
     isRunning?: boolean
     onRunCode?: (code: string, languageId: string) => void
+    onEditorCodeChange?: (code: string, languageId: string) => void
     onClearConsole?: () => void
+    onMentorRequestHint?: () => Promise<string>
+    onMentorChat?: (message: string) => Promise<string>
+    onMentorExplainError?: () => Promise<string>
 }
 
 export function CodeLabWorkspace({
@@ -40,7 +44,11 @@ export function CodeLabWorkspace({
     onLogout,
     isRunning = false,
     onRunCode,
+    onEditorCodeChange,
     onClearConsole,
+    onMentorRequestHint,
+    onMentorChat,
+    onMentorExplainError,
 }: CodeLabWorkspaceProps) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const centerRef = useRef<HTMLDivElement | null>(null)
@@ -132,7 +140,7 @@ export function CodeLabWorkspace({
                     </div>
                     <div className="h-[78vh] min-h-120 shrink-0 px-3 py-2">
                         <div className="h-full overflow-hidden rounded-xl border border-border">
-                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} />
+                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
                         </div>
                     </div>
                     <div className="shrink-0">
@@ -169,7 +177,7 @@ export function CodeLabWorkspace({
 
                     <div ref={centerRef} className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden" style={{ width: `${centerWidth}%` }}>
                         <div className="min-h-0" style={{ height: consoleCollapsed ? '100%' : `${editorHeight}%` }}>
-                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} />
+                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
                         </div>
 
                         {consoleCollapsed ? (
@@ -181,6 +189,14 @@ export function CodeLabWorkspace({
                                 >
                                     Show Console
                                 </button>
+                                <MentorPanel
+                                    mentor={mentor}
+                                    isOpen={mentorOpen}
+                                    onToggle={onToggleMentor}
+                                    onRequestHint={onMentorRequestHint}
+                                    onSendMessage={onMentorChat}
+                                    onExplainError={onMentorExplainError}
+                                />
                             </div>
                         ) : (
                             <>
@@ -216,7 +232,14 @@ export function CodeLabWorkspace({
                             />
 
                             <div className="h-full min-w-0" style={{ width: `${rightWidth}%` }}>
-                                <MentorPanel mentor={mentor} isOpen={mentorOpen} onToggle={onToggleMentor} />
+                                <MentorPanel
+                                    mentor={mentor}
+                                    isOpen={mentorOpen}
+                                    onToggle={onToggleMentor}
+                                    onRequestHint={onMentorRequestHint}
+                                    onSendMessage={onMentorChat}
+                                    onExplainError={onMentorExplainError}
+                                />
                             </div>
                         </>
                     ) : null}

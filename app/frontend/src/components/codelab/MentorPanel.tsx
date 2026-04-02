@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Send, Sparkles } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Send, Sparkles } from 'lucide-react'
 import { motion } from 'motion/react'
 import type { MentorData } from './types'
 import { ScrollArea } from '../ui/scroll-area'
@@ -8,11 +8,16 @@ type MentorPanelProps = {
     mentor: MentorData
     isOpen: boolean
     onToggle: () => void
+    onRequestHint?: () => Promise<string>
+    onSendMessage?: (message: string) => Promise<string>
+    onExplainError?: () => Promise<string>
 }
 
-export function MentorPanel({ mentor, isOpen, onToggle }: MentorPanelProps) {
+export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMessage, onExplainError }: MentorPanelProps) {
     const [messages, setMessages] = useState(mentor.initialMessages)
     const [input, setInput] = useState('')
+    const [isActionLoading, setIsActionLoading] = useState(false)
+    const [toolsOpen, setToolsOpen] = useState(true)
 
     const hintSuggestions = useMemo(
         () =>
@@ -41,12 +46,42 @@ export function MentorPanel({ mentor, isOpen, onToggle }: MentorPanelProps) {
         ])
     }
 
-    const handleRequestHint = () => {
-        const randomHint = hintSuggestions[Math.floor(Math.random() * hintSuggestions.length)]
-        pushAssistantMessage(randomHint)
+    const handleRequestHint = async () => {
+        setIsActionLoading(true)
+        try {
+            if (onRequestHint) {
+                const hint = await onRequestHint()
+                pushAssistantMessage(hint)
+            } else {
+                const randomHint = hintSuggestions[Math.floor(Math.random() * hintSuggestions.length)]
+                pushAssistantMessage(randomHint)
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to fetch hint'
+            pushAssistantMessage(message)
+        } finally {
+            setIsActionLoading(false)
+        }
     }
 
-    const handleSend = () => {
+    const handleExplainError = async () => {
+        setIsActionLoading(true)
+        try {
+            if (onExplainError) {
+                const explanation = await onExplainError()
+                pushAssistantMessage(explanation)
+            } else {
+                pushAssistantMessage('No error found to explain yet.')
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to explain error'
+            pushAssistantMessage(message)
+        } finally {
+            setIsActionLoading(false)
+        }
+    }
+
+    const handleSend = async () => {
         if (!input.trim()) {
             return
         }
@@ -59,11 +94,22 @@ export function MentorPanel({ mentor, isOpen, onToggle }: MentorPanelProps) {
 
         setMessages((prev) => [...prev, userMessage])
         setInput('')
+        setIsActionLoading(true)
 
-        window.setTimeout(() => {
-            const randomResponse = responseSuggestions[Math.floor(Math.random() * responseSuggestions.length)]
-            pushAssistantMessage(randomResponse)
-        }, 800)
+        try {
+            if (onSendMessage) {
+                const response = await onSendMessage(userMessage.content)
+                pushAssistantMessage(response)
+            } else {
+                const randomResponse = responseSuggestions[Math.floor(Math.random() * responseSuggestions.length)]
+                pushAssistantMessage(randomResponse)
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to send chat message'
+            pushAssistantMessage(message)
+        } finally {
+            setIsActionLoading(false)
+        }
     }
 
     return (
@@ -128,16 +174,47 @@ export function MentorPanel({ mentor, isOpen, onToggle }: MentorPanelProps) {
                     </ScrollArea>
 
                     <div className="relative z-10 space-y-3 border-t border-border bg-card p-4">
-                        <motion.button
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.98 }}
-                            type="button"
-                            onClick={handleRequestHint}
-                            className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/30 bg-linear-to-r from-primary/20 to-purple-600/20 px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:border-primary/50"
-                        >
-                            <Sparkles className="size-4" />
-                            <span>{mentor.hintButtonLabel}</span>
-                        </motion.button>
+                        <div className="rounded-lg border border-border bg-secondary/20">
+                            <button
+                                type="button"
+                                onClick={() => setToolsOpen((prev) => !prev)}
+                                className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium text-foreground"
+                            >
+                                <span>AI Tools</span>
+                                <ChevronDown className={['size-4 transition-transform', toolsOpen ? 'rotate-180' : ''].join(' ')} />
+                            </button>
+
+                            {toolsOpen ? (
+                                <div className="space-y-2 border-t border-border p-3">
+                                    <motion.button
+                                        whileHover={{ scale: 1.01 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="button"
+                                        disabled={isActionLoading}
+                                        onClick={() => {
+                                            void handleRequestHint()
+                                        }}
+                                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/30 bg-linear-to-r from-primary/20 to-purple-600/20 px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        <Sparkles className="size-4" />
+                                        <span>{mentor.hintButtonLabel}</span>
+                                    </motion.button>
+
+                                    <motion.button
+                                        whileHover={{ scale: 1.01 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="button"
+                                        disabled={isActionLoading}
+                                        onClick={() => {
+                                            void handleExplainError()
+                                        }}
+                                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        Explain Error
+                                    </motion.button>
+                                </div>
+                            ) : null}
+                        </div>
 
                         <div className="flex gap-2">
                             <input
@@ -146,7 +223,7 @@ export function MentorPanel({ mentor, isOpen, onToggle }: MentorPanelProps) {
                                 onChange={(event) => setInput(event.target.value)}
                                 onKeyDown={(event) => {
                                     if (event.key === 'Enter') {
-                                        handleSend()
+                                        void handleSend()
                                     }
                                 }}
                                 placeholder={mentor.inputPlaceholder}
@@ -157,8 +234,11 @@ export function MentorPanel({ mentor, isOpen, onToggle }: MentorPanelProps) {
                                 whileHover={{ scale: 1.04 }}
                                 whileTap={{ scale: 0.96 }}
                                 type="button"
-                                onClick={handleSend}
-                                className="rounded-lg bg-primary p-2.5 text-primary-foreground shadow-lg shadow-primary/20"
+                                onClick={() => {
+                                    void handleSend()
+                                }}
+                                disabled={isActionLoading}
+                                className="rounded-lg bg-primary p-2.5 text-primary-foreground shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 <Send className="size-4" />
                             </motion.button>

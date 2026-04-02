@@ -1,5 +1,8 @@
+import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuthSession } from '../../features/auth/context/useAuthSession'
+import { completeAndClearActiveLearningSession } from '../../features/sessions/sessionLifecycle'
 import { DashboardLayout } from './DashboardLayout'
 import {
     defaultStudentSidebarBrand,
@@ -35,12 +38,45 @@ export function StudentLayout({
     children,
     showHeader = true,
     brand = defaultStudentSidebarBrand,
-    profile = defaultStudentSidebarProfile,
+    profile,
     navItems = defaultStudentSidebarNavItems,
     defaultExpandedIds = defaultStudentSidebarExpandedIds,
     pagePathMap = defaultStudentSidebarPagePathMap,
 }: StudentLayoutProps) {
     const navigate = useNavigate()
+    const { user, signOut } = useAuthSession()
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            void completeAndClearActiveLearningSession(true)
+        }
+
+        window.addEventListener('beforeunload', handleBeforeUnload)
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+        }
+    }, [])
+
+    const resolvedProfile = useMemo(() => {
+        if (profile) {
+            return profile
+        }
+
+        const displayName = user?.full_name?.trim() || user?.username || defaultStudentSidebarProfile.name
+        const initials = displayName
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase() ?? '')
+            .join('') || defaultStudentSidebarProfile.initials
+
+        return {
+            ...defaultStudentSidebarProfile,
+            name: displayName,
+            initials,
+        }
+    }, [profile, user])
 
     return (
         <DashboardLayout
@@ -57,8 +93,13 @@ export function StudentLayout({
                             navigate(path)
                         }
                     }}
+                    onLogout={() => {
+                        void completeAndClearActiveLearningSession()
+                        signOut()
+                        navigate('/login', { replace: true })
+                    }}
                     brand={brand}
-                    profile={profile}
+                    profile={resolvedProfile}
                     defaultExpandedIds={defaultExpandedIds}
                     navItems={navItems}
                 />

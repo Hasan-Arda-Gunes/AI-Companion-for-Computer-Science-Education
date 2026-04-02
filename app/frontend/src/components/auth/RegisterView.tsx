@@ -41,7 +41,7 @@ export function RegisterView({
                 <section className="relative overflow-hidden rounded-2xl border border-border bg-card px-7 py-8 shadow-2xl" style={{ backdropFilter: 'blur(20px)', backgroundColor: 'rgba(30, 32, 38, 0.85)' }}>
                     <div className="pointer-events-none absolute inset-0 opacity-30" style={{ background: 'radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.2) 0%, transparent 60%)' }} />
 
-                    <h1 className="relative z-10 mt-2 text-center text-4xl font-semibold leading-tight text-foreground sm:text-[2.25rem]">Create your <span className="text-primary">EvolutionAI</span> account</h1>
+                    <h1 className="relative z-10 mt-2 text-center text-4xl font-semibold leading-tight text-foreground sm:text-[2.25rem]">Create your <span className="text-primary">AIMentor</span> account</h1>
                     <p className="relative z-10 mt-2 text-center text-[1.02rem] text-muted-foreground">Start coding with AI guidance</p>
                     {errorMessage ? <p className="relative z-10 mt-4 text-center text-sm text-red-400">{errorMessage}</p> : null}
 
