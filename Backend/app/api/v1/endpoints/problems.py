@@ -120,8 +120,9 @@ async def get_problem(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    """Get a specific problem by ID"""
+    """Get a specific problem by ID (creator or admin only)"""
     
+    # Get problem
     result = await db.execute(
         select(Problem).where(
             Problem.id == problem_id,
@@ -136,6 +137,21 @@ async def get_problem(
             detail="Problem not found"
         )
     
+    # Check authorization: creator or admin only
+    user_result = await db.execute(
+        select(User).where(User.id == user_id)
+    )
+    user = user_result.scalar_one_or_none()
+    
+    is_creator = problem.created_by == user_id
+    is_admin = user and user.is_superuser
+    
+    if not (is_creator or is_admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the creator or admin can view this problem"
+        )
+    
     return problem
 
 
@@ -146,7 +162,7 @@ async def update_problem(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    """Update a problem (admin/instructor only)"""
+    """Update a problem (creator or admin only)"""
     
     result = await db.execute(
         select(Problem).where(Problem.id == problem_id)
@@ -157,6 +173,21 @@ async def update_problem(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Problem not found"
+        )
+    
+    # Check authorization: creator or admin only
+    user_result = await db.execute(
+        select(User).where(User.id == user_id)
+    )
+    user = user_result.scalar_one_or_none()
+    
+    is_creator = problem.created_by == user_id
+    is_admin = user and user.is_superuser
+    
+    if not (is_creator or is_admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the creator or admin can update this problem"
         )
     
     # Update fields
@@ -176,7 +207,7 @@ async def delete_problem(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    """Soft delete a problem (admin/instructor only)"""
+    """Soft delete a problem (creator or admin only)"""
     
     result = await db.execute(
         select(Problem).where(Problem.id == problem_id)
@@ -187,6 +218,21 @@ async def delete_problem(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Problem not found"
+        )
+    
+    # Check authorization: creator or admin only
+    user_result = await db.execute(
+        select(User).where(User.id == user_id)
+    )
+    user = user_result.scalar_one_or_none()
+    
+    is_creator = problem.created_by == user_id
+    is_admin = user and user.is_superuser
+    
+    if not (is_creator or is_admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the creator or admin can delete this problem"
         )
     
     problem.is_active = False
