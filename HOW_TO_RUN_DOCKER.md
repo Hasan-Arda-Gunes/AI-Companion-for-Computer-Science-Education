@@ -9,17 +9,28 @@ This project includes a root Docker Compose setup that starts:
 - Docker Desktop installed and running
 - Ports available: 5173, 8000, 5432
 
-## 1) Set optional environment variables
-From the project root, you can define these before running compose:
+## 1) Configure local `.env`
+The root compose file reads database credentials from a root `.env` file.
 
-- `SECRET_KEY` (recommended)
-- `GEMINI_API_KEY` (required only if you use AI endpoints)
+Required keys:
 
-PowerShell example:
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DB`
 
-```powershell
-$env:SECRET_KEY="replace-with-a-strong-secret"
-$env:GEMINI_API_KEY="your-gemini-api-key"
+Optional keys:
+
+- `SECRET_KEY`
+- `GEMINI_API_KEY`
+
+Example `.env`:
+
+```env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=change-me
+POSTGRES_DB=ai_tutor
+SECRET_KEY=replace-with-a-strong-secret
+GEMINI_API_KEY=
 ```
 
 ## 2) Start all services
