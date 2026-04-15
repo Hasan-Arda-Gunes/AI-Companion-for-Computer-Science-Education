@@ -14,6 +14,11 @@ class DifficultyLevel(str, Enum):
     ADVANCED = "advanced"
 
 
+class UserRole(str, Enum):
+    STUDENT = "student"
+    TEACHER = "teacher"
+
+
 class SubmissionStatus(str, Enum):
     PENDING = "pending"
     CORRECT = "correct"
@@ -27,6 +32,7 @@ class UserBase(BaseModel):
     email: EmailStr
     username: str
     full_name: Optional[str] = None
+    role: UserRole = UserRole.STUDENT
 
 
 class UserCreate(UserBase):
@@ -41,6 +47,7 @@ class UserLogin(BaseModel):
 class UserResponse(UserBase):
     id: int
     is_active: bool
+    role: UserRole
     created_at: datetime
     
     class Config:

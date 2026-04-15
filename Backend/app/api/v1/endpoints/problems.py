@@ -26,9 +26,19 @@ async def create_problem(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    """Create a new programming problem (admin/instructor only)"""
+    """Create a new programming problem (teachers only)"""
     
-    # In production, add admin check here
+    # Check if user is a teacher
+    result = await db.execute(
+        select(User).where(User.id == user_id)
+    )
+    user = result.scalar_one_or_none()
+    
+    if not user or user.role.value != "teacher":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only teachers can create problems"
+        )
     
     new_problem = Problem(
         title=problem_data.title,
