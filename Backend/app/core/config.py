@@ -57,8 +57,16 @@ class Settings(BaseSettings):
         return url
     
     # AI/LLM Configuration
+    # Gemini Configuration
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
-    LLM_MODEL: str = "gemini-2.5-flash"
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    
+    # Ollama Configuration (local LLMs)
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama2")
+    
+    # Common LLM settings
+    LLM_MODEL: str = "gemini-2.5-flash"  # Default fallback
     LLM_MAX_TOKENS: int = 4000
     LLM_TEMPERATURE: float = 0.7
     

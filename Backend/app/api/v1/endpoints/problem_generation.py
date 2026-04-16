@@ -37,6 +37,7 @@ async def generate_problem(
     - **description**: Describe what kind of problem you want
     - **difficulty**: beginner, intermediate, or advanced
     - **topic**: Programming topic
+    - **provider**: LLM provider to use: 'gemini' or 'ollama'
     - **save**: If True, saves to database. If False, returns preview only.
     
     Example:
@@ -45,13 +46,24 @@ async def generate_problem(
       "description": "Create a problem about finding the longest palindromic substring",
       "difficulty": "intermediate",
       "topic": "strings",
-      "additional_requirements": "Should use dynamic programming"
+      "additional_requirements": "Should use dynamic programming",
+      "provider": "gemini"
     }
     ```
     """
     
+    provider = str(request.provider).lower()
+    
+    # Check provider availability
+    available_providers = problem_generator.get_available_providers()
+    if not available_providers.get(provider):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Provider '{provider}' not available. Available: {list(available_providers.keys())}"
+        )
+    
     try:
-        # Generate problem using AI
+        # Generate problem using AI with specified provider
         problem_data = await problem_generator.generate_problem(
             description=request.description,
             difficulty=request.difficulty,
@@ -59,7 +71,8 @@ async def generate_problem(
             additional_requirements=request.additional_requirements,
             num_test_cases=request.num_test_cases,
             num_examples=request.num_examples,
-            num_hints=request.num_hints
+            num_hints=request.num_hints,
+            provider=provider
         )
         
         if not save:
@@ -67,6 +80,7 @@ async def generate_problem(
             return ProblemGenerationResponse(
                 success=True,
                 message="Problem generated successfully (preview mode)",
+                provider_used=provider,
                 preview={
                     "title": problem_data["title"],
                     "description": problem_data["description"],
@@ -107,6 +121,7 @@ async def generate_problem(
         return ProblemGenerationResponse(
             success=True,
             message="Problem generated and saved successfully!",
+            provider_used=provider,
             problem_id=new_problem.id,
             problem=problem_data
         )
@@ -132,14 +147,27 @@ async def refine_problem(
     """
     Refine an existing problem using AI
     
+    Provider options: "gemini" or "ollama" (defaults to "gemini")
+    
     Example:
     ```json
     {
       "problem_id": 1,
-      "refinement_request": "Make it harder by adding more edge cases and increase difficulty"
+      "refinement_request": "Make it harder by adding more edge cases and increase difficulty",
+      "provider": "gemini"
     }
     ```
     """
+    
+    provider = str(request.provider).lower()
+    
+    # Check provider availability
+    available_providers = problem_generator.get_available_providers()
+    if not available_providers.get(provider):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Provider '{provider}' not available. Available: {list(available_providers.keys())}"
+        )
     
     # Get existing problem
     result = await db.execute(
@@ -179,10 +207,11 @@ async def refine_problem(
             "related_concepts": problem.related_concepts
         }
         
-        # Refine using AI
+        # Refine using AI with specified provider
         refined_data = await problem_generator.refine_problem(
             existing_problem=existing_problem,
-            refinement_request=request.refinement_request
+            refinement_request=request.refinement_request,
+            provider=provider
         )
         
         # Update problem in database
@@ -203,6 +232,7 @@ async def refine_problem(
         return ProblemGenerationResponse(
             success=True,
             message="Problem refined successfully!",
+            provider_used=provider,
             problem_id=problem.id,
             problem=refined_data
         )
@@ -223,7 +253,19 @@ async def generate_additional_test_cases(
 ):
     """
     Generate additional test cases for an existing problem
+    
+    Provider options: "gemini" or "ollama" (defaults to "gemini")
     """
+    
+    provider = str(request.provider).lower()
+    
+    # Check provider availability
+    available_providers = problem_generator.get_available_providers()
+    if not available_providers.get(provider):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Provider '{provider}' not available. Available: {list(available_providers.keys())}"
+        )
     
     # Get problem
     result = await db.execute(
@@ -238,11 +280,12 @@ async def generate_additional_test_cases(
         )
     
     try:
-        # Generate test cases
+        # Generate test cases using specified provider
         new_cases = await problem_generator.generate_test_cases(
             problem_description=problem.description,
             function_signature=problem.starter_code,
-            num_cases=request.num_cases
+            num_cases=request.num_cases,
+            provider=provider
         )
         
         # Add to existing test cases
@@ -262,6 +305,7 @@ async def generate_additional_test_cases(
         return {
             "success": True,
             "message": f"Generated {len(new_cases)} new test cases",
+            "provider_used": provider,
             "new_test_cases": new_cases,
             "total_test_cases": len(updated_cases)
         }
@@ -281,6 +325,8 @@ async def get_problem_suggestions(
     """
     Get AI-generated problem ideas/suggestions
     
+    Provider options: "gemini" or "ollama" (defaults to "gemini")
+    
     Great for when users need inspiration!
     
     Example:
@@ -288,16 +334,28 @@ async def get_problem_suggestions(
     {
       "topic": "trees",
       "difficulty": "intermediate",
-      "num_suggestions": 5
+      "num_suggestions": 5,
+      "provider": "gemini"
     }
     ```
     """
+    
+    provider = str(request.provider).lower()
+    
+    # Check provider availability
+    available_providers = problem_generator.get_available_providers()
+    if not available_providers.get(provider):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Provider '{provider}' not available. Available: {list(available_providers.keys())}"
+        )
     
     try:
         ideas = await problem_generator.suggest_problem_ideas(
             topic=request.topic,
             difficulty=request.difficulty,
-            num_suggestions=request.num_suggestions
+            num_suggestions=request.num_suggestions,
+            provider=provider
         )
         
         return ideas
@@ -315,21 +373,35 @@ async def create_problem_from_suggestion(
     brief_description: str,
     difficulty: str,
     topic: str,
+    provider: str = "gemini",
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
     """
     Create a full problem from a suggestion
     
-    Takes a problem idea and generates the complete problem
+    Takes a problem idea and generates the complete problem using specified provider
+    
+    Provider options: "gemini" or "ollama" (defaults to "gemini")
     """
     
+    provider = provider.lower()
+    
+    # Check provider availability
+    available_providers = problem_generator.get_available_providers()
+    if not available_providers.get(provider):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Provider '{provider}' not available. Available: {list(available_providers.keys())}"
+        )
+    
     try:
-        # Generate full problem from the suggestion
+        # Generate full problem from the suggestion using specified provider
         problem_data = await problem_generator.generate_problem(
             description=f"{title}: {brief_description}",
             difficulty=difficulty,
-            topic=topic
+            topic=topic,
+            provider=provider
         )
         
         # Save to database
@@ -359,6 +431,7 @@ async def create_problem_from_suggestion(
         return ProblemGenerationResponse(
             success=True,
             message="Problem created from suggestion!",
+            provider_used=provider,
             problem_id=new_problem.id,
             problem=problem_data
         )

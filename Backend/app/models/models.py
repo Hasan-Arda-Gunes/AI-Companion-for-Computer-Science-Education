@@ -110,6 +110,7 @@ class Submission(Base):
     
     # AI Feedback
     ai_feedback = Column(JSON)  # Structured feedback from LLM
+    provider_used = Column(String(50), default="gemini")  # Track which LLM provider was used
     correctness_analysis = Column(Text)
     quality_analysis = Column(Text)
     suggestions = Column(JSON)
