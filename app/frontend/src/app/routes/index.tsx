@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute, PublicOnlyRoute } from './AuthGuards'
 import { RoleBasedRoute } from './RoleGuards'
 import { CodeLabPage } from './pages/CodeLabPage'
-import { CreateQuestionPage } from './pages/CreateQuestionPage'
+import { InstructorCreateQuestionPage } from './pages/InstructorCreateQuestionPage'
 import { InstructorDashboardPage } from './pages/InstructorDashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProblemsPage } from './pages/ProblemsPage'
@@ -80,7 +80,7 @@ export function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <RoleBasedRoute requiredRoles={['teacher']}>
-                            <CreateQuestionPage />
+                            <InstructorCreateQuestionPage />
                         </RoleBasedRoute>
                     </ProtectedRoute>
                 }

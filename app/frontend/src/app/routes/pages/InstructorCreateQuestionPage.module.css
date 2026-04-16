@@ -1,0 +1,365 @@
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--background);
+    overflow: hidden;
+}
+
+.mainContent {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+}
+
+.leftPanelContent,
+.rightPanelContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rightPanelContent {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--background);
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--background);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 3px;
+
+        &:hover {
+            background: var(--primary-light);
+        }
+    }
+}
+
+.actionBar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--background-hover);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.saveButton,
+.previewButton,
+.publishButton {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.saveButton {
+    background: var(--primary);
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: var(--primary-light);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.previewButton,
+.publishButton {
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border);
+
+    &:hover {
+        background: var(--background-hover);
+        border-color: var(--primary);
+    }
+
+    &:active {
+        background: var(--background);
+    }
+}
+
+.publishButton {
+    margin-left: auto;
+    background: #4caf50;
+    color: white;
+    border: none;
+
+    &:hover {
+        background: #45a049;
+    }
+}
+
+.errorBanner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(244, 67, 54, 0.1);
+    border-top: 1px solid #f44336;
+    color: #f44336;
+    font-size: 13px;
+    animation: slideDown 0.3s ease-out;
+
+    button {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+        padding: 0;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: var(--background);
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+    }
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        color: var(--text);
+    }
+}
+
+.searchInput {
+    margin: 12px 16px;
+    padding: 8px 12px;
+    background: var(--background-hover);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 13px;
+
+    &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+    }
+
+    &::placeholder {
+        color: var(--text-secondary);
+    }
+}
+
+.questionsList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.questionItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: var(--background-hover);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+    }
+
+    &:has(input:checked) {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.questionInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.questionTitle {
+    font-size: 13px;
+    font-weight: 500;
+    color: inherit;
+    margin-bottom: 4px;
+}
+
+.questionMeta {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.difficulty,
+.topic {
+    padding: 2px 6px;
+    background: var(--background);
+    border-radius: 3px;
+    color: var(--text-secondary);
+
+    .questionItem:has(input:checked) & {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+}
+
+.modalFooter {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    justify-content: flex-end;
+}
+
+.cancelButton,
+.confirmButton {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton {
+    background: var(--background-hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+
+    &:hover {
+        background: var(--background);
+    }
+}
+
+.confirmButton {
+    background: var(--primary);
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: var(--primary-light);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .actionBar {
+        flex-wrap: wrap;
+    }
+
+    .publishButton {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .modalContent {
+        width: 95%;
+        max-height: 90vh;
+    }
+}
