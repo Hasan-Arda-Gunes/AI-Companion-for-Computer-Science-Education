@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RegisterView } from '../../../components/auth/RegisterView'
 import { registerUser } from '../../../features/auth/api/authApi'
+import type { UserRole } from '../../../features/auth/types'
 
 export function RegisterPage() {
     const navigate = useNavigate()
@@ -9,6 +10,7 @@ export function RegisterPage() {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [role, setRole] = useState<UserRole>('student')
     const [errorMessage, setErrorMessage] = useState<string>()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -27,6 +29,7 @@ export function RegisterPage() {
                 username,
                 password,
                 full_name: fullName,
+                role,
             })
 
             navigate('/login', {
@@ -46,12 +49,14 @@ export function RegisterPage() {
             username={username}
             email={email}
             password={password}
+            role={role}
             errorMessage={errorMessage}
             isSubmitting={isSubmitting}
             onFullNameChange={setFullName}
             onUsernameChange={setUsername}
             onEmailChange={setEmail}
             onPasswordChange={setPassword}
+            onRoleChange={setRole}
             onSubmit={handleRegister}
         />
     )
