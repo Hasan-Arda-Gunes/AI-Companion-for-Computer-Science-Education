@@ -135,7 +135,7 @@ export const defaultStudentSidebarPagePathMap: Record<string, string> = {
     problems: '/student/problems',
     'create-question': '/student/create-question',
     achievements: '/student/dashboard',
-    settings: '/student/settings',
+    settings: '/settings',
     'course-ds': '/student/dashboard',
     'course-algo': '/student/dashboard',
 }

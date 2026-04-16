@@ -1,4 +1,4 @@
-import { DashboardLayout } from '../../../components/layout/DashboardLayout'
+import { InstructorLayout } from '../../../components/layout/InstructorLayout'
 
 const questions = [
     { title: 'Two Sum Variants', difficulty: 'Easy', source: 'Manual' },
@@ -8,7 +8,8 @@ const questions = [
 
 export function QuestionBankPage() {
     return (
-        <DashboardLayout
+        <InstructorLayout
+            currentPage="question-bank"
             title="Question Bank"
             subtitle="Instructor question repository with static placeholders for filters, metadata, and actions."
         >
@@ -34,6 +35,6 @@ export function QuestionBankPage() {
                     ))}
                 </div>
             </article>
-        </DashboardLayout>
+        </InstructorLayout>
     )
 }
