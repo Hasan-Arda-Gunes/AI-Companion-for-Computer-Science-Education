@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.database import get_db
 from app.models.models import LearningSession, Problem
@@ -103,10 +103,10 @@ async def complete_session(
         )
     
     # Calculate time spent
-    time_spent = int((datetime.utcnow() - session.started_at).total_seconds())
+    time_spent = int((datetime.now(timezone.utc) - session.started_at).total_seconds())
     
     session.is_completed = True
-    session.completed_at = datetime.utcnow()
+    session.completed_at = datetime.now(timezone.utc)
     session.final_score = final_score
     session.time_spent = time_spent
     

@@ -16,6 +16,11 @@ class DifficultyLevel(str, enum.Enum):
     ADVANCED = "advanced"
 
 
+class UserRole(str, enum.Enum):
+    STUDENT = "student"
+    TEACHER = "teacher"
+
+
 class SubmissionStatus(str, enum.Enum):
     PENDING = "pending"
     CORRECT = "correct"
@@ -25,7 +30,7 @@ class SubmissionStatus(str, enum.Enum):
 
 
 class User(Base):
-    """User model for students"""
+    """User model for students and teachers"""
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -33,6 +38,7 @@ class User(Base):
     username = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255))
+    role = Column(Enum(UserRole), default=UserRole.STUDENT, nullable=False)
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
