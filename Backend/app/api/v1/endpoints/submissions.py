@@ -32,6 +32,7 @@ async def evaluate_submission_background(
     code: str,
     problem_id: int,
     language: str,
+    provider: str,
     db_url: str
 ):
     """Background task to evaluate a submission"""
@@ -72,13 +73,14 @@ async def evaluate_submission_background(
             else:
                 submission_status = SubmissionStatus.INCORRECT
             
-            # Get AI feedback
+            # Get AI feedback using specified provider
             ai_feedback = await ai_service.evaluate_code(
                 code=code,
                 problem_description=problem.description,
                 test_results=test_results,
                 evaluation_criteria=problem.evaluation_criteria,
-                language=language
+                language=language,
+                provider=provider
             )
             
             # Update submission
@@ -91,6 +93,7 @@ async def evaluate_submission_background(
                 submission.test_results = [t.model_dump() for t in test_results]
                 submission.execution_time = execution_time
                 submission.ai_feedback = ai_feedback.model_dump()
+                submission.provider_used = provider
                 submission.evaluated_at = datetime.utcnow()
                 
                 await db.commit()
@@ -228,6 +231,7 @@ async def submit_code(
         code=submission_data.code,
         problem_id=submission_data.problem_id,
         language=submission_data.language,
+        provider=str(submission_data.provider).lower(),
         db_url=settings.DATABASE_URL
     )
     

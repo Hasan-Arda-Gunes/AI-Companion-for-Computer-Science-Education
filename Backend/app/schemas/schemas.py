@@ -120,6 +120,7 @@ class SubmissionCreate(BaseModel):
     code: str
     language: str = "python"
     session_id: Optional[int] = None
+    provider: LLMProvider = LLMProvider.GEMINI  # Default to Gemini
 
 
 class TestCaseResult(BaseModel):
@@ -154,6 +155,7 @@ class SubmissionResponse(BaseModel):
     ai_feedback: Optional[AIFeedback]
     submitted_at: datetime
     evaluated_at: Optional[datetime]
+    provider_used: Optional[str] = None  # Track which LLM provider was used for feedback
     
     class Config:
         from_attributes = True
@@ -178,16 +180,24 @@ class SessionResponse(BaseModel):
         from_attributes = True
 
 
+# AI Provider Enum
+class LLMProvider(str, Enum):
+    GEMINI = "gemini"
+    OLLAMA = "ollama"
+
+
 # AI Interaction Schemas
 class ChatMessage(BaseModel):
     message: str
     context: Optional[Dict[str, Any]] = None
+    provider: LLMProvider = LLMProvider.GEMINI  # Default to Gemini
 
 
 class ChatResponse(BaseModel):
     response: str
     suggestions: Optional[List[str]] = None
     related_concepts: Optional[List[str]] = None
+    provider_used: str = "gemini"
 
 
 class HintRequest(BaseModel):
@@ -195,12 +205,14 @@ class HintRequest(BaseModel):
     session_id: int
     current_code: Optional[str] = None
     hint_level: int = 1  # Progressive hints
+    provider: LLMProvider = LLMProvider.GEMINI  # Default to Gemini
 
 
 class HintResponse(BaseModel):
     hint: str
     hint_level: int
     remaining_hints: int
+    provider_used: str = "gemini"
 
 
 # Progress Schemas

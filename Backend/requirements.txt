@@ -20,6 +20,7 @@ email-validator==2.1.0
 
 # AI/LLM
 google-generativeai==0.8.5
+ollama==0.3.2
 
 # Background tasks
 celery[redis]==5.3.6  # Optional for production
