@@ -521,6 +521,175 @@ async def test_missing_auth_token(client):
 
 
 @pytest.mark.anyio
+async def test_teacher_can_create_class(client):
+    """Teachers can create classes"""
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "class_teacher@example.com",
+            "username": "class_teacher",
+            "password": "password123",
+            "role": "teacher"
+        }
+    )
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "class_teacher@example.com",
+            "password": "password123"
+        }
+    )
+    token = login_response.json()["access_token"]
+
+    response = await client.post(
+        "/api/v1/classes/",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "name": "Algorithms 101",
+            "description": "Intro class"
+        }
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["name"] == "Algorithms 101"
+    assert data["student_count"] == 0
+
+
+@pytest.mark.anyio
+async def test_student_cannot_create_class(client):
+    """Students cannot create classes"""
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "class_student@example.com",
+            "username": "class_student",
+            "password": "password123",
+            "role": "student"
+        }
+    )
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "class_student@example.com",
+            "password": "password123"
+        }
+    )
+    token = login_response.json()["access_token"]
+
+    response = await client.post(
+        "/api/v1/classes/",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "name": "Should Fail"
+        }
+    )
+    assert response.status_code == 403
+    assert "Only teachers can manage classes" in response.json()["detail"]
+
+
+@pytest.mark.anyio
+async def test_teacher_can_add_and_remove_student_from_class(client):
+    """Teacher can add and remove student from class"""
+    # Teacher setup
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "membership_teacher@example.com",
+            "username": "membership_teacher",
+            "password": "password123",
+            "role": "teacher"
+        }
+    )
+    teacher_login = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "membership_teacher@example.com",
+            "password": "password123"
+        }
+    )
+    teacher_token = teacher_login.json()["access_token"]
+
+    # Student setup
+    register_student_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "enrolled_student@example.com",
+            "username": "enrolled_student",
+            "password": "password123",
+            "role": "student"
+        }
+    )
+    student_id = register_student_response.json()["id"]
+
+    # Create class
+    create_class_response = await client.post(
+        "/api/v1/classes/",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={
+            "name": "Data Structures"
+        }
+    )
+    class_id = create_class_response.json()["id"]
+
+    # Add student
+    add_response = await client.post(
+        f"/api/v1/classes/{class_id}/students",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={"student_id": student_id}
+    )
+    assert add_response.status_code == 201
+    add_data = add_response.json()
+    assert add_data["class_id"] == class_id
+    assert add_data["student"]["id"] == student_id
+
+    student_login = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "enrolled_student@example.com",
+            "password": "password123"
+        }
+    )
+    student_token = student_login.json()["access_token"]
+
+    # Student can list enrolled classes
+    student_list_response = await client.get(
+        "/api/v1/classes/",
+        headers={"Authorization": f"Bearer {student_token}"}
+    )
+    assert student_list_response.status_code == 200
+    student_classes = student_list_response.json()
+    assert len(student_classes) == 1
+    assert student_classes[0]["id"] == class_id
+
+    # Verify class detail includes student
+    detail_response = await client.get(
+        f"/api/v1/classes/{class_id}",
+        headers={"Authorization": f"Bearer {teacher_token}"}
+    )
+    assert detail_response.status_code == 200
+    detail_data = detail_response.json()
+    assert detail_data["student_count"] == 1
+
+    # Remove student
+    remove_response = await client.delete(
+        f"/api/v1/classes/{class_id}/students/{student_id}",
+        headers={"Authorization": f"Bearer {teacher_token}"}
+    )
+    assert remove_response.status_code == 204
+
+    # Verify class detail after removal
+    detail_response_after = await client.get(
+        f"/api/v1/classes/{class_id}",
+        headers={"Authorization": f"Bearer {teacher_token}"}
+    )
+    assert detail_response_after.status_code == 200
+    detail_data_after = detail_response_after.json()
+    assert detail_data_after["student_count"] == 0
+
+
+@pytest.mark.anyio
 async def test_invalid_auth_token(client):
     """Test accessing with invalid token"""
     response = await client.get(
@@ -1110,6 +1279,315 @@ async def test_code_submission_with_different_difficulties(client):
         
         assert submission_response.status_code == 201
         assert submission_response.json()["problem_id"] == problem_id
+
+
+# Role-based problem listing tests
+@pytest.mark.anyio
+async def test_teacher_sees_only_own_problems(client):
+    """Teachers should see only problems they created"""
+    # Register two teachers
+    teacher1_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "teacher_list1@example.com",
+            "username": "teacher_list1",
+            "password": "password123",
+            "role": "teacher"
+        }
+    )
+    teacher1_id = teacher1_response.json()["id"]
+
+    teacher2_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "teacher_list2@example.com",
+            "username": "teacher_list2",
+            "password": "password123",
+            "role": "teacher"
+        }
+    )
+
+    # Login as teacher1
+    login1 = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "teacher_list1@example.com",
+            "password": "password123"
+        }
+    )
+    token1 = login1.json()["access_token"]
+
+    # Login as teacher2
+    login2 = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "teacher_list2@example.com",
+            "password": "password123"
+        }
+    )
+    token2 = login2.json()["access_token"]
+
+    # Teacher1 creates a problem
+    problem1_response = await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {token1}"},
+        json={
+            "title": "Teacher1 Problem",
+            "description": "Created by teacher1",
+            "difficulty": "beginner",
+            "topic": "arrays",
+            "examples": [{"input": [1], "expected_output": 1}],
+            "test_cases": [{"id": "test_1", "input": [1], "expected_output": 1}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    # Teacher2 creates a problem
+    problem2_response = await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {token2}"},
+        json={
+            "title": "Teacher2 Problem",
+            "description": "Created by teacher2",
+            "difficulty": "intermediate",
+            "topic": "loops",
+            "examples": [{"input": [1], "expected_output": 2}],
+            "test_cases": [{"id": "test_1", "input": [1], "expected_output": 2}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    # Teacher1 lists problems - should see only their own
+    list1_response = await client.get(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {token1}"}
+    )
+    assert list1_response.status_code == 200
+    problems1 = list1_response.json()["problems"]
+    assert len(problems1) == 1
+    assert problems1[0]["title"] == "Teacher1 Problem"
+
+    # Teacher2 lists problems - should see only their own
+    list2_response = await client.get(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {token2}"}
+    )
+    assert list2_response.status_code == 200
+    problems2 = list2_response.json()["problems"]
+    assert len(problems2) == 1
+    assert problems2[0]["title"] == "Teacher2 Problem"
+
+
+@pytest.mark.anyio
+async def test_student_sees_teachers_and_own_problems(client):
+    """Students should see problems from their teachers and their own AI-generated problems"""
+    # Register teacher
+    teacher_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "teacher_for_student@example.com",
+            "username": "teacher_for_student",
+            "password": "password123",
+            "role": "teacher"
+        }
+    )
+
+    # Login as teacher
+    teacher_login = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "teacher_for_student@example.com",
+            "password": "password123"
+        }
+    )
+    teacher_token = teacher_login.json()["access_token"]
+
+    # Teacher creates 2 problems
+    problem1_response = await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={
+            "title": "Teacher Problem 1",
+            "description": "First teacher problem",
+            "difficulty": "beginner",
+            "topic": "basics",
+            "examples": [{"input": [1], "expected_output": 1}],
+            "test_cases": [{"id": "test_1", "input": [1], "expected_output": 1}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    problem2_response = await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={
+            "title": "Teacher Problem 2",
+            "description": "Second teacher problem",
+            "difficulty": "intermediate",
+            "topic": "data structures",
+            "examples": [{"input": [1], "expected_output": 2}],
+            "test_cases": [{"id": "test_1", "input": [1], "expected_output": 2}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    # Register student
+    student_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "student_list@example.com",
+            "username": "student_list",
+            "password": "password123",
+            "role": "student"
+        }
+    )
+    student_id = student_response.json()["id"]
+
+    # Login as student
+    student_login = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "student_list@example.com",
+            "password": "password123"
+        }
+    )
+    student_token = student_login.json()["access_token"]
+
+    # Student creates their own problem (AI-generated)
+    student_problem_response = await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {student_token}"},
+        json={
+            "title": "Student AI Problem",
+            "description": "Generated by AI for student",
+            "difficulty": "beginner",
+            "topic": "sorting",
+            "examples": [{"input": [3, 1, 2], "expected_output": [1, 2, 3]}],
+            "test_cases": [{"id": "test_1", "input": [3, 1, 2], "expected_output": [1, 2, 3]}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    # Create class and enroll student
+    class_response = await client.post(
+        "/api/v1/classes/",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={
+            "name": "Intro Class",
+            "description": "Introduction to programming"
+        }
+    )
+    class_id = class_response.json()["id"]
+
+    # Add student to class
+    await client.post(
+        f"/api/v1/classes/{class_id}/students",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={"student_id": student_id}
+    )
+
+    # Student lists problems - should see teacher problems + own
+    list_response = await client.get(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {student_token}"}
+    )
+    assert list_response.status_code == 200
+    problems = list_response.json()["problems"]
+
+    # Should see 3 problems: 2 from teacher + 1 own
+    assert len(problems) == 3
+    titles = [p["title"] for p in problems]
+    assert "Teacher Problem 1" in titles
+    assert "Teacher Problem 2" in titles
+    assert "Student AI Problem" in titles
+
+
+@pytest.mark.anyio
+async def test_student_not_enrolled_sees_only_own_problems(client):
+    """Student not enrolled in any class should see only their own problems"""
+    # Register teacher
+    teacher_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "teacher_not_enrolled@example.com",
+            "username": "teacher_not_enrolled",
+            "password": "password123",
+            "role": "teacher"
+        }
+    )
+
+    # Login as teacher
+    teacher_login = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "teacher_not_enrolled@example.com",
+            "password": "password123"
+        }
+    )
+    teacher_token = teacher_login.json()["access_token"]
+
+    # Teacher creates a problem
+    await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {teacher_token}"},
+        json={
+            "title": "Unreachable Problem",
+            "description": "Student not enrolled",
+            "difficulty": "beginner",
+            "topic": "basics",
+            "examples": [{"input": [1], "expected_output": 1}],
+            "test_cases": [{"id": "test_1", "input": [1], "expected_output": 1}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    # Register student NOT in any class
+    student_response = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "student_not_enrolled@example.com",
+            "username": "student_not_enrolled",
+            "password": "password123",
+            "role": "student"
+        }
+    )
+
+    # Login as student
+    student_login = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "student_not_enrolled@example.com",
+            "password": "password123"
+        }
+    )
+    student_token = student_login.json()["access_token"]
+
+    # Student creates their own problem
+    await client.post(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {student_token}"},
+        json={
+            "title": "Only My Problem",
+            "description": "Only problem student should see",
+            "difficulty": "beginner",
+            "topic": "basics",
+            "examples": [{"input": [1], "expected_output": 1}],
+            "test_cases": [{"id": "test_1", "input": [1], "expected_output": 1}],
+            "evaluation_criteria": {"check_correctness": True}
+        }
+    )
+
+    # Student lists problems - should see only their own
+    list_response = await client.get(
+        "/api/v1/problems/",
+        headers={"Authorization": f"Bearer {student_token}"}
+    )
+    assert list_response.status_code == 200
+    problems = list_response.json()["problems"]
+
+    # Should see 1 problem: only their own
+    assert len(problems) == 1
+    assert problems[0]["title"] == "Only My Problem"
 
 
 if __name__ == "__main__":
