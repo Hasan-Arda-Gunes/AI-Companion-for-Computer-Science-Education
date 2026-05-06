@@ -4,6 +4,8 @@ import type {
     ChatWithAiResponse,
     ExplainErrorRequest,
     ExplainErrorResponse,
+    InstructorChatRequest,
+    InstructorChatResponse,
     RequestHintRequest,
     RequestHintResponse,
 } from '../types'
@@ -31,7 +33,12 @@ function getAuthHeader() {
 }
 
 export async function requestHint(payload: RequestHintRequest) {
-    const response = await fetch(`${API_BASE_URL}/ai/hint`, {
+    const url = new URL(`${API_BASE_URL}/ai/hint`)
+    if (payload.provider) {
+        url.searchParams.set('provider', payload.provider)
+    }
+
+    const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -49,7 +56,12 @@ export async function requestHint(payload: RequestHintRequest) {
 }
 
 export async function chatWithAi(payload: ChatWithAiRequest) {
-    const response = await fetch(`${API_BASE_URL}/ai/chat`, {
+    const url = new URL(`${API_BASE_URL}/ai/chat`)
+    if (payload.provider) {
+        url.searchParams.set('provider', payload.provider)
+    }
+
+    const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -67,7 +79,12 @@ export async function chatWithAi(payload: ChatWithAiRequest) {
 }
 
 export async function explainError(payload: ExplainErrorRequest) {
-    const response = await fetch(`${API_BASE_URL}/ai/explain-error`, {
+    const url = new URL(`${API_BASE_URL}/ai/explain-error`)
+    if (payload.provider) {
+        url.searchParams.set('provider', payload.provider)
+    }
+
+    const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -82,4 +99,27 @@ export async function explainError(payload: ExplainErrorRequest) {
     }
 
     return (await response.json()) as ExplainErrorResponse
+}
+
+export async function instructorChat(payload: InstructorChatRequest) {
+    const url = new URL(`${API_BASE_URL}/ai/chat`)
+    if (payload.provider) {
+        url.searchParams.set('provider', payload.provider)
+    }
+
+    const response = await fetch(url.toString(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+        },
+        body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+        const apiError = (await parseJsonSafe(response)) as { detail?: string } | null
+        throw new Error(apiError?.detail ?? 'Failed to chat with AI')
+    }
+
+    return (await response.json()) as InstructorChatResponse
 }

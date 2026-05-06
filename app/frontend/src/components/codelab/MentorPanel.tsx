@@ -3,14 +3,15 @@ import { ChevronDown, ChevronLeft, ChevronRight, Send, Sparkles } from 'lucide-r
 import { motion } from 'motion/react'
 import type { MentorData } from './types'
 import { ScrollArea } from '../ui/scroll-area'
+import type { LLMProvider } from '../../features/ai/types'
 
 type MentorPanelProps = {
     mentor: MentorData
     isOpen: boolean
     onToggle: () => void
-    onRequestHint?: () => Promise<string>
-    onSendMessage?: (message: string) => Promise<string>
-    onExplainError?: () => Promise<string>
+    onRequestHint?: (provider: LLMProvider) => Promise<string>
+    onSendMessage?: (message: string, provider: LLMProvider) => Promise<string>
+    onExplainError?: (provider: LLMProvider) => Promise<string>
 }
 
 export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMessage, onExplainError }: MentorPanelProps) {
@@ -18,6 +19,7 @@ export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMes
     const [input, setInput] = useState('')
     const [isActionLoading, setIsActionLoading] = useState(false)
     const [toolsOpen, setToolsOpen] = useState(true)
+    const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini')
 
     const hintSuggestions = useMemo(
         () =>
@@ -50,7 +52,7 @@ export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMes
         setIsActionLoading(true)
         try {
             if (onRequestHint) {
-                const hint = await onRequestHint()
+                const hint = await onRequestHint(selectedProvider)
                 pushAssistantMessage(hint)
             } else {
                 const randomHint = hintSuggestions[Math.floor(Math.random() * hintSuggestions.length)]
@@ -68,7 +70,7 @@ export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMes
         setIsActionLoading(true)
         try {
             if (onExplainError) {
-                const explanation = await onExplainError()
+                const explanation = await onExplainError(selectedProvider)
                 pushAssistantMessage(explanation)
             } else {
                 pushAssistantMessage('No error found to explain yet.')
@@ -98,7 +100,7 @@ export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMes
 
         try {
             if (onSendMessage) {
-                const response = await onSendMessage(userMessage.content)
+                const response = await onSendMessage(userMessage.content, selectedProvider)
                 pushAssistantMessage(response)
             } else {
                 const randomResponse = responseSuggestions[Math.floor(Math.random() * responseSuggestions.length)]
@@ -133,6 +135,18 @@ export function MentorPanel({ mentor, isOpen, onToggle, onRequestHint, onSendMes
                             <p className="text-xs text-muted-foreground">{mentor.subtitle}</p>
                         </div>
                     </div>
+
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>Model</span>
+                        <select
+                            value={selectedProvider}
+                            onChange={(event) => setSelectedProvider(event.target.value as LLMProvider)}
+                            className="rounded-md border border-border bg-secondary px-2 py-1 text-xs text-foreground"
+                        >
+                            <option value="gemini">Gemini</option>
+                            <option value="ollama">Ollama</option>
+                        </select>
+                    </label>
 
                     <motion.button
                         whileHover={{ scale: 1.08 }}

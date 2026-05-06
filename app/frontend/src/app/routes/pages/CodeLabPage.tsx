@@ -13,6 +13,7 @@ import {
 } from '../../../features/sessions/sessionLifecycle'
 import { getSubmission, submitCode } from '../../../features/submissions/api/submissionsApi'
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, ConsoleLog, EvolutionStage, MentorData, QuestionData } from '../../../components/codelab/types'
+import type { LLMProvider } from '../../../features/ai/types'
 import type { SubmissionDetails } from '../../../features/submissions/types'
 
 const sampleStages: EvolutionStage[] = [
@@ -459,7 +460,7 @@ export function CodeLabPage() {
         }))
     }
 
-    const handleMentorRequestHint = async () => {
+    const handleMentorRequestHint = async (provider: LLMProvider) => {
         const resolvedProblemId = Number(selectedProblemId)
         if (!Number.isFinite(resolvedProblemId) || resolvedProblemId <= 0) {
             throw new Error('Select a problem to request a hint.')
@@ -474,6 +475,7 @@ export function CodeLabPage() {
             session_id: activeSessionId,
             current_code: currentCode,
             hint_level: hintLevel,
+            provider,
         })
 
         setHintLevel(result.hint_level + 1)
@@ -484,18 +486,19 @@ export function CodeLabPage() {
         return result.hint
     }
 
-    const handleMentorChat = async (message: string) => {
+    const handleMentorChat = async (message: string, provider: LLMProvider) => {
         const result = await chatWithAi({
             message,
             context: {
                 current_code: currentCode,
             },
+            provider,
         })
 
         return result.response
     }
 
-    const handleMentorExplainError = async () => {
+    const handleMentorExplainError = async (provider: LLMProvider) => {
         const lastErrorLog = [...consoleData.logs].reverse().find((log) => log.type === 'error')
 
         if (!lastErrorLog) {
@@ -505,6 +508,7 @@ export function CodeLabPage() {
         const result = await explainError({
             error_message: lastErrorLog.message,
             code: currentCode,
+            provider,
         })
 
         const explanation = result.explanation ?? result.response

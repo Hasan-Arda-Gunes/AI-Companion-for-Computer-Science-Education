@@ -6,6 +6,7 @@ import { EditorPanel } from './EditorPanel'
 import { MentorPanel } from './MentorPanel'
 import { QuestionPanel } from './QuestionPanel'
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, EvolutionStage, MentorData, QuestionData } from './types'
+import type { LLMProvider } from '../../features/ai/types'
 
 type CodeLabWorkspaceProps = {
     title: string
@@ -24,9 +25,9 @@ type CodeLabWorkspaceProps = {
     onRunCode?: (code: string, languageId: string) => void
     onEditorCodeChange?: (code: string, languageId: string) => void
     onClearConsole?: () => void
-    onMentorRequestHint?: () => Promise<string>
-    onMentorChat?: (message: string) => Promise<string>
-    onMentorExplainError?: () => Promise<string>
+    onMentorRequestHint?: (provider: LLMProvider) => Promise<string>
+    onMentorChat?: (message: string, provider: LLMProvider) => Promise<string>
+    onMentorExplainError?: (provider: LLMProvider) => Promise<string>
 }
 
 export function CodeLabWorkspace({
@@ -158,7 +159,14 @@ export function CodeLabWorkspace({
                         />
 
                         <div className="absolute inset-y-0 right-0 z-40 w-[min(88vw,22rem)] border-l border-border shadow-2xl lg:hidden">
-                            <MentorPanel mentor={mentor} isOpen={mentorOpen} onToggle={onToggleMentor} />
+                            <MentorPanel
+                                mentor={mentor}
+                                isOpen={mentorOpen}
+                                onToggle={onToggleMentor}
+                                onRequestHint={onMentorRequestHint}
+                                onSendMessage={onMentorChat}
+                                onExplainError={onMentorExplainError}
+                            />
                         </div>
                     </>
                 ) : null}
