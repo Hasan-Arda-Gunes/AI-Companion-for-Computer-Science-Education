@@ -27,6 +27,11 @@ class SubmissionStatus(str, Enum):
     ERROR = "error"
 
 
+class LLMProvider(str, Enum):
+    GEMINI = "gemini"
+    OLLAMA = "ollama"
+
+
 # User Schemas
 class UserBase(BaseModel):
     email: EmailStr
@@ -50,6 +55,17 @@ class UserResponse(UserBase):
     role: UserRole
     created_at: datetime
     
+    class Config:
+        from_attributes = True
+
+
+class UserSummary(BaseModel):
+    id: int
+    email: EmailStr
+    username: str
+    full_name: Optional[str] = None
+    role: UserRole
+
     class Config:
         from_attributes = True
 
@@ -213,6 +229,45 @@ class HintResponse(BaseModel):
     hint_level: int
     remaining_hints: int
     provider_used: str = "gemini"
+
+
+# Class management schemas
+class ClassBase(BaseModel):
+    name: str = Field(..., min_length=1, max_length=150)
+    description: Optional[str] = None
+
+
+class ClassCreate(ClassBase):
+    pass
+
+
+class ClassResponse(ClassBase):
+    id: int
+    teacher_id: int
+    is_active: bool
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    student_count: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class ClassDetailResponse(ClassResponse):
+    students: List[UserSummary] = []
+
+
+class ClassStudentAddRequest(BaseModel):
+    student_id: int
+
+
+class ClassMembershipResponse(BaseModel):
+    class_id: int
+    student: UserSummary
+    added_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # Progress Schemas

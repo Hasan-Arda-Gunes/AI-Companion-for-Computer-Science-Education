@@ -3,11 +3,11 @@ Problem management endpoints
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from typing import Optional, List
 
 from app.db.database import get_db
-from app.models.models import Problem, User, UserProgress
+from app.models.models import Problem, User, UserProgress, UserRole, Classroom, ClassMembership
 from app.schemas.schemas import (
     ProblemCreate,
     ProblemUpdate,
@@ -76,11 +76,54 @@ async def list_problems(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    """Get list of problems with filtering and pagination"""
+    """Get list of problems with filtering and pagination.
     
-    # Build query
+    - Teachers see only problems they created
+    - Students see problems created by their teachers and their own AI-generated problems
+    """
+    
+    # Get current user
+    user_result = await db.execute(
+        select(User).where(User.id == user_id)
+    )
+    user = user_result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Build base query with active problems
     query = select(Problem).where(Problem.is_active == True)
     
+    # Apply role-based filtering
+    if user.role == UserRole.TEACHER:
+        # Teachers see only their own problems
+        query = query.where(Problem.created_by == user_id)
+    else:
+        # Students see:
+        # 1. Problems they created themselves (AI-generated)
+        # 2. Problems created by teachers in their classes
+        
+        # Get teacher IDs from classes student is enrolled in
+        teacher_query = select(Classroom.teacher_id).join(
+            ClassMembership,
+            ClassMembership.class_id == Classroom.id
+        ).where(ClassMembership.student_id == user_id)
+        
+        teacher_result = await db.execute(teacher_query)
+        teacher_ids = teacher_result.scalars().all()
+        
+        # Filter: problems created by student OR by their teachers
+        query = query.where(
+            or_(
+                Problem.created_by == user_id,
+                Problem.created_by.in_(teacher_ids) if teacher_ids else False
+            )
+        )
+    
+    # Apply additional filters
     if difficulty:
         query = query.where(Problem.difficulty == difficulty)
     
