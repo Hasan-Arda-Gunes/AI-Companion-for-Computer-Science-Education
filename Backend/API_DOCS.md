@@ -344,7 +344,8 @@ Submit code for evaluation. The submission will be evaluated asynchronously.
   "problem_id": 1,
   "code": "def two_sum(nums, target):\n    hash_map = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in hash_map:\n            return [hash_map[complement], i]\n        hash_map[num] = i",
   "language": "python",
-  "session_id": 1
+  "session_id": 1,
+  "provider": "gemini"
 }
 ```
 
@@ -380,6 +381,7 @@ Get detailed results of a submission including AI feedback and test results.
   "language": "python",
   "status": "correct",
   "score": 95.5,
+  "provider_used": "gemini",
   "test_results": [
     {
       "test_id": "test_1",
@@ -586,7 +588,8 @@ Get a progressive hint for a problem. Each problem has up to 3 levels of hints.
   "problem_id": 1,
   "session_id": 1,
   "current_code": "def two_sum(nums, target):\n    # stuck here",
-  "hint_level": 1
+  "hint_level": 1,
+  "provider": "gemini"
 }
 ```
 
@@ -596,7 +599,7 @@ Get a progressive hint for a problem. Each problem has up to 3 levels of hints.
   "hint": "Think about what data structure would allow you to quickly check if a number exists. A hash map (dictionary in Python) can look up values in O(1) time.",
   "hint_level": 1,
   "remaining_hints": 2,
-  "next_level_available": true
+  "provider_used": "gemini"
 }
 ```
 
@@ -654,6 +657,7 @@ Have a conversation with the AI assistant about problems, concepts, or debugging
 {
   "message": "I'm getting an IndexError. What does that mean?",
   "problem_id": 1,
+  "provider": "gemini",
   "context": {
     "current_code": "def two_sum(nums, target):\n    return [nums[10], nums[20]]",
     "error_message": "list index out of range"
@@ -665,12 +669,12 @@ Have a conversation with the AI assistant about problems, concepts, or debugging
 ```json
 {
   "response": "An IndexError with 'list index out of range' means you're trying to access an element at an index that doesn't exist in the list. In your code, you're trying to access index 10 and 20, but the list might be smaller. You should check the length of the list first using len().",
-  "follow_up_suggestions": [
+  "provider_used": "gemini",
+  "suggestions": [
     "How can I check the length of a list?",
     "What debugging techniques can help?",
     "Can you show me a safe way to access list elements?"
-  ],
-  "conversation_id": "conv_123"
+  ]
 }
 ```
 
