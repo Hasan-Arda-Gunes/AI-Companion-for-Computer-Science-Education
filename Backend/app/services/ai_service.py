@@ -94,6 +94,10 @@ class AIService:
             AIFeedback with detailed analysis
         """
         
+        # Extract provider value if it's an enum
+        if hasattr(provider, 'value'):
+            provider = provider.value
+        
         # Calculate test pass rate
         total_tests = len(test_results)
         passed_tests = sum(1 for t in test_results if t.passed)
@@ -201,6 +205,10 @@ Respond ONLY with valid JSON, no additional text."""
             A hint appropriate for the level
         """
         
+        # Extract provider value if it's an enum
+        if hasattr(provider, 'value'):
+            provider = provider.value
+        
         hint_guidance = {
             1: "Give a gentle nudge in the right direction without revealing the solution. Focus on the approach or concept.",
             2: "Provide more specific guidance about the algorithm or data structure to use, but don't give code.",
@@ -278,6 +286,10 @@ Provide just the hint text, no extra formatting."""
         Returns:
             AI assistant's response
         """
+        
+        # Extract provider value if it's an enum
+        if hasattr(provider, 'value'):
+            provider = provider.value
         
         system_prompt = """You are an encouraging and knowledgeable programming tutor. Your role is to:
 1. Help students understand programming concepts

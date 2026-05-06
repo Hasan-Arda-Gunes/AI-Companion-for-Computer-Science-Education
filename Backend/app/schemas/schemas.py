@@ -136,7 +136,7 @@ class SubmissionCreate(BaseModel):
     code: str
     language: str = "python"
     session_id: Optional[int] = None
-    provider: LLMProvider = LLMProvider.GEMINI  # Default to Gemini
+    provider: str = "gemini"  # Default to Gemini
 
 
 class TestCaseResult(BaseModel):
@@ -196,17 +196,11 @@ class SessionResponse(BaseModel):
         from_attributes = True
 
 
-# AI Provider Enum
-class LLMProvider(str, Enum):
-    GEMINI = "gemini"
-    OLLAMA = "ollama"
-
-
 # AI Interaction Schemas
 class ChatMessage(BaseModel):
     message: str
     context: Optional[Dict[str, Any]] = None
-    provider: LLMProvider = LLMProvider.GEMINI  # Default to Gemini
+    provider: str = "gemini"  # Default to Gemini
 
 
 class ChatResponse(BaseModel):
@@ -221,7 +215,7 @@ class HintRequest(BaseModel):
     session_id: int
     current_code: Optional[str] = None
     hint_level: int = 1  # Progressive hints
-    provider: LLMProvider = LLMProvider.GEMINI  # Default to Gemini
+    provider: str = "gemini"  # Default to Gemini
 
 
 class HintResponse(BaseModel):
