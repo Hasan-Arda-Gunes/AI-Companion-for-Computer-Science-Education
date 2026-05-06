@@ -207,8 +207,24 @@ class CodeExecutor:
 # Test harness
 if __name__ == "__main__":
     import json
+    import inspect
     test_input = {json.dumps(test_input)}
-    result = {function_name}(*test_input if isinstance(test_input, list) else [test_input])
+    
+    # Inspect function signature to determine how many parameters it expects
+    sig = inspect.signature({function_name})
+    num_params = len(sig.parameters)
+    
+    # Call function with appropriate unpacking
+    if num_params == 1:
+        # Single parameter function - pass test_input as-is
+        result = {function_name}(test_input)
+    elif isinstance(test_input, list):
+        # Multiple parameters - unpack the list
+        result = {function_name}(*test_input)
+    else:
+        # Single test_input value for multiple param function
+        result = {function_name}(test_input)
+    
     print(json.dumps(result))
 """
         else:
