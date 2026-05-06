@@ -12,6 +12,7 @@ import { StudentDashboardPage } from './pages/StudentDashboardPage'
 import { StudentCreateQuestionTempPage } from './pages/StudentCreateQuestionTempPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { UnauthorizedPage } from './pages/UnauthorizedPage'
+import { MultiPanelDemo } from '../../components/layout/multi-panel-layout/__demo__/MultiPanelDemo'
 
 export function AppRoutes() {
     return (
@@ -20,6 +21,9 @@ export function AppRoutes() {
             <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
             <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+            {/* Dev-only: Multi-panel layout demo */}
+            <Route path="/dev/panel-demo" element={<MultiPanelDemo />} />
 
             {/* Student Routes */}
             <Route
