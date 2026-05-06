@@ -571,6 +571,195 @@ Get all study sessions for the current user.
 
 ---
 
+### Classes
+
+Class management endpoints for teachers to create and manage learning classes with enrolled students.
+
+#### Create Class
+**POST** `/classes/`
+
+Create a new class (teachers only).
+
+**Required Role:** Teacher
+
+**Request:**
+```json
+{
+  "name": "Introduction to Python",
+  "description": "Learn Python fundamentals with hands-on problems"
+}
+```
+
+**Response (201):**
+```json
+{
+  "id": 1,
+  "name": "Introduction to Python",
+  "description": "Learn Python fundamentals with hands-on problems",
+  "teacher_id": 5,
+  "is_active": true,
+  "created_at": "2024-02-16T10:00:00Z",
+  "updated_at": null,
+  "student_count": 0
+}
+```
+
+**Status Codes:**
+- 201 - Class created successfully
+- 403 - Only teachers can create classes
+- 422 - Validation error
+
+#### List My Classes
+**GET** `/classes/`
+
+List classes for the current user.
+- **Teachers** see the classes they own
+- **Students** see the classes they are enrolled in
+
+**Response (200):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Introduction to Python",
+    "description": "Learn Python fundamentals",
+    "teacher_id": 5,
+    "is_active": true,
+    "created_at": "2024-02-16T10:00:00Z",
+    "updated_at": null,
+    "student_count": 25
+  },
+  {
+    "id": 2,
+    "name": "Data Structures",
+    "description": "Master arrays, linked lists, trees, and graphs",
+    "teacher_id": 5,
+    "is_active": true,
+    "created_at": "2024-02-17T14:30:00Z",
+    "updated_at": null,
+    "student_count": 18
+  }
+]
+```
+
+**Status Codes:**
+- 200 - Classes retrieved
+- 401 - Not authenticated
+
+#### Get Class Details
+**GET** `/classes/{class_id}`
+
+Get detailed information about a class including all enrolled students (teachers only).
+
+**Required Permission:** Must be the class teacher
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "name": "Introduction to Python",
+  "description": "Learn Python fundamentals with hands-on problems",
+  "teacher_id": 5,
+  "is_active": true,
+  "created_at": "2024-02-16T10:00:00Z",
+  "updated_at": null,
+  "student_count": 3,
+  "students": [
+    {
+      "id": 10,
+      "email": "alice@example.com",
+      "username": "alice_wonder",
+      "full_name": "Alice Wonder",
+      "role": "student"
+    },
+    {
+      "id": 11,
+      "email": "bob@example.com",
+      "username": "bob_builder",
+      "full_name": "Bob Builder",
+      "role": "student"
+    },
+    {
+      "id": 12,
+      "email": "charlie@example.com",
+      "username": "charlie_code",
+      "full_name": "Charlie Code",
+      "role": "student"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- 200 - Class retrieved
+- 403 - Only class teacher can view this
+- 404 - Class not found
+
+#### Add Student to Class
+**POST** `/classes/{class_id}/students`
+
+Add a student to a class (teachers only).
+
+**Required Permission:** Must be the class teacher
+
+**Request:**
+```json
+{
+  "student_id": 10
+}
+```
+
+**Response (201):**
+```json
+{
+  "class_id": 1,
+  "student": {
+    "id": 10,
+    "email": "alice@example.com",
+    "username": "alice_wonder",
+    "full_name": "Alice Wonder",
+    "role": "student"
+  },
+  "added_at": "2024-02-16T11:15:00Z"
+}
+```
+
+**Status Codes:**
+- 201 - Student added successfully
+- 400 - Student already enrolled or user is not a student
+- 403 - Only class teacher can add students
+- 404 - Class or student not found
+
+#### Remove Student from Class
+**DELETE** `/classes/{class_id}/students/{student_id}`
+
+Remove a student from a class (teachers only).
+
+**Required Permission:** Must be the class teacher
+
+**Response:** 204 No Content
+
+**Status Codes:**
+- 204 - Student removed successfully
+- 403 - Only class teacher can remove students
+- 404 - Class not found or student not enrolled
+
+#### Delete Class
+**DELETE** `/classes/{class_id}`
+
+Soft-delete a class (teachers only). Historical data is preserved.
+
+**Required Permission:** Must be the class teacher
+
+**Response:** 204 No Content
+
+**Status Codes:**
+- 204 - Class deleted successfully
+- 403 - Only class teacher can delete this class
+- 404 - Class not found
+
+---
+
 ### AI Assistance
 
 AI-powered assistance including hints, explanations, and chat support for students.
