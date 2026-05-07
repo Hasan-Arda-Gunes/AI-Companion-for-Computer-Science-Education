@@ -115,6 +115,7 @@ class ProblemResponse(ProblemBase):
     id: int
     constraints: Optional[Dict[str, Any]]
     examples: List[Dict[str, Any]]
+    test_cases: List[Dict[str, Any]]
     starter_code: Optional[str]
     hints: Optional[List[str]]
     learning_objectives: Optional[List[str]]
