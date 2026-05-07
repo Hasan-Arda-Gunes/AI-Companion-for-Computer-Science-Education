@@ -96,6 +96,20 @@ function mapDifficultyToAi(difficulty: ProblemForm['difficulty']): 'easy' | 'med
     return 'hard'
 }
 
+function parseStructuredInput(value: string): unknown {
+    const trimmed = value.trim()
+
+    if (!trimmed) {
+        return ''
+    }
+
+    try {
+        return JSON.parse(trimmed)
+    } catch {
+        return value
+    }
+}
+
 export function InstructorCreateQuestionPage() {
     const [problemForm, setProblemForm] = useState<ProblemForm>(defaultProblemForm)
     const [testCases, setTestCases] = useState<TestCase[]>(defaultTestCases)
@@ -407,8 +421,8 @@ export function InstructorCreateQuestionPage() {
         const sanitizedExamples = problemForm.examples
             .filter((example) => example.input.trim() || example.expected_output.trim())
             .map((example) => ({
-                input: example.input,
-                expected_output: example.expected_output,
+                input: parseStructuredInput(example.input),
+                expected_output: parseStructuredInput(example.expected_output),
             }))
 
         const functionName = problemForm.function_name.trim() || 'solution'
@@ -421,8 +435,8 @@ export function InstructorCreateQuestionPage() {
             examples: sanitizedExamples,
             test_cases: testCases.map((testCase) => ({
                 id: testCase.id,
-                input: testCase.input,
-                expected_output: testCase.expectedOutput,
+                input: parseStructuredInput(testCase.input),
+                expected_output: parseStructuredInput(testCase.expectedOutput),
                 function_name: functionName,
             })),
             starter_code: problemForm.starter_code,

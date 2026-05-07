@@ -113,7 +113,7 @@ export function TestCasePanel({
                                         value={testCase.input}
                                         onChange={(e) => onUpdate(testCase.id, 'input', e.target.value)}
                                         className="w-full px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
-                                        placeholder="e.g., [2,7,11,15], 9"
+                                        placeholder='e.g., [2, 7, 11, 15], 9 or "hello"'
                                     />
                                 </div>
                                 <div>
@@ -125,7 +125,7 @@ export function TestCasePanel({
                                         value={testCase.expectedOutput}
                                         onChange={(e) => onUpdate(testCase.id, 'expectedOutput', e.target.value)}
                                         className="w-full px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
-                                        placeholder="e.g., [0,1]"
+                                        placeholder='e.g., [0, 1] or "answer"'
                                     />
                                 </div>
                             </div>

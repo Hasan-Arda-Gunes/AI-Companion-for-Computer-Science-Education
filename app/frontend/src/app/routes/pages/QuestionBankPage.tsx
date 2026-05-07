@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { listMyClasses } from '../../../features/classes/api/classesApi'
+import type { ClassSummary } from '../../../features/classes/types'
 import { deleteProblem, getProblemById, listProblems, updateProblem } from '../../../features/problems/api/problemsApi'
 import type { Problem, ProblemDetails, ProblemDifficulty } from '../../../features/problems/types'
 import { InstructorLayout } from '../../../components/layout/InstructorLayout'
 import { useAuthSession } from '../../../features/auth/context/useAuthSession'
-
 
 export function QuestionBankPage() {
     const navigate = useNavigate()
@@ -22,6 +23,8 @@ export function QuestionBankPage() {
     const [editDescription, setEditDescription] = useState('')
     const [editDifficulty, setEditDifficulty] = useState<ProblemDifficulty>('beginner')
     const [editTopic, setEditTopic] = useState('')
+    const [editClassId, setEditClassId] = useState<number | ''>('')
+    const [classes, setClasses] = useState<ClassSummary[]>([])
 
     const loadProblems = useCallback(async () => {
         if (!user?.id) {
@@ -35,8 +38,15 @@ export function QuestionBankPage() {
 
         try {
             const response = await listProblems()
-            const ownedProblems = response.problems.filter((problem) => problem.created_by === user.id)
-            setProblems(ownedProblems)
+            const hasCreatorInfo = response.problems?.some((problem) => problem.created_by !== undefined && problem.created_by !== null)
+
+            if (hasCreatorInfo) {
+                setProblems(response.problems.filter((problem) => problem.created_by === user.id))
+            } else {
+                console.warn('[QuestionBankPage] Backend did not include creator info on problems; showing all returned problems')
+                setActionMessage('Backend did not return creator info; showing all problems.')
+                setProblems(response.problems ?? [])
+            }
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to load problems'
             setErrorMessage(message)
@@ -56,6 +66,7 @@ export function QuestionBankPage() {
             setEditDescription(response.description)
             setEditDifficulty(response.difficulty)
             setEditTopic(response.topic)
+            setEditClassId(response.class_id ?? '')
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to load problem details'
             setDetailsError(message)
@@ -63,6 +74,19 @@ export function QuestionBankPage() {
         } finally {
             setIsDetailsLoading(false)
         }
+    }, [])
+
+    useEffect(() => {
+        const loadClasses = async () => {
+            try {
+                const classesData = await listMyClasses()
+                setClasses(classesData)
+            } catch {
+                // Silently fail for classes load
+            }
+        }
+
+        void loadClasses()
     }, [])
 
     useEffect(() => {
@@ -94,6 +118,7 @@ export function QuestionBankPage() {
                 description: editDescription.trim() || undefined,
                 difficulty: editDifficulty,
                 topic: editTopic.trim() || undefined,
+                class_id: editClassId ? Number(editClassId) : undefined,
             })
             setActionMessage('Question updated.')
             await loadProblems()
@@ -149,12 +174,8 @@ export function QuestionBankPage() {
                         >
                             Refresh
                         </button>
-                        {actionMessage ? (
-                            <span className="text-xs text-emerald-300">{actionMessage}</span>
-                        ) : null}
-                        {actionError ? (
-                            <span className="text-xs text-red-300">{actionError}</span>
-                        ) : null}
+                        {actionMessage ? <span className="text-xs text-emerald-300">{actionMessage}</span> : null}
+                        {actionError ? <span className="text-xs text-red-300">{actionError}</span> : null}
                     </div>
                 </section>
 
@@ -173,9 +194,7 @@ export function QuestionBankPage() {
                 {!isLoading && !errorMessage ? (
                     <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
                         <div className="rounded-xl border border-border bg-card p-4">
-                            <div className="mb-3 text-sm text-muted-foreground">
-                                Total loaded: {problems.length}
-                            </div>
+                            <div className="mb-3 text-sm text-muted-foreground">Total loaded: {problems.length}</div>
                             <div className="space-y-3">
                                 {problems.map((problem) => (
                                     <button
@@ -197,6 +216,11 @@ export function QuestionBankPage() {
                                             <span className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">
                                                 {problem.topic}
                                             </span>
+                                            {problem.class_id ? (
+                                                <span className="rounded-md border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                                    Class: {problem.class_id}
+                                                </span>
+                                            ) : null}
                                         </div>
                                     </button>
                                 ))}
@@ -221,9 +245,7 @@ export function QuestionBankPage() {
                                 <p className="mt-4 text-sm text-muted-foreground">Loading question details...</p>
                             ) : null}
 
-                            {detailsError ? (
-                                <p className="mt-4 text-sm text-red-300">{detailsError}</p>
-                            ) : null}
+                            {detailsError ? <p className="mt-4 text-sm text-red-300">{detailsError}</p> : null}
 
                             {selectedProblem ? (
                                 <div className="mt-4 space-y-4">
@@ -255,9 +277,7 @@ export function QuestionBankPage() {
                                             </label>
                                             <select
                                                 value={editDifficulty}
-                                                onChange={(event) =>
-                                                    setEditDifficulty(event.target.value as ProblemDifficulty)
-                                                }
+                                                onChange={(event) => setEditDifficulty(event.target.value as ProblemDifficulty)}
                                                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
                                             >
                                                 <option value="beginner">Beginner</option>
@@ -275,6 +295,25 @@ export function QuestionBankPage() {
                                                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs uppercase tracking-wide text-muted-foreground">
+                                            Class
+                                        </label>
+                                        <select
+                                            value={editClassId}
+                                            onChange={(event) =>
+                                                setEditClassId(event.target.value ? Number(event.target.value) : '')
+                                            }
+                                            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                                        >
+                                            <option value="">No class</option>
+                                            {classes.map((cls) => (
+                                                <option key={cls.id} value={cls.id}>
+                                                    {cls.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     <div className="flex flex-wrap items-center gap-2">

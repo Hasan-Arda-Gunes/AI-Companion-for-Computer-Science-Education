@@ -36,6 +36,9 @@ function buildListProblemsQuery(params: ListProblemsParams = {}) {
     if (params.search) {
         searchParams.set('search', params.search)
     }
+        if (params.class_id) {
+            searchParams.set('class_id', String(params.class_id))
+        }
 
     const query = searchParams.toString()
     return query ? `?${query}` : ''
@@ -59,8 +62,12 @@ export async function listProblems(params: ListProblemsParams = {}) {
         const payload = (await parseJsonSafe(response)) as { detail?: string } | null
         throw new Error(payload?.detail ?? 'Failed to load problems')
     }
+    const json = await parseJsonSafe(response)
+    // Log raw response for debugging issues where frontend sees empty lists
+    // while the backend returns data. Remove or guard this in production.
+    console.debug('[problemsApi] listProblems raw response:', json)
 
-    return (await response.json()) as ListProblemsResponse
+    return (json ?? {}) as ListProblemsResponse
 }
 
 export async function createProblem(payload: CreateProblemRequest) {

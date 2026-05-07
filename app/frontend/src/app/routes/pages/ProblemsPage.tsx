@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { listMyClasses } from '../../../features/classes/api/classesApi'
+import type { ClassSummary } from '../../../features/classes/types'
 import { listProblems } from '../../../features/problems/api/problemsApi'
 import type { Problem, ProblemDifficulty } from '../../../features/problems/types'
 import { StudentLayout } from '../../../components/layout/StudentLayout'
@@ -12,15 +14,17 @@ export function ProblemsPage() {
     const [searchValue, setSearchValue] = useState('')
     const [difficultyValue, setDifficultyValue] = useState<ProblemDifficulty | ''>('')
     const [topicValue, setTopicValue] = useState('')
+    const [classValue, setClassValue] = useState<number | ''>('')
+    const [classes, setClasses] = useState<ClassSummary[]>([])
 
     const fetchProblems = useCallback(
-        async (params?: { search?: string; difficulty?: ProblemDifficulty; topic?: string }) => {
+        async (params?: { search?: string; difficulty?: ProblemDifficulty; topic?: string; class_id?: number }) => {
             setIsLoading(true)
             setErrorMessage(null)
 
             try {
                 const response = await listProblems(params)
-                setProblems(response.problems)
+                setProblems(response.problems ?? [])
             } catch (error) {
                 const message = error instanceof Error ? error.message : 'Failed to load problems'
                 setErrorMessage(message)
@@ -32,6 +36,19 @@ export function ProblemsPage() {
     )
 
     useEffect(() => {
+        const loadClasses = async () => {
+            try {
+                const classesData = await listMyClasses()
+                setClasses(classesData)
+            } catch {
+                // Silently fail for classes load
+            }
+        }
+
+        void loadClasses()
+    }, [])
+
+    useEffect(() => {
         void fetchProblems()
     }, [fetchProblems])
 
@@ -40,6 +57,7 @@ export function ProblemsPage() {
             search: searchValue.trim() || undefined,
             difficulty: difficultyValue || undefined,
             topic: topicValue.trim() || undefined,
+            class_id: classValue ? Number(classValue) : undefined,
         })
     }
 
@@ -47,21 +65,20 @@ export function ProblemsPage() {
         setSearchValue('')
         setDifficultyValue('')
         setTopicValue('')
+        setClassValue('')
     }
 
     return (
         <StudentLayout
             currentPage="problems"
             title="Problems"
-            subtitle="Temporary page showing problems from GET /problems/."
+            subtitle="Browse problems and filter by class."
             showHeader={false}
         >
             <div className="space-y-4">
                 <section className="rounded-xl border border-border bg-card p-4">
                     <h1 className="text-2xl font-semibold text-foreground">Problems</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Data source: GET /problems/
-                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">Data source: GET /problems/</p>
                     <div className="mt-4 flex flex-wrap gap-3">
                         <input
                             value={searchValue}
@@ -85,6 +102,20 @@ export function ProblemsPage() {
                             placeholder="Topic"
                             className="min-w-40 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
                         />
+                        <select
+                            value={classValue}
+                            onChange={(event) =>
+                                setClassValue(event.target.value ? Number(event.target.value) : '')
+                            }
+                            className="min-w-45 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                        >
+                            <option value="">All classes</option>
+                            {classes.map((cls) => (
+                                <option key={cls.id} value={cls.id}>
+                                    {cls.name}
+                                </option>
+                            ))}
+                        </select>
                         <button
                             type="button"
                             onClick={handleApplyFilters}
@@ -116,9 +147,7 @@ export function ProblemsPage() {
 
                 {!isLoading && !errorMessage ? (
                     <section className="rounded-xl border border-border bg-card p-4">
-                        <div className="mb-3 text-sm text-muted-foreground">
-                            Total loaded: {problems.length}
-                        </div>
+                        <div className="mb-3 text-sm text-muted-foreground">Total loaded: {problems.length}</div>
                         <div className="space-y-3">
                             {problems.map((problem) => (
                                 <button
@@ -135,6 +164,11 @@ export function ProblemsPage() {
                                         <span className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">
                                             {problem.topic}
                                         </span>
+                                        {problem.class_id ? (
+                                            <span className="rounded-md border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                                Class: {problem.class_id}
+                                            </span>
+                                        ) : null}
                                     </div>
                                 </button>
                             ))}

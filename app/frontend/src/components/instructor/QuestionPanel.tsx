@@ -45,8 +45,8 @@ export function QuestionPanel({
                     <button
                         onClick={() => setLeftView('edit')}
                         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${leftView === 'edit'
-                                ? 'bg-[var(--electric-purple)] text-white shadow-md'
-                                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--slate-gray)]'
+                            ? 'bg-[var(--electric-purple)] text-white shadow-md'
+                            : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--slate-gray)]'
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -57,8 +57,8 @@ export function QuestionPanel({
                     <button
                         onClick={() => setLeftView('preview')}
                         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${leftView === 'preview'
-                                ? 'bg-[var(--electric-purple)] text-white shadow-md'
-                                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--slate-gray)]'
+                            ? 'bg-[var(--electric-purple)] text-white shadow-md'
+                            : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--slate-gray)]'
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -262,7 +262,7 @@ export function QuestionPanel({
                                                     }))
                                                 }
                                                 className="flex-1 px-2.5 py-1.5 bg-[var(--slate-gray)] border border-[var(--border)] rounded text-xs font-mono text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)]"
-                                                placeholder="input"
+                                                placeholder='e.g. [1, 2] or "hello"'
                                             />
                                             <span className="text-[var(--muted-foreground)] text-xs">-&gt;</span>
                                             <input
@@ -282,7 +282,7 @@ export function QuestionPanel({
                                                     }))
                                                 }
                                                 className="flex-1 px-2.5 py-1.5 bg-[var(--slate-gray)] border border-[var(--border)] rounded text-xs font-mono text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)]"
-                                                placeholder="expected output"
+                                                placeholder='e.g. [0, 1] or "answer"'
                                             />
                                             <button
                                                 onClick={() =>
@@ -403,8 +403,8 @@ export function QuestionPanel({
                                                     }))
                                                 }
                                                 className={`w-4 h-4 rounded border transition-colors flex items-center justify-center ${problemForm[key]
-                                                        ? 'bg-[var(--electric-purple)] border-[var(--electric-purple)]'
-                                                        : 'border-[var(--border)] bg-[var(--slate-gray)]'
+                                                    ? 'bg-[var(--electric-purple)] border-[var(--electric-purple)]'
+                                                    : 'border-[var(--border)] bg-[var(--slate-gray)]'
                                                     }`}
                                             >
                                                 {problemForm[key] && <Check className="w-2.5 h-2.5 text-white" />}

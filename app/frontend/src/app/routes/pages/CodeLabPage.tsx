@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CodeLabWorkspace } from '../../../components/codelab/CodeLabWorkspace'
-import { StudentLayout } from '../../../components/layout/StudentLayout'
 import { chatWithAi, explainError, requestHint } from '../../../features/ai/api/aiApi'
 import { getProblemById } from '../../../features/problems/api/problemsApi'
 import { getDefaultEditorLanguage, getEditorTabSize } from '../../../features/settings/editorPreferences'
