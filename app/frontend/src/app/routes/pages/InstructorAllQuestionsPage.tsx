@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { listProblems } from '../../../features/problems/api/problemsApi'
 import type { Problem, ProblemDifficulty } from '../../../features/problems/types'
-import { StudentLayout } from '../../../components/layout/StudentLayout'
+import { InstructorLayout } from '../../../components/layout/InstructorLayout'
 
-export function ProblemsPage() {
+export function InstructorAllQuestionsPage() {
     const navigate = useNavigate()
     const [problems, setProblems] = useState<Problem[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -50,15 +50,15 @@ export function ProblemsPage() {
     }
 
     return (
-        <StudentLayout
-            currentPage="problems"
-            title="Problems"
-            subtitle="Temporary page showing problems from GET /problems/."
+        <InstructorLayout
+            currentPage="instructor-all-questions"
+            title="All Questions"
+            subtitle="Browse the full question catalog across all instructors."
             showHeader={false}
         >
             <div className="space-y-4">
                 <section className="rounded-xl border border-border bg-card p-4">
-                    <h1 className="text-2xl font-semibold text-foreground">Problems</h1>
+                    <h1 className="text-2xl font-semibold text-foreground">All Questions</h1>
                     <p className="mt-1 text-sm text-muted-foreground">
                         Data source: GET /problems/
                     </p>
@@ -146,6 +146,6 @@ export function ProblemsPage() {
                     </section>
                 ) : null}
             </div>
-        </StudentLayout>
+        </InstructorLayout>
     )
 }

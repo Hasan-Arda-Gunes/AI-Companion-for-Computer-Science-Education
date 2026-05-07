@@ -5,6 +5,7 @@ import { CodeLabPage } from './pages/CodeLabPage'
 import { ClassesPage } from './pages/ClassesPage'
 import { InstructorCreateQuestionPage } from './pages/InstructorCreateQuestionPage'
 import { InstructorDashboardPage } from './pages/InstructorDashboardPage'
+import { InstructorAllQuestionsPage } from './pages/InstructorAllQuestionsPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProblemsPage } from './pages/ProblemsPage'
 import { QuestionBankPage } from './pages/QuestionBankPage'
@@ -76,6 +77,16 @@ export function AppRoutes() {
                     <ProtectedRoute>
                         <RoleBasedRoute requiredRoles={['teacher']}>
                             <QuestionBankPage />
+                        </RoleBasedRoute>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/instructor/all-questions"
+                element={
+                    <ProtectedRoute>
+                        <RoleBasedRoute requiredRoles={['teacher']}>
+                            <InstructorAllQuestionsPage />
                         </RoleBasedRoute>
                     </ProtectedRoute>
                 }

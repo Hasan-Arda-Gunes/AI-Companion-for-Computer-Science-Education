@@ -58,6 +58,7 @@ export function CodeLabWorkspace({
     const [editorHeight, setEditorHeight] = useState(68)
     const [consoleCollapsed, setConsoleCollapsed] = useState(false)
     const [activeHandle, setActiveHandle] = useState<'left' | 'right' | 'console' | null>(null)
+    const editorInstanceKey = `${editor.defaultLanguageId}:${editor.codeTemplates[editor.defaultLanguageId] ?? ''}`
 
     useEffect(() => {
         if (!activeHandle) {
@@ -141,7 +142,7 @@ export function CodeLabWorkspace({
                     </div>
                     <div className="h-[78vh] min-h-120 shrink-0 px-3 py-2">
                         <div className="h-full overflow-hidden rounded-xl border border-border">
-                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
+                            <EditorPanel key={editorInstanceKey} editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
                         </div>
                     </div>
                     <div className="shrink-0">
@@ -185,7 +186,7 @@ export function CodeLabWorkspace({
 
                     <div ref={centerRef} className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden" style={{ width: `${centerWidth}%` }}>
                         <div className="min-h-0" style={{ height: consoleCollapsed ? '100%' : `${editorHeight}%` }}>
-                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
+                            <EditorPanel key={editorInstanceKey} editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
                         </div>
 
                         {consoleCollapsed ? (

@@ -5,6 +5,7 @@ import type {
     ListProblemsParams,
     ListProblemsResponse,
     ProblemDetails,
+    UpdateProblemRequest,
 } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
@@ -106,4 +107,48 @@ export async function getProblemById(problemId: number) {
     }
 
     return (await response.json()) as ProblemDetails
+}
+
+export async function updateProblem(problemId: number, payload: UpdateProblemRequest) {
+    const { accessToken, tokenType } = getAuthToken()
+
+    if (!accessToken) {
+        throw new Error('Not authenticated')
+    }
+
+    const response = await fetch(`${API_BASE_URL}/problems/${problemId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${tokenType} ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+        const apiError = (await parseJsonSafe(response)) as { detail?: string } | null
+        throw new Error(apiError?.detail ?? 'Failed to update problem')
+    }
+
+    return (await response.json()) as ProblemDetails
+}
+
+export async function deleteProblem(problemId: number) {
+    const { accessToken, tokenType } = getAuthToken()
+
+    if (!accessToken) {
+        throw new Error('Not authenticated')
+    }
+
+    const response = await fetch(`${API_BASE_URL}/problems/${problemId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `${tokenType} ${accessToken}`,
+        },
+    })
+
+    if (!response.ok) {
+        const apiError = (await parseJsonSafe(response)) as { detail?: string } | null
+        throw new Error(apiError?.detail ?? 'Failed to delete problem')
+    }
 }

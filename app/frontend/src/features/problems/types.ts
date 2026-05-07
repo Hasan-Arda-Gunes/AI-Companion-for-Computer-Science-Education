@@ -23,6 +23,7 @@ export type Problem = {
     description: string
     difficulty: ProblemDifficulty
     topic: string
+    created_by?: number
     examples: ProblemExample[]
     starter_code: string
     hints: string[]
@@ -35,6 +36,7 @@ export type ProblemDetails = {
     description: string
     difficulty: ProblemDifficulty
     topic: string
+    created_by?: number
     constraints?: Record<string, unknown>
     examples?: Array<{
         input: unknown
@@ -76,3 +78,15 @@ export type CreateProblemRequest = {
 }
 
 export type CreateProblemResponse = Problem
+
+export type UpdateProblemRequest = {
+    title?: string
+    description?: string
+    difficulty?: ProblemDifficulty
+    topic?: string
+    constraints?: Record<string, unknown>
+    examples?: ProblemExample[]
+    test_cases?: ProblemTestCase[]
+    starter_code?: string
+    is_active?: boolean
+}

@@ -5,9 +5,13 @@ import { StudentLayout } from '../../../components/layout/StudentLayout'
 import { InstructorLayout } from '../../../components/layout/InstructorLayout'
 import {
     AVAILABLE_EDITOR_LANGUAGES,
+    AVAILABLE_EDITOR_TAB_SIZES,
     type EditorLanguageId,
+    type EditorTabSize,
     getDefaultEditorLanguage,
+    getEditorTabSize,
     setDefaultEditorLanguage,
+    setEditorTabSize,
 } from '../../../features/settings/editorPreferences'
 
 const languageLabelMap: Record<EditorLanguageId, string> = {
@@ -26,11 +30,13 @@ const languageLabelMap: Record<EditorLanguageId, string> = {
 export function SettingsPage() {
     const { user } = useAuthSession()
     const [defaultLanguage, setDefaultLanguage] = useState<EditorLanguageId>(() => getDefaultEditorLanguage())
+    const [tabSize, setTabSize] = useState<EditorTabSize>(() => getEditorTabSize())
     const [savedMessage, setSavedMessage] = useState<string | null>(null)
 
     const handleSave = () => {
         setDefaultEditorLanguage(defaultLanguage)
-        setSavedMessage(`Default language saved as ${languageLabelMap[defaultLanguage]}.`)
+        setEditorTabSize(tabSize)
+        setSavedMessage(`Saved ${languageLabelMap[defaultLanguage]} with tab size ${tabSize}.`)
     }
 
     const layoutProps = {
@@ -64,6 +70,24 @@ export function SettingsPage() {
                             {AVAILABLE_EDITOR_LANGUAGES.map((languageId) => (
                                 <option key={languageId} value={languageId}>
                                     {languageLabelMap[languageId]}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label className="block space-y-2">
+                        <span className="text-sm text-muted-foreground">Editor Tab Size</span>
+                        <select
+                            value={tabSize}
+                            onChange={(event) => {
+                                setTabSize(Number(event.target.value) as EditorTabSize)
+                                setSavedMessage(null)
+                            }}
+                            className="w-full rounded-lg border border-input bg-input-background px-3 py-2 text-sm"
+                        >
+                            {AVAILABLE_EDITOR_TAB_SIZES.map((size) => (
+                                <option key={size} value={size}>
+                                    {size} spaces
                                 </option>
                             ))}
                         </select>
