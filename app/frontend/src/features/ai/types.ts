@@ -22,6 +22,7 @@ export type RequestHintResponse = {
     hint: string
     hint_level: number
     remaining_hints: number
+    provider_used?: LLMProvider
 }
 
 export type ChatWithAiRequest = {
@@ -33,16 +34,21 @@ export type ChatWithAiRequest = {
 
 export type ChatWithAiResponse = {
     response: string
+    provider_used?: LLMProvider
 }
 
 export type ExplainErrorRequest = {
-    error_message: string
     code: string
+    language: string
+    context?: string
 } & BaseAIRequest
 
 export type ExplainErrorResponse = {
     explanation?: string
     response?: string
+    key_concepts?: string[]
+    potential_issues?: string[]
+    provider_used?: LLMProvider
 }
 
 // Instructor AI Types
@@ -126,4 +132,5 @@ export type InstructorChatRequest = {
 
 export type InstructorChatResponse = {
     response: string
+    provider_used?: LLMProvider
 }

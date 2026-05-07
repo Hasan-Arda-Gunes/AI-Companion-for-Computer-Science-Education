@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute, PublicOnlyRoute } from './AuthGuards'
 import { RoleBasedRoute } from './RoleGuards'
 import { CodeLabPage } from './pages/CodeLabPage'
+import { ClassesPage } from './pages/ClassesPage'
 import { InstructorCreateQuestionPage } from './pages/InstructorCreateQuestionPage'
 import { InstructorDashboardPage } from './pages/InstructorDashboardPage'
 import { LoginPage } from './pages/LoginPage'
@@ -104,6 +105,14 @@ export function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <SettingsPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/classes"
+                element={
+                    <ProtectedRoute>
+                        <ClassesPage />
                     </ProtectedRoute>
                 }
             />

@@ -41,6 +41,19 @@ export const defaultInstructorSidebarNavItems: StudentSidebarItem[] = [
         ),
     },
     {
+        id: 'classes',
+        label: 'Classes',
+        page: 'classes',
+        icon: (
+            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M4 6h16" />
+                <path d="M6 6v12" />
+                <path d="M18 6v12" />
+                <path d="M6 18h12" />
+            </svg>
+        ),
+    },
+    {
         id: 'create-question',
         label: 'Create Question',
         page: 'create-question',
@@ -109,6 +122,7 @@ export const defaultInstructorSidebarPagePathMap: Record<string, string> = {
     instructordashboard: '/instructor/dashboard',
     'question-bank': '/instructor/question-bank',
     'create-question': '/instructor/create-question',
+    classes: '/classes',
     'submissions-review': '/instructor/submissions-review',
     students: '/instructor/students',
     analytics: '/instructor/analytics',

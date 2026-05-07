@@ -79,7 +79,7 @@ export async function chatWithAi(payload: ChatWithAiRequest) {
 }
 
 export async function explainError(payload: ExplainErrorRequest) {
-    const url = new URL(`${API_BASE_URL}/ai/explain-error`)
+    const url = new URL(`${API_BASE_URL}/ai/explain`)
     if (payload.provider) {
         url.searchParams.set('provider', payload.provider)
     }

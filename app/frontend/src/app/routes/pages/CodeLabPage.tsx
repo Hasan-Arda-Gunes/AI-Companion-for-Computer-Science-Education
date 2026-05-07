@@ -506,8 +506,9 @@ export function CodeLabPage() {
         }
 
         const result = await explainError({
-            error_message: lastErrorLog.message,
             code: currentCode,
+            language: defaultLanguageId,
+            context: `Runtime error: ${lastErrorLog.message}`,
             provider,
         })
 

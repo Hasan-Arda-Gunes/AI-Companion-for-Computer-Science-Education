@@ -94,6 +94,19 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
         ),
     },
     {
+        id: 'classes',
+        label: 'Classes',
+        page: 'classes',
+        icon: (
+            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M3 7h18" />
+                <path d="M7 7v12" />
+                <path d="M17 7v12" />
+                <path d="M5 19h14" />
+            </svg>
+        ),
+    },
+    {
         id: 'create-question',
         label: 'Create Question',
         page: 'create-question',
@@ -133,6 +146,7 @@ export const defaultStudentSidebarPagePathMap: Record<string, string> = {
     studentdashboard: '/student/dashboard',
     codelab: '/code-lab',
     problems: '/student/problems',
+    classes: '/classes',
     'create-question': '/student/create-question',
     achievements: '/student/dashboard',
     settings: '/settings',
