@@ -84,7 +84,7 @@ class ProblemBase(BaseModel):
 
 
 class ProblemCreate(ProblemBase):
-    class_id: int  # Required: which class this problem is for
+    class_id: Optional[int] = None  # Optional: if set, only students in this class can see it
     constraints: Optional[Dict[str, Any]] = None
     examples: List[Dict[str, Any]]
     test_cases: List[Dict[str, Any]]

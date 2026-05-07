@@ -3,7 +3,7 @@ Problem management endpoints
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, and_
 from typing import Optional, List
 
 from app.db.database import get_db
@@ -104,7 +104,7 @@ async def list_problems(
         query = query.where(Problem.created_by == user_id)
     else:
         # Students see:
-        # 1. Problems they created themselves (AI-generated)
+        # 1. Problems they created themselves (AI-generated, no class_id)
         # 2. Problems assigned to classes they are enrolled in
         
         # Get class IDs that student is enrolled in
@@ -115,10 +115,10 @@ async def list_problems(
         student_class_result = await db.execute(student_class_query)
         class_ids = student_class_result.scalars().all()
         
-        # Filter: problems created by student OR problems assigned to their classes
+        # Filter: (problems created by student with no class) OR (problems assigned to their classes)
         query = query.where(
             or_(
-                Problem.created_by == user_id,
+                and_(Problem.created_by == user_id, Problem.class_id == None),
                 Problem.class_id.in_(class_ids) if class_ids else False
             )
         )
