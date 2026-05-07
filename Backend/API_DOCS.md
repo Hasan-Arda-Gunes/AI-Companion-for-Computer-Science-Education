@@ -212,7 +212,7 @@ Get detailed information about a specific problem (creator or admin only).
 #### Create Problem
 **POST** `/problems/`
 
-Create a new programming problem (teachers only).
+Create a new programming problem for a specific class (teachers only).
 
 **Required Role:** Teacher
 
@@ -223,6 +223,7 @@ Create a new programming problem (teachers only).
   "description": "Find the maximum element in an array",
   "difficulty": "beginner",
   "topic": "arrays",
+  "class_id": 1,
   "examples": [
     {"input": [1, 5, 3], "expected_output": 5}
   ],
@@ -234,16 +235,23 @@ Create a new programming problem (teachers only).
       "function_name": "find_max"
     }
   ],
-  "starter_code": "def find_max(arr):\n    pass",
-  "evaluation_criteria": {
-    "check_correctness": true,
-    "check_efficiency": true
-  },
-  "hints": ["Consider iterating through the array"],
-  "time_limit": 5000,
-  "memory_limit": 256
+  "evaluation_criteria": {"correctness": 100},
+  "starter_code": "def find_max(arr):\n    # Complete this function",
+  "hints": ["Use a loop to compare elements"],
+  "learning_objectives": ["Understand loops", "Compare values"],
+  "related_concepts": ["loops", "comparisons"]
 }
 ```
+
+**Required Fields:**
+- `title` - Problem title
+- `description` - Problem description
+- `difficulty` - "beginner", "intermediate", or "advanced"
+- `topic` - Problem topic/category
+- `class_id` - ID of the class this problem is assigned to
+- `examples` - Array of example input/output pairs
+- `test_cases` - Array of test cases for evaluation
+- `evaluation_criteria` - Criteria for evaluating submissions
 
 **Response (201):**
 ```json
@@ -262,7 +270,8 @@ Create a new programming problem (teachers only).
 **Status Codes:**
 - 201 - Problem created successfully
 - 403 - Only teachers can create problems
-- 422 - Validation error
+- 404 - Class not found
+- 422 - Validation error (missing required fields or invalid class_id)
 
 #### Update Problem
 **PUT** `/problems/{problem_id}`
@@ -279,6 +288,7 @@ Update a problem (creator or admin only). All fields are optional.
   "description": "Find the maximum element in an array",
   "difficulty": "intermediate",
   "topic": "arrays",
+  "class_id": 2,
   "starter_code": "def find_max(arr):\n    # Complete this function",
   "examples": [
     {"input": [1, 5, 3], "expected_output": 5}
@@ -294,6 +304,9 @@ Update a problem (creator or admin only). All fields are optional.
   "is_active": true
 }
 ```
+
+**Optional Fields:**
+- `class_id` - Can reassign problem to a different class
 
 **Response (200):**
 ```json

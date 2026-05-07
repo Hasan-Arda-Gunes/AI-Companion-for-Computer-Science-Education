@@ -84,6 +84,7 @@ class ProblemBase(BaseModel):
 
 
 class ProblemCreate(ProblemBase):
+    class_id: int  # Required: which class this problem is for
     constraints: Optional[Dict[str, Any]] = None
     examples: List[Dict[str, Any]]
     test_cases: List[Dict[str, Any]]
@@ -102,6 +103,7 @@ class ProblemUpdate(BaseModel):
     description: Optional[str] = None
     difficulty: Optional[DifficultyLevel] = None
     topic: Optional[str] = None
+    class_id: Optional[int] = None
     constraints: Optional[Dict[str, Any]] = None
     examples: Optional[List[Dict[str, Any]]] = None
     test_cases: Optional[List[Dict[str, Any]]] = None

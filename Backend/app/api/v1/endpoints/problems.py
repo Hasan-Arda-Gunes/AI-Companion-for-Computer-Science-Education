@@ -56,7 +56,8 @@ async def create_problem(
         hints=problem_data.hints,
         learning_objectives=problem_data.learning_objectives,
         related_concepts=problem_data.related_concepts,
-        created_by=user_id
+        created_by=user_id,
+        class_id=problem_data.class_id
     )
     
     db.add(new_problem)
@@ -104,22 +105,21 @@ async def list_problems(
     else:
         # Students see:
         # 1. Problems they created themselves (AI-generated)
-        # 2. Problems created by teachers in their classes
+        # 2. Problems assigned to classes they are enrolled in
         
-        # Get teacher IDs from classes student is enrolled in
-        teacher_query = select(Classroom.teacher_id).join(
-            ClassMembership,
-            ClassMembership.class_id == Classroom.id
-        ).where(ClassMembership.student_id == user_id)
+        # Get class IDs that student is enrolled in
+        student_class_query = select(ClassMembership.class_id).where(
+            ClassMembership.student_id == user_id
+        )
         
-        teacher_result = await db.execute(teacher_query)
-        teacher_ids = teacher_result.scalars().all()
+        student_class_result = await db.execute(student_class_query)
+        class_ids = student_class_result.scalars().all()
         
-        # Filter: problems created by student OR by their teachers
+        # Filter: problems created by student OR problems assigned to their classes
         query = query.where(
             or_(
                 Problem.created_by == user_id,
-                Problem.created_by.in_(teacher_ids) if teacher_ids else False
+                Problem.class_id.in_(class_ids) if class_ids else False
             )
         )
     
@@ -179,22 +179,6 @@ async def get_problem(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Problem not found"
         )
-    
-    # Check authorization: creator or admin only
-    user_result = await db.execute(
-        select(User).where(User.id == user_id)
-    )
-    user = user_result.scalar_one_or_none()
-    
-    is_creator = problem.created_by == user_id
-    is_admin = user and user.is_superuser
-    
-    if not (is_creator or is_admin):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only the creator or admin can view this problem"
-        )
-    
     return problem
 
 
