@@ -84,6 +84,7 @@ class ProblemBase(BaseModel):
 
 
 class ProblemCreate(ProblemBase):
+    class_id: Optional[int] = None  # Optional: if set, only students in this class can see it
     constraints: Optional[Dict[str, Any]] = None
     examples: List[Dict[str, Any]]
     test_cases: List[Dict[str, Any]]
@@ -102,6 +103,7 @@ class ProblemUpdate(BaseModel):
     description: Optional[str] = None
     difficulty: Optional[DifficultyLevel] = None
     topic: Optional[str] = None
+    class_id: Optional[int] = None
     constraints: Optional[Dict[str, Any]] = None
     examples: Optional[List[Dict[str, Any]]] = None
     test_cases: Optional[List[Dict[str, Any]]] = None
@@ -113,6 +115,7 @@ class ProblemResponse(ProblemBase):
     id: int
     constraints: Optional[Dict[str, Any]]
     examples: List[Dict[str, Any]]
+    test_cases: List[Dict[str, Any]]
     starter_code: Optional[str]
     hints: Optional[List[str]]
     learning_objectives: Optional[List[str]]
