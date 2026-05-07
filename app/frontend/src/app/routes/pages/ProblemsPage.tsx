@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { StudentLayout } from '../../../components/layout/StudentLayout'
 import { listProblems } from '../../../features/problems/api/problemsApi'
 import type { Problem } from '../../../features/problems/types'
+import { StudentLayout } from '../../../components/layout/StudentLayout'
 
 export function ProblemsPage() {
     const navigate = useNavigate()
