@@ -24,16 +24,11 @@ export function EditorPanel({ editor, isRunning = false, onRunCode, onCodeChange
     const [showLanguageMenu, setShowLanguageMenu] = useState(false)
 
     useEffect(() => {
-        const nextLanguage = editor.languages.find((language) => language.id === editor.defaultLanguageId) ?? editor.languages[0]
-        setSelectedLanguage(nextLanguage)
-        setCode(editor.codeTemplates[nextLanguage.id] ?? FALLBACK_TEMPLATE)
-    }, [editor.defaultLanguageId, editor.languages, editor.codeTemplates])
-
-    useEffect(() => {
         onCodeChange?.(code, selectedLanguage.id)
     }, [code, selectedLanguage.id, onCodeChange])
 
     const currentFileName = `${editor.fileBaseName}${selectedLanguage.extension}`
+    const resolvedTabSize = editor.tabSize && editor.tabSize > 0 ? editor.tabSize : 2
 
     const handleLanguageChange = (language: CodeLanguageOption) => {
         setSelectedLanguage(language)
@@ -121,7 +116,8 @@ export function EditorPanel({ editor, isRunning = false, onRunCode, onCodeChange
                         roundedSelection: false,
                         scrollBeyondLastLine: false,
                         automaticLayout: true,
-                        tabSize: 2,
+                        tabSize: resolvedTabSize,
+                        trimAutoWhitespace: false,
                         wordWrap: 'on',
                         padding: { top: 16, bottom: 16 },
                         renderLineHighlight: 'all',

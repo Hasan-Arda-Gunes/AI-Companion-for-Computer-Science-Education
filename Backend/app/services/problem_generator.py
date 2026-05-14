@@ -1,43 +1,33 @@
 """
 AI Problem Generator Service
-Generates complete programming problems from user descriptions using Gemini
+Generates complete programming problems using dual LLM providers (Gemini and Ollama)
 """
-import google.generativeai as genai
 import json
 from typing import Dict, List, Any, Optional
-from app.core.config import settings
+from app.services.ai_service import ai_service
 
 
 class ProblemGeneratorService:
-    """Service for AI-powered problem generation"""
+    """Service for AI-powered problem generation with multi-provider support"""
     
-    def __init__(self):
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = settings.LLM_MODEL
-
-    def _generate_text(self, prompt: str, max_tokens: int, temperature: float) -> str:
-        """Generate text from Gemini and normalize empty responses."""
-        model = genai.GenerativeModel(model_name=self.model)
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                max_output_tokens=max_tokens,
-                temperature=temperature,
-            ),
-        )
-
-        if hasattr(response, "text") and response.text:
-            return response.text.strip()
-
-        finish_reason = "unknown"
-        if getattr(response, "candidates", None):
-            candidate = response.candidates[0]
-            finish_reason = str(getattr(candidate, "finish_reason", "unknown"))
-
-        prompt_feedback = str(getattr(response, "prompt_feedback", "none"))
-        raise ValueError(
-            f"Gemini returned empty response (finish_reason={finish_reason}, prompt_feedback={prompt_feedback})"
-        )
+    def get_available_providers(self) -> Dict[str, bool]:
+        """Get dict of available providers and their status"""
+        return ai_service.list_available_providers()
+    
+    async def _generate_text(self, prompt: str, provider: str = "gemini") -> str:
+        """Generate text using specified LLM provider"""
+        try:
+            response = await ai_service.chat_assistance(
+                user_message=prompt,
+                problem_context=None,
+                current_code=None,
+                provider=provider
+            )
+            if response:
+                return response.strip()
+            raise ValueError("Empty response from AI service")
+        except Exception as e:
+            raise ValueError(f"Error generating text with {provider}: {str(e)}")
     
     async def generate_problem(
         self,
@@ -47,7 +37,8 @@ class ProblemGeneratorService:
         additional_requirements: Optional[str] = None,
         num_test_cases: int = 5,
         num_examples: int = 2,
-        num_hints: int = 3
+        num_hints: int = 3,
+        provider: str = "gemini"
     ) -> Dict[str, Any]:
         """
         Generate a complete programming problem from a description
@@ -60,6 +51,7 @@ class ProblemGeneratorService:
             num_test_cases: Number of test cases to generate
             num_examples: Number of example inputs/outputs
             num_hints: Number of progressive hints
+            provider: LLM provider to use (gemini or ollama)
             
         Returns:
             Complete problem structure ready to be saved to database
@@ -148,11 +140,7 @@ Generate ONLY the JSON object, no additional text or markdown formatting.
 """
 
         try:
-            problem_text = self._generate_text(
-                prompt=prompt,
-                max_tokens=4000,
-                temperature=0.8,
-            )
+            problem_text = await self._generate_text(prompt, provider)
             
             # Remove markdown code fences if present
             if problem_text.startswith("```"):
@@ -182,7 +170,8 @@ Generate ONLY the JSON object, no additional text or markdown formatting.
     async def refine_problem(
         self,
         existing_problem: Dict[str, Any],
-        refinement_request: str
+        refinement_request: str,
+        provider: str = "gemini"
     ) -> Dict[str, Any]:
         """
         Refine an existing problem based on user feedback
@@ -190,6 +179,7 @@ Generate ONLY the JSON object, no additional text or markdown formatting.
         Args:
             existing_problem: Current problem structure
             refinement_request: What to change/improve
+            provider: LLM provider to use (gemini or ollama)
             
         Returns:
             Updated problem structure
@@ -211,11 +201,7 @@ Return ONLY the JSON object, no additional text.
 """
 
         try:
-            problem_text = self._generate_text(
-                prompt=prompt,
-                max_tokens=4000,
-                temperature=0.7,
-            )
+            problem_text = await self._generate_text(prompt, provider)
             
             # Clean up response
             if problem_text.startswith("```"):
@@ -234,7 +220,8 @@ Return ONLY the JSON object, no additional text.
         self,
         problem_description: str,
         function_signature: str,
-        num_cases: int = 5
+        num_cases: int = 5,
+        provider: str = "gemini"
     ) -> List[Dict[str, Any]]:
         """
         Generate additional test cases for an existing problem
@@ -243,6 +230,7 @@ Return ONLY the JSON object, no additional text.
             problem_description: Description of the problem
             function_signature: Function signature/template
             num_cases: Number of test cases to generate
+            provider: LLM provider to use (gemini or ollama)
             
         Returns:
             List of test cases
@@ -277,11 +265,7 @@ Return ONLY the JSON array, no additional text.
 """
 
         try:
-            cases_text = self._generate_text(
-                prompt=prompt,
-                max_tokens=2000,
-                temperature=0.7,
-            )
+            cases_text = await self._generate_text(prompt, provider)
             
             # Clean up
             if cases_text.startswith("```"):
@@ -300,7 +284,8 @@ Return ONLY the JSON array, no additional text.
         self,
         topic: str,
         difficulty: str,
-        num_suggestions: int = 5
+        num_suggestions: int = 5,
+        provider: str = "gemini"
     ) -> List[Dict[str, str]]:
         """
         Get problem ideas/suggestions based on topic and difficulty
@@ -309,6 +294,7 @@ Return ONLY the JSON array, no additional text.
             topic: Programming topic
             difficulty: Difficulty level
             num_suggestions: Number of ideas to generate
+            provider: LLM provider to use (gemini or ollama)
             
         Returns:
             List of problem ideas with titles and brief descriptions
@@ -335,11 +321,7 @@ Return ONLY the JSON array, no additional text.
 """
 
         try:
-            ideas_text = self._generate_text(
-                prompt=prompt,
-                max_tokens=1500,
-                temperature=0.9,
-            )
+            ideas_text = await self._generate_text(prompt, provider)
             
             # Clean up
             if ideas_text.startswith("```"):

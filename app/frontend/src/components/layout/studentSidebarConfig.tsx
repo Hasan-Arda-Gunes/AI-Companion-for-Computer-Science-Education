@@ -15,7 +15,7 @@ export const defaultStudentSidebarProfile: StudentProfile = {
     meta: 'Level 12 • 1,340 XP',
 }
 
-export const defaultStudentSidebarExpandedIds = ['courses']
+export const defaultStudentSidebarExpandedIds: string[] = []
 
 export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
     {
@@ -26,57 +26,6 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
             <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M3 10.5 12 3l9 7.5" />
                 <path d="M5.5 9.5V20h13V9.5" />
-            </svg>
-        ),
-    },
-    {
-        id: 'courses',
-        label: 'Courses',
-        icon: (
-            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M2 5a2 2 0 0 1 2-2h7v17H4a2 2 0 0 0-2 2Z" />
-                <path d="M22 5a2 2 0 0 0-2-2h-7v17h7a2 2 0 0 1 2 2Z" />
-            </svg>
-        ),
-        children: [
-            {
-                id: 'course-ds',
-                label: 'Data Structures',
-                page: 'course-ds',
-                icon: (
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <ellipse cx="12" cy="5" rx="7" ry="3" />
-                        <path d="M5 5v6c0 1.66 3.13 3 7 3s7-1.34 7-3V5" />
-                        <path d="M5 11v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6" />
-                    </svg>
-                ),
-            },
-            {
-                id: 'course-algo',
-                label: 'Algorithms',
-                page: 'course-algo',
-                icon: (
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <rect x="10" y="2" width="4" height="4" />
-                        <rect x="3" y="16" width="4" height="4" />
-                        <rect x="17" y="16" width="4" height="4" />
-                        <path d="M12 6v5" />
-                        <path d="M12 11H5v5" />
-                        <path d="M12 11h7v5" />
-                    </svg>
-                ),
-            },
-        ],
-    },
-    {
-        id: 'code-lab',
-        label: 'Code Lab',
-        page: 'codelab',
-        icon: (
-            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="m8 9-4 3 4 3" />
-                <path d="m16 9 4 3-4 3" />
-                <path d="m14 5-4 14" />
             </svg>
         ),
     },
@@ -94,14 +43,15 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
         ),
     },
     {
-        id: 'create-question',
-        label: 'Create Question',
-        page: 'create-question',
+        id: 'classes',
+        label: 'Classes',
+        page: 'classes',
         icon: (
             <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M12 5v14" />
-                <path d="M5 12h14" />
-                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 7h18" />
+                <path d="M7 7v12" />
+                <path d="M17 7v12" />
+                <path d="M5 19h14" />
             </svg>
         ),
     },
@@ -131,11 +81,8 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
 
 export const defaultStudentSidebarPagePathMap: Record<string, string> = {
     studentdashboard: '/student/dashboard',
-    codelab: '/code-lab',
     problems: '/student/problems',
-    'create-question': '/student/create-question',
+    classes: '/classes',
     achievements: '/student/dashboard',
-    settings: '/student/settings',
-    'course-ds': '/student/dashboard',
-    'course-algo': '/student/dashboard',
+    settings: '/settings',
 }

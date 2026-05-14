@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
+import type { UserRole } from '../../features/auth/types'
 import { AuthParticles } from './AuthParticles'
 
 type RegisterViewProps = {
@@ -8,12 +9,14 @@ type RegisterViewProps = {
     username: string
     email: string
     password: string
+    role: UserRole
     errorMessage?: string
     isSubmitting: boolean
     onFullNameChange: (value: string) => void
     onUsernameChange: (value: string) => void
     onEmailChange: (value: string) => void
     onPasswordChange: (value: string) => void
+    onRoleChange: (value: UserRole) => void
     onSubmit: () => void
 }
 
@@ -22,12 +25,14 @@ export function RegisterView({
     username,
     email,
     password,
+    role,
     errorMessage,
     isSubmitting,
     onFullNameChange,
     onUsernameChange,
     onEmailChange,
     onPasswordChange,
+    onRoleChange,
     onSubmit,
 }: RegisterViewProps) {
     const [showPassword, setShowPassword] = useState(false)
@@ -49,6 +54,34 @@ export function RegisterView({
                         <Field label="Full Name" value={fullName} placeholder="John Doe" focusedField={focusedField} setFocusedField={setFocusedField} fieldKey="fullName" onChange={onFullNameChange} />
                         <Field label="Username" value={username} placeholder="student123" focusedField={focusedField} setFocusedField={setFocusedField} fieldKey="username" onChange={onUsernameChange} />
                         <Field label="Email" value={email} placeholder="your.email@example.com" focusedField={focusedField} setFocusedField={setFocusedField} fieldKey="email" onChange={onEmailChange} />
+
+                        <label className="block space-y-2">
+                            <span className="text-sm font-semibold text-foreground">Role</span>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onRoleChange('student')}
+                                    aria-pressed={role === 'student'}
+                                    className={`rounded border px-3 py-2 text-sm font-medium transition-colors ${role === 'student'
+                                            ? 'border-primary bg-primary/20 text-foreground'
+                                            : 'border-border bg-secondary text-muted-foreground hover:text-foreground'
+                                        }`}
+                                >
+                                    Student
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onRoleChange('teacher')}
+                                    aria-pressed={role === 'teacher'}
+                                    className={`rounded border px-3 py-2 text-sm font-medium transition-colors ${role === 'teacher'
+                                            ? 'border-primary bg-primary/20 text-foreground'
+                                            : 'border-border bg-secondary text-muted-foreground hover:text-foreground'
+                                        }`}
+                                >
+                                    Teacher
+                                </button>
+                            </div>
+                        </label>
 
                         <label className="block space-y-2">
                             <span className="text-sm font-semibold text-foreground">Password</span>

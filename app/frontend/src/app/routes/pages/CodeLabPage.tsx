@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CodeLabWorkspace } from '../../../components/codelab/CodeLabWorkspace'
-import { StudentLayout } from '../../../components/layout/StudentLayout'
 import { chatWithAi, explainError, requestHint } from '../../../features/ai/api/aiApi'
 import { getProblemById } from '../../../features/problems/api/problemsApi'
-import { getDefaultEditorLanguage } from '../../../features/settings/editorPreferences'
+import { getDefaultEditorLanguage, getEditorTabSize } from '../../../features/settings/editorPreferences'
 import { startSession } from '../../../features/sessions/api/sessionsApi'
 import {
     completeAndClearActiveLearningSession,
@@ -13,7 +12,13 @@ import {
 } from '../../../features/sessions/sessionLifecycle'
 import { getSubmission, submitCode } from '../../../features/submissions/api/submissionsApi'
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, ConsoleLog, EvolutionStage, MentorData, QuestionData } from '../../../components/codelab/types'
+import type { LLMProvider } from '../../../features/ai/types'
 import type { SubmissionDetails } from '../../../features/submissions/types'
+import { useAuthSession } from '../../../features/auth/context/useAuthSession'
+import { defaultInstructorSidebarPagePathMap } from '../../../components/layout/instructorSidebarConfig'
+import { defaultStudentSidebarPagePathMap } from '../../../components/layout/studentSidebarConfig'
+import { DashboardLayout } from '../../../components/layout/DashboardLayout'
+import { RoleAwareSidebar } from '../../../components/layout/RoleAwareSidebar'
 
 const sampleStages: EvolutionStage[] = [
     { id: 'stage-1', label: 'Stage 1', active: true },
@@ -249,6 +254,9 @@ const sampleMentor: MentorData = {
 }
 
 export function CodeLabPage() {
+    const navigate = useNavigate()
+    const { user, signOut } = useAuthSession()
+    const isTeacher = user?.role === 'teacher'
     const [searchParams] = useSearchParams()
     const selectedProblemId = searchParams.get('problemId')
     const [mentorOpen, setMentorOpen] = useState(true)
@@ -265,6 +273,11 @@ export function CodeLabPage() {
         xp: 1280,
     })
     const [defaultLanguageId, setDefaultLanguageId] = useState(() => getDefaultEditorLanguage())
+    const [tabSize] = useState(() => getEditorTabSize())
+
+    const pagePathMap = isTeacher
+        ? defaultInstructorSidebarPagePathMap
+        : defaultStudentSidebarPagePathMap
 
     const resolvedEditor = useMemo<CodeEditorData>(() => {
         const languageExists = sampleEditor.languages.some((language) => language.id === defaultLanguageId)
@@ -275,10 +288,11 @@ export function CodeLabPage() {
             defaultLanguageId: resolvedDefaultLanguage,
             codeTemplates: {
                 ...sampleEditor.codeTemplates,
-                python: starterCode?.trim() ? starterCode : sampleEditor.codeTemplates.python,
+                python: starterCode && starterCode.length > 0 ? starterCode : sampleEditor.codeTemplates.python,
             },
+            tabSize,
         }
-    }, [defaultLanguageId, starterCode])
+    }, [defaultLanguageId, starterCode, tabSize])
 
     const createLog = (type: ConsoleLog['type'], message: string): ConsoleLog => ({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -387,9 +401,10 @@ export function CodeLabPage() {
             ])
 
             try {
+                const sanitizedCode = code.replace(/\t/g, ' '.repeat(tabSize))
                 const submission = await submitCode({
                     problem_id: resolvedProblemId,
-                    code,
+                    code: sanitizedCode,
                     language: backendLanguage,
                     session_id: activeSessionId,
                 })
@@ -459,7 +474,7 @@ export function CodeLabPage() {
         }))
     }
 
-    const handleMentorRequestHint = async () => {
+    const handleMentorRequestHint = async (provider: LLMProvider) => {
         const resolvedProblemId = Number(selectedProblemId)
         if (!Number.isFinite(resolvedProblemId) || resolvedProblemId <= 0) {
             throw new Error('Select a problem to request a hint.')
@@ -474,6 +489,7 @@ export function CodeLabPage() {
             session_id: activeSessionId,
             current_code: currentCode,
             hint_level: hintLevel,
+            provider,
         })
 
         setHintLevel(result.hint_level + 1)
@@ -484,18 +500,19 @@ export function CodeLabPage() {
         return result.hint
     }
 
-    const handleMentorChat = async (message: string) => {
+    const handleMentorChat = async (message: string, provider: LLMProvider) => {
         const result = await chatWithAi({
             message,
             context: {
                 current_code: currentCode,
             },
+            provider,
         })
 
         return result.response
     }
 
-    const handleMentorExplainError = async () => {
+    const handleMentorExplainError = async (provider: LLMProvider) => {
         const lastErrorLog = [...consoleData.logs].reverse().find((log) => log.type === 'error')
 
         if (!lastErrorLog) {
@@ -503,8 +520,10 @@ export function CodeLabPage() {
         }
 
         const result = await explainError({
-            error_message: lastErrorLog.message,
             code: currentCode,
+            language: defaultLanguageId,
+            context: `Runtime error: ${lastErrorLog.message}`,
+            provider,
         })
 
         const explanation = result.explanation ?? result.response
@@ -619,8 +638,9 @@ export function CodeLabPage() {
                 }
 
                 setQuestionData(mappedQuestion)
-                setStarterCode(detail.starter_code?.trim() ? detail.starter_code : null)
-                setCurrentCode(detail.starter_code?.trim() ? detail.starter_code : sampleEditor.codeTemplates.python)
+                const resolvedStarterCode = detail.starter_code ?? null
+                setStarterCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : null)
+                setCurrentCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : sampleEditor.codeTemplates.python)
                 setHintLevel(1)
                 setDefaultLanguageId(getDefaultEditorLanguage())
                 appendLogs([createLog('success', `Loaded problem: ${detail.title}`)])
@@ -642,11 +662,26 @@ export function CodeLabPage() {
     }, [selectedProblemId])
 
     return (
-        <StudentLayout
-            currentPage="codelab"
+        <DashboardLayout
             title="Code Lab"
             subtitle="Solve algorithm problems with guided AI support and an integrated coding workspace."
-            showHeader={false}
+            sidebar={
+                <RoleAwareSidebar
+                    className="hidden lg:flex"
+                    currentPage="codelab"
+                    onNavigate={(page) => {
+                        const path = pagePathMap[page]
+                        if (path) {
+                            navigate(path)
+                        }
+                    }}
+                    onLogout={() => {
+                        void completeAndClearActiveLearningSession()
+                        signOut()
+                        navigate('/login', { replace: true })
+                    }}
+                />
+            }
         >
             <div className="-m-4 h-dvh overflow-hidden border border-border bg-card shadow-sm sm:-m-6 lg:-m-10 lg:border-0">
                 <CodeLabWorkspace
@@ -671,6 +706,6 @@ export function CodeLabPage() {
                     onMentorExplainError={handleMentorExplainError}
                 />
             </div>
-        </StudentLayout>
+        </DashboardLayout>
     )
 }

@@ -212,7 +212,7 @@ Get detailed information about a specific problem (creator or admin only).
 #### Create Problem
 **POST** `/problems/`
 
-Create a new programming problem (teachers only).
+Create a new programming problem for a specific class (teachers only).
 
 **Required Role:** Teacher
 
@@ -223,6 +223,7 @@ Create a new programming problem (teachers only).
   "description": "Find the maximum element in an array",
   "difficulty": "beginner",
   "topic": "arrays",
+  "class_id": 1,
   "examples": [
     {"input": [1, 5, 3], "expected_output": 5}
   ],
@@ -234,16 +235,23 @@ Create a new programming problem (teachers only).
       "function_name": "find_max"
     }
   ],
-  "starter_code": "def find_max(arr):\n    pass",
-  "evaluation_criteria": {
-    "check_correctness": true,
-    "check_efficiency": true
-  },
-  "hints": ["Consider iterating through the array"],
-  "time_limit": 5000,
-  "memory_limit": 256
+  "evaluation_criteria": {"correctness": 100},
+  "starter_code": "def find_max(arr):\n    # Complete this function",
+  "hints": ["Use a loop to compare elements"],
+  "learning_objectives": ["Understand loops", "Compare values"],
+  "related_concepts": ["loops", "comparisons"]
 }
 ```
+
+**Required Fields:**
+- `title` - Problem title
+- `description` - Problem description
+- `difficulty` - "beginner", "intermediate", or "advanced"
+- `topic` - Problem topic/category
+- `class_id` - ID of the class this problem is assigned to
+- `examples` - Array of example input/output pairs
+- `test_cases` - Array of test cases for evaluation
+- `evaluation_criteria` - Criteria for evaluating submissions
 
 **Response (201):**
 ```json
@@ -262,7 +270,8 @@ Create a new programming problem (teachers only).
 **Status Codes:**
 - 201 - Problem created successfully
 - 403 - Only teachers can create problems
-- 422 - Validation error
+- 404 - Class not found
+- 422 - Validation error (missing required fields or invalid class_id)
 
 #### Update Problem
 **PUT** `/problems/{problem_id}`
@@ -279,6 +288,7 @@ Update a problem (creator or admin only). All fields are optional.
   "description": "Find the maximum element in an array",
   "difficulty": "intermediate",
   "topic": "arrays",
+  "class_id": 2,
   "starter_code": "def find_max(arr):\n    # Complete this function",
   "examples": [
     {"input": [1, 5, 3], "expected_output": 5}
@@ -294,6 +304,9 @@ Update a problem (creator or admin only). All fields are optional.
   "is_active": true
 }
 ```
+
+**Optional Fields:**
+- `class_id` - Can reassign problem to a different class
 
 **Response (200):**
 ```json
@@ -344,7 +357,8 @@ Submit code for evaluation. The submission will be evaluated asynchronously.
   "problem_id": 1,
   "code": "def two_sum(nums, target):\n    hash_map = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in hash_map:\n            return [hash_map[complement], i]\n        hash_map[num] = i",
   "language": "python",
-  "session_id": 1
+  "session_id": 1,
+  "provider": "gemini"
 }
 ```
 
@@ -380,6 +394,7 @@ Get detailed results of a submission including AI feedback and test results.
   "language": "python",
   "status": "correct",
   "score": 95.5,
+  "provider_used": "gemini",
   "test_results": [
     {
       "test_id": "test_1",
@@ -569,6 +584,195 @@ Get all study sessions for the current user.
 
 ---
 
+### Classes
+
+Class management endpoints for teachers to create and manage learning classes with enrolled students.
+
+#### Create Class
+**POST** `/classes/`
+
+Create a new class (teachers only).
+
+**Required Role:** Teacher
+
+**Request:**
+```json
+{
+  "name": "Introduction to Python",
+  "description": "Learn Python fundamentals with hands-on problems"
+}
+```
+
+**Response (201):**
+```json
+{
+  "id": 1,
+  "name": "Introduction to Python",
+  "description": "Learn Python fundamentals with hands-on problems",
+  "teacher_id": 5,
+  "is_active": true,
+  "created_at": "2024-02-16T10:00:00Z",
+  "updated_at": null,
+  "student_count": 0
+}
+```
+
+**Status Codes:**
+- 201 - Class created successfully
+- 403 - Only teachers can create classes
+- 422 - Validation error
+
+#### List My Classes
+**GET** `/classes/`
+
+List classes for the current user.
+- **Teachers** see the classes they own
+- **Students** see the classes they are enrolled in
+
+**Response (200):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Introduction to Python",
+    "description": "Learn Python fundamentals",
+    "teacher_id": 5,
+    "is_active": true,
+    "created_at": "2024-02-16T10:00:00Z",
+    "updated_at": null,
+    "student_count": 25
+  },
+  {
+    "id": 2,
+    "name": "Data Structures",
+    "description": "Master arrays, linked lists, trees, and graphs",
+    "teacher_id": 5,
+    "is_active": true,
+    "created_at": "2024-02-17T14:30:00Z",
+    "updated_at": null,
+    "student_count": 18
+  }
+]
+```
+
+**Status Codes:**
+- 200 - Classes retrieved
+- 401 - Not authenticated
+
+#### Get Class Details
+**GET** `/classes/{class_id}`
+
+Get detailed information about a class including all enrolled students (teachers only).
+
+**Required Permission:** Must be the class teacher
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "name": "Introduction to Python",
+  "description": "Learn Python fundamentals with hands-on problems",
+  "teacher_id": 5,
+  "is_active": true,
+  "created_at": "2024-02-16T10:00:00Z",
+  "updated_at": null,
+  "student_count": 3,
+  "students": [
+    {
+      "id": 10,
+      "email": "alice@example.com",
+      "username": "alice_wonder",
+      "full_name": "Alice Wonder",
+      "role": "student"
+    },
+    {
+      "id": 11,
+      "email": "bob@example.com",
+      "username": "bob_builder",
+      "full_name": "Bob Builder",
+      "role": "student"
+    },
+    {
+      "id": 12,
+      "email": "charlie@example.com",
+      "username": "charlie_code",
+      "full_name": "Charlie Code",
+      "role": "student"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- 200 - Class retrieved
+- 403 - Only class teacher can view this
+- 404 - Class not found
+
+#### Add Student to Class
+**POST** `/classes/{class_id}/students`
+
+Add a student to a class (teachers only).
+
+**Required Permission:** Must be the class teacher
+
+**Request:**
+```json
+{
+  "student_id": 10
+}
+```
+
+**Response (201):**
+```json
+{
+  "class_id": 1,
+  "student": {
+    "id": 10,
+    "email": "alice@example.com",
+    "username": "alice_wonder",
+    "full_name": "Alice Wonder",
+    "role": "student"
+  },
+  "added_at": "2024-02-16T11:15:00Z"
+}
+```
+
+**Status Codes:**
+- 201 - Student added successfully
+- 400 - Student already enrolled or user is not a student
+- 403 - Only class teacher can add students
+- 404 - Class or student not found
+
+#### Remove Student from Class
+**DELETE** `/classes/{class_id}/students/{student_id}`
+
+Remove a student from a class (teachers only).
+
+**Required Permission:** Must be the class teacher
+
+**Response:** 204 No Content
+
+**Status Codes:**
+- 204 - Student removed successfully
+- 403 - Only class teacher can remove students
+- 404 - Class not found or student not enrolled
+
+#### Delete Class
+**DELETE** `/classes/{class_id}`
+
+Soft-delete a class (teachers only). Historical data is preserved.
+
+**Required Permission:** Must be the class teacher
+
+**Response:** 204 No Content
+
+**Status Codes:**
+- 204 - Class deleted successfully
+- 403 - Only class teacher can delete this class
+- 404 - Class not found
+
+---
+
 ### AI Assistance
 
 AI-powered assistance including hints, explanations, and chat support for students.
@@ -586,7 +790,8 @@ Get a progressive hint for a problem. Each problem has up to 3 levels of hints.
   "problem_id": 1,
   "session_id": 1,
   "current_code": "def two_sum(nums, target):\n    # stuck here",
-  "hint_level": 1
+  "hint_level": 1,
+  "provider": "gemini"
 }
 ```
 
@@ -596,7 +801,7 @@ Get a progressive hint for a problem. Each problem has up to 3 levels of hints.
   "hint": "Think about what data structure would allow you to quickly check if a number exists. A hash map (dictionary in Python) can look up values in O(1) time.",
   "hint_level": 1,
   "remaining_hints": 2,
-  "next_level_available": true
+  "provider_used": "gemini"
 }
 ```
 
@@ -654,6 +859,7 @@ Have a conversation with the AI assistant about problems, concepts, or debugging
 {
   "message": "I'm getting an IndexError. What does that mean?",
   "problem_id": 1,
+  "provider": "gemini",
   "context": {
     "current_code": "def two_sum(nums, target):\n    return [nums[10], nums[20]]",
     "error_message": "list index out of range"
@@ -665,12 +871,12 @@ Have a conversation with the AI assistant about problems, concepts, or debugging
 ```json
 {
   "response": "An IndexError with 'list index out of range' means you're trying to access an element at an index that doesn't exist in the list. In your code, you're trying to access index 10 and 20, but the list might be smaller. You should check the length of the list first using len().",
-  "follow_up_suggestions": [
+  "provider_used": "gemini",
+  "suggestions": [
     "How can I check the length of a list?",
     "What debugging techniques can help?",
     "Can you show me a safe way to access list elements?"
-  ],
-  "conversation_id": "conv_123"
+  ]
 }
 ```
 

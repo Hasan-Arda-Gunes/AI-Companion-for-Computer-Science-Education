@@ -37,6 +37,7 @@ export type CodeEditorData = {
   languages: CodeLanguageOption[]
   codeTemplates: Record<string, string>
   runButtonLabel?: string
+  tabSize?: number
 }
 
 export type CodeLanguageOption = {

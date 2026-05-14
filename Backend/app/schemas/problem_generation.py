@@ -3,6 +3,7 @@ Additional schemas for AI-powered problem generation
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
+from app.schemas.schemas import LLMProvider
 
 
 class ProblemGenerationRequest(BaseModel):
@@ -42,6 +43,10 @@ class ProblemGenerationRequest(BaseModel):
         le=5,
         description="Number of progressive hints"
     )
+    provider: LLMProvider = Field(
+        default=LLMProvider.GEMINI,
+        description="LLM provider to use: 'gemini' or 'ollama'"
+    )
 
 
 class ProblemRefinementRequest(BaseModel):
@@ -56,6 +61,10 @@ class ProblemRefinementRequest(BaseModel):
             "Add more examples"
         ]
     )
+    provider: LLMProvider = Field(
+        default=LLMProvider.GEMINI,
+        description="LLM provider to use: 'gemini' or 'ollama'"
+    )
 
 
 class TestCaseGenerationRequest(BaseModel):
@@ -66,6 +75,10 @@ class TestCaseGenerationRequest(BaseModel):
         ge=1,
         le=10,
         description="Number of test cases to generate"
+    )
+    provider: LLMProvider = Field(
+        default=LLMProvider.GEMINI,
+        description="LLM provider to use: 'gemini' or 'ollama'"
     )
 
 
@@ -78,6 +91,10 @@ class ProblemSuggestionRequest(BaseModel):
         ge=3,
         le=10,
         description="Number of suggestions to get"
+    )
+    provider: LLMProvider = Field(
+        default=LLMProvider.GEMINI,
+        description="LLM provider to use: 'gemini' or 'ollama'"
     )
 
 
@@ -93,6 +110,7 @@ class ProblemGenerationResponse(BaseModel):
     success: bool
     message: str
     problem_id: Optional[int] = None
+    provider_used: Optional[str] = None  # Track which LLM provider was used
     problem: Optional[Dict[str, Any]] = None
     preview: Optional[Dict[str, Any]] = None  # Preview without saving
 

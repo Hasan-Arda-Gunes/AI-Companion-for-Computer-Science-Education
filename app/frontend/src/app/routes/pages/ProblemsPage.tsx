@@ -1,63 +1,136 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { StudentLayout } from '../../../components/layout/StudentLayout'
+import { listMyClasses } from '../../../features/classes/api/classesApi'
+import type { ClassSummary } from '../../../features/classes/types'
 import { listProblems } from '../../../features/problems/api/problemsApi'
-import type { Problem } from '../../../features/problems/types'
+import type { Problem, ProblemDifficulty } from '../../../features/problems/types'
+import { StudentLayout } from '../../../components/layout/StudentLayout'
 
 export function ProblemsPage() {
     const navigate = useNavigate()
     const [problems, setProblems] = useState<Problem[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [searchValue, setSearchValue] = useState('')
+    const [difficultyValue, setDifficultyValue] = useState<ProblemDifficulty | ''>('')
+    const [topicValue, setTopicValue] = useState('')
+    const [classValue, setClassValue] = useState<number | ''>('')
+    const [classes, setClasses] = useState<ClassSummary[]>([])
 
-    useEffect(() => {
-        let isMounted = true
-
-        const loadProblems = async () => {
+    const fetchProblems = useCallback(
+        async (params?: { search?: string; difficulty?: ProblemDifficulty; topic?: string; class_id?: number }) => {
             setIsLoading(true)
             setErrorMessage(null)
 
             try {
-                const response = await listProblems()
-                if (!isMounted) {
-                    return
-                }
-
-                setProblems(response.problems)
+                const response = await listProblems(params)
+                setProblems(response.problems ?? [])
             } catch (error) {
-                if (!isMounted) {
-                    return
-                }
-
                 const message = error instanceof Error ? error.message : 'Failed to load problems'
                 setErrorMessage(message)
             } finally {
-                if (isMounted) {
-                    setIsLoading(false)
-                }
+                setIsLoading(false)
+            }
+        },
+        [],
+    )
+
+    useEffect(() => {
+        const loadClasses = async () => {
+            try {
+                const classesData = await listMyClasses()
+                setClasses(classesData)
+            } catch {
+                // Silently fail for classes load
             }
         }
 
-        loadProblems()
-
-        return () => {
-            isMounted = false
-        }
+        void loadClasses()
     }, [])
+
+    useEffect(() => {
+        void fetchProblems()
+    }, [fetchProblems])
+
+    const handleApplyFilters = () => {
+        void fetchProblems({
+            search: searchValue.trim() || undefined,
+            difficulty: difficultyValue || undefined,
+            topic: topicValue.trim() || undefined,
+            class_id: classValue ? Number(classValue) : undefined,
+        })
+    }
+
+    const handleClearFilters = () => {
+        setSearchValue('')
+        setDifficultyValue('')
+        setTopicValue('')
+        setClassValue('')
+    }
 
     return (
         <StudentLayout
             currentPage="problems"
             title="Problems"
-            subtitle="Temporary page showing problems from GET /problems/."
+            subtitle="Browse problems and filter by class."
             showHeader={false}
         >
             <div className="space-y-4">
                 <section className="rounded-xl border border-border bg-card p-4">
                     <h1 className="text-2xl font-semibold text-foreground">Problems</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Data source: GET /problems/
-                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">Data source: GET /problems/</p>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                        <input
+                            value={searchValue}
+                            onChange={(event) => setSearchValue(event.target.value)}
+                            placeholder="Search title or description"
+                            className="min-w-56 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                        />
+                        <select
+                            value={difficultyValue}
+                            onChange={(event) => setDifficultyValue(event.target.value as ProblemDifficulty | '')}
+                            className="min-w-45 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                        >
+                            <option value="">All difficulties</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                        <input
+                            value={topicValue}
+                            onChange={(event) => setTopicValue(event.target.value)}
+                            placeholder="Topic"
+                            className="min-w-40 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                        />
+                        <select
+                            value={classValue}
+                            onChange={(event) =>
+                                setClassValue(event.target.value ? Number(event.target.value) : '')
+                            }
+                            className="min-w-45 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                        >
+                            <option value="">All classes</option>
+                            {classes.map((cls) => (
+                                <option key={cls.id} value={cls.id}>
+                                    {cls.name}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            type="button"
+                            onClick={handleApplyFilters}
+                            className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+                        >
+                            Apply filters
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleClearFilters}
+                            className="rounded-md border border-border px-3 py-2 text-sm text-foreground transition hover:border-primary/40"
+                        >
+                            Clear
+                        </button>
+                    </div>
                 </section>
 
                 {isLoading ? (
@@ -74,9 +147,7 @@ export function ProblemsPage() {
 
                 {!isLoading && !errorMessage ? (
                     <section className="rounded-xl border border-border bg-card p-4">
-                        <div className="mb-3 text-sm text-muted-foreground">
-                            Total loaded: {problems.length}
-                        </div>
+                        <div className="mb-3 text-sm text-muted-foreground">Total loaded: {problems.length}</div>
                         <div className="space-y-3">
                             {problems.map((problem) => (
                                 <button
@@ -93,6 +164,11 @@ export function ProblemsPage() {
                                         <span className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">
                                             {problem.topic}
                                         </span>
+                                        {problem.class_id ? (
+                                            <span className="rounded-md border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                                Class: {problem.class_id}
+                                            </span>
+                                        ) : null}
                                     </div>
                                 </button>
                             ))}

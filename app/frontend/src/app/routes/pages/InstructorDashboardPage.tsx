@@ -1,8 +1,9 @@
-import { DashboardLayout } from '../../../components/layout/DashboardLayout'
+import { InstructorLayout } from '../../../components/layout/InstructorLayout'
 
 export function InstructorDashboardPage() {
     return (
-        <DashboardLayout
+        <InstructorLayout
+            currentPage="instructordashboard"
             title="Instructor Dashboard"
             subtitle="Monitor classes, question performance, and student-level outcomes from one place."
         >
@@ -21,6 +22,6 @@ export function InstructorDashboardPage() {
                 <p className="mt-2 text-sm text-muted-foreground">Recent submission and progression activity will appear in this area.</p>
                 <div className="mt-4 h-52 rounded-lg border border-dashed border-border bg-background" />
             </article>
-        </DashboardLayout>
+        </InstructorLayout>
     )
 }

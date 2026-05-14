@@ -1,7 +1,7 @@
 """
 SQLAlchemy database models
 """
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Float, JSON, Enum
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Float, JSON, Enum, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -48,6 +48,8 @@ class User(Base):
     submissions = relationship("Submission", back_populates="user")
     progress = relationship("UserProgress", back_populates="user")
     sessions = relationship("LearningSession", back_populates="user")
+    classes_taught = relationship("Classroom", back_populates="teacher")
+    class_memberships = relationship("ClassMembership", back_populates="student")
 
 
 class Problem(Base):
@@ -79,6 +81,7 @@ class Problem(Base):
     
     # Metadata
     created_by = Column(Integer, ForeignKey("users.id"))
+    class_id = Column(Integer, ForeignKey("classes.id"), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     is_active = Column(Boolean, default=True)
@@ -110,6 +113,7 @@ class Submission(Base):
     
     # AI Feedback
     ai_feedback = Column(JSON)  # Structured feedback from LLM
+    provider_used = Column(String(50), default="gemini")  # Track which LLM provider was used
     correctness_analysis = Column(Text)
     quality_analysis = Column(Text)
     suggestions = Column(JSON)
@@ -195,3 +199,41 @@ class AIInteraction(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     tokens_used = Column(Integer)
     response_time = Column(Float)  # ms
+
+
+class Classroom(Base):
+    """Teacher-managed class containing student members"""
+    __tablename__ = "classes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(150), nullable=False)
+    description = Column(Text)
+    teacher_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    teacher = relationship("User", back_populates="classes_taught")
+    memberships = relationship(
+        "ClassMembership",
+        back_populates="classroom",
+        cascade="all, delete-orphan"
+    )
+
+
+class ClassMembership(Base):
+    """Mapping table linking students to classes"""
+    __tablename__ = "class_memberships"
+    __table_args__ = (
+        UniqueConstraint("class_id", "student_id", name="uq_class_student_membership"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    class_id = Column(Integer, ForeignKey("classes.id"), nullable=False, index=True)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    added_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    classroom = relationship("Classroom", back_populates="memberships")
+    student = relationship("User", back_populates="class_memberships")

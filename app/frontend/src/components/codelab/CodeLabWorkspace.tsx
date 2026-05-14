@@ -6,6 +6,7 @@ import { EditorPanel } from './EditorPanel'
 import { MentorPanel } from './MentorPanel'
 import { QuestionPanel } from './QuestionPanel'
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, EvolutionStage, MentorData, QuestionData } from './types'
+import type { LLMProvider } from '../../features/ai/types'
 
 type CodeLabWorkspaceProps = {
     title: string
@@ -24,9 +25,9 @@ type CodeLabWorkspaceProps = {
     onRunCode?: (code: string, languageId: string) => void
     onEditorCodeChange?: (code: string, languageId: string) => void
     onClearConsole?: () => void
-    onMentorRequestHint?: () => Promise<string>
-    onMentorChat?: (message: string) => Promise<string>
-    onMentorExplainError?: () => Promise<string>
+    onMentorRequestHint?: (provider: LLMProvider) => Promise<string>
+    onMentorChat?: (message: string, provider: LLMProvider) => Promise<string>
+    onMentorExplainError?: (provider: LLMProvider) => Promise<string>
 }
 
 export function CodeLabWorkspace({
@@ -57,6 +58,7 @@ export function CodeLabWorkspace({
     const [editorHeight, setEditorHeight] = useState(68)
     const [consoleCollapsed, setConsoleCollapsed] = useState(false)
     const [activeHandle, setActiveHandle] = useState<'left' | 'right' | 'console' | null>(null)
+    const editorInstanceKey = `${editor.defaultLanguageId}:${editor.codeTemplates[editor.defaultLanguageId] ?? ''}`
 
     useEffect(() => {
         if (!activeHandle) {
@@ -140,7 +142,7 @@ export function CodeLabWorkspace({
                     </div>
                     <div className="h-[78vh] min-h-120 shrink-0 px-3 py-2">
                         <div className="h-full overflow-hidden rounded-xl border border-border">
-                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
+                            <EditorPanel key={editorInstanceKey} editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
                         </div>
                     </div>
                     <div className="shrink-0">
@@ -158,7 +160,14 @@ export function CodeLabWorkspace({
                         />
 
                         <div className="absolute inset-y-0 right-0 z-40 w-[min(88vw,22rem)] border-l border-border shadow-2xl lg:hidden">
-                            <MentorPanel mentor={mentor} isOpen={mentorOpen} onToggle={onToggleMentor} />
+                            <MentorPanel
+                                mentor={mentor}
+                                isOpen={mentorOpen}
+                                onToggle={onToggleMentor}
+                                onRequestHint={onMentorRequestHint}
+                                onSendMessage={onMentorChat}
+                                onExplainError={onMentorExplainError}
+                            />
                         </div>
                     </>
                 ) : null}
@@ -177,7 +186,7 @@ export function CodeLabWorkspace({
 
                     <div ref={centerRef} className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden" style={{ width: `${centerWidth}%` }}>
                         <div className="min-h-0" style={{ height: consoleCollapsed ? '100%' : `${editorHeight}%` }}>
-                            <EditorPanel editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
+                            <EditorPanel key={editorInstanceKey} editor={editor} isRunning={isRunning} onRunCode={onRunCode} onCodeChange={onEditorCodeChange} />
                         </div>
 
                         {consoleCollapsed ? (

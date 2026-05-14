@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { DashboardLayout } from '../../../components/layout/DashboardLayout'
+import { InstructorLayout } from '../../../components/layout/InstructorLayout'
 
 export function CreateQuestionPage() {
     const [prompt, setPrompt] = useState('')
     const [promptView, setPromptView] = useState<'write' | 'preview'>('write')
 
     return (
-        <DashboardLayout
+        <InstructorLayout
+            currentPage="create-question"
             title="Create Question"
             subtitle="Instructor authoring surface for composing, categorizing, and previewing new questions."
         >
@@ -128,6 +129,6 @@ export function CreateQuestionPage() {
                     </div>
                 </form>
             </article>
-        </DashboardLayout>
+        </InstructorLayout>
     )
 }

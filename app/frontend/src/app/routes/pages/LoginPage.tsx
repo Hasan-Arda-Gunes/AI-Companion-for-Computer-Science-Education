@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LoginView } from '../../../components/auth/LoginView'
-import { loginUser } from '../../../features/auth/api/authApi'
+import { loginUser, getCurrentUser } from '../../../features/auth/api/authApi'
 import { useAuthSession } from '../../../features/auth/context/useAuthSession'
-import { saveAuthToken } from '../../../features/auth/storage/authStorage'
+import { saveAuthToken, getAuthToken } from '../../../features/auth/storage/authStorage'
 
 export function LoginPage() {
     const navigate = useNavigate()
@@ -26,11 +26,32 @@ export function LoginPage() {
         setIsSubmitting(true)
 
         try {
+            console.log('[LoginPage] Starting login...')
             const loginResponse = await loginUser({ email, password })
+            console.log('[LoginPage] Login successful, saving token...')
             saveAuthToken(loginResponse.access_token, loginResponse.token_type)
-            await refreshSession()
-            navigate('/student/dashboard', { replace: true })
+
+            console.log('[LoginPage] Fetching current user...')
+            const { accessToken, tokenType } = getAuthToken()
+            if (!accessToken) {
+                throw new Error('Failed to retrieve auth token')
+            }
+            const user = await getCurrentUser(accessToken, tokenType)
+            console.log('[LoginPage] User loaded, role:', user.role)
+
+            // Refresh session in the background (for context updates)
+            void refreshSession()
+
+            // Route immediately based on user role
+            if (user.role === 'teacher') {
+                console.log('[LoginPage] Routing teacher to /instructor/dashboard')
+                navigate('/instructor/dashboard', { replace: true })
+            } else {
+                console.log('[LoginPage] Routing student to /student/dashboard')
+                navigate('/student/dashboard', { replace: true })
+            }
         } catch (error) {
+            console.log('[LoginPage] Login error:', error)
             setErrorMessage(error instanceof Error ? error.message : 'Login failed.')
         } finally {
             setIsSubmitting(false)

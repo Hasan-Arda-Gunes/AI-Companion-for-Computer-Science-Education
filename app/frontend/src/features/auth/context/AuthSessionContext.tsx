@@ -3,6 +3,8 @@ import { createContext, useEffect, useMemo, useState } from 'react'
 import { getCurrentUser } from '../api/authApi'
 import { clearAuthToken, getAuthToken } from '../storage/authStorage'
 import type { User } from '../types'
+import { getPermissionsForRole } from '../permissions'
+import type { Permission } from '../constants'
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated'
 
@@ -10,6 +12,7 @@ type AuthSessionContextValue = {
     status: AuthStatus
     user: User | null
     isAuthenticated: boolean
+    permissions: Permission[]
     refreshSession: () => Promise<void>
     signOut: () => void
 }
@@ -88,6 +91,7 @@ export function AuthSessionProvider({ children }: AuthSessionProviderProps) {
             status,
             user,
             isAuthenticated: status === 'authenticated',
+            permissions: user ? getPermissionsForRole(user.role) : [],
             refreshSession,
             signOut,
         }),

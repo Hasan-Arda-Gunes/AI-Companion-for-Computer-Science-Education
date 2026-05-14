@@ -5,6 +5,7 @@ import type {
     ListProblemsParams,
     ListProblemsResponse,
     ProblemDetails,
+    UpdateProblemRequest,
 } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
@@ -35,6 +36,9 @@ function buildListProblemsQuery(params: ListProblemsParams = {}) {
     if (params.search) {
         searchParams.set('search', params.search)
     }
+        if (params.class_id) {
+            searchParams.set('class_id', String(params.class_id))
+        }
 
     const query = searchParams.toString()
     return query ? `?${query}` : ''
@@ -58,8 +62,12 @@ export async function listProblems(params: ListProblemsParams = {}) {
         const payload = (await parseJsonSafe(response)) as { detail?: string } | null
         throw new Error(payload?.detail ?? 'Failed to load problems')
     }
+    const json = await parseJsonSafe(response)
+    // Log raw response for debugging issues where frontend sees empty lists
+    // while the backend returns data. Remove or guard this in production.
+    console.debug('[problemsApi] listProblems raw response:', json)
 
-    return (await response.json()) as ListProblemsResponse
+    return (json ?? {}) as ListProblemsResponse
 }
 
 export async function createProblem(payload: CreateProblemRequest) {
@@ -106,4 +114,48 @@ export async function getProblemById(problemId: number) {
     }
 
     return (await response.json()) as ProblemDetails
+}
+
+export async function updateProblem(problemId: number, payload: UpdateProblemRequest) {
+    const { accessToken, tokenType } = getAuthToken()
+
+    if (!accessToken) {
+        throw new Error('Not authenticated')
+    }
+
+    const response = await fetch(`${API_BASE_URL}/problems/${problemId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${tokenType} ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+        const apiError = (await parseJsonSafe(response)) as { detail?: string } | null
+        throw new Error(apiError?.detail ?? 'Failed to update problem')
+    }
+
+    return (await response.json()) as ProblemDetails
+}
+
+export async function deleteProblem(problemId: number) {
+    const { accessToken, tokenType } = getAuthToken()
+
+    if (!accessToken) {
+        throw new Error('Not authenticated')
+    }
+
+    const response = await fetch(`${API_BASE_URL}/problems/${problemId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `${tokenType} ${accessToken}`,
+        },
+    })
+
+    if (!response.ok) {
+        const apiError = (await parseJsonSafe(response)) as { detail?: string } | null
+        throw new Error(apiError?.detail ?? 'Failed to delete problem')
+    }
 }

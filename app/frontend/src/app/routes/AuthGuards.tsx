@@ -15,13 +15,14 @@ function AuthBootstrappingScreen() {
 }
 
 export function ProtectedRoute({ children }: GuardProps) {
-    const { status, isAuthenticated } = useAuthSession()
+    const { status, isAuthenticated, user } = useAuthSession()
 
     if (status === 'loading') {
         return <AuthBootstrappingScreen />
     }
 
-    if (!isAuthenticated) {
+    // Consider authenticated if we have a user object OR if the session says we're authenticated
+    if (!isAuthenticated && !user) {
         return <Navigate to="/login" replace />
     }
 

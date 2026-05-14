@@ -10,7 +10,8 @@ from app.api.v1.endpoints import (
     submissions,
     ai_assistance,
     sessions,
-    progress
+    progress,
+    classes,
 )
 
 api_router = APIRouter()
@@ -23,3 +24,4 @@ api_router.include_router(submissions.router)
 api_router.include_router(ai_assistance.router)
 api_router.include_router(sessions.router)
 api_router.include_router(progress.router)
+api_router.include_router(classes.router)

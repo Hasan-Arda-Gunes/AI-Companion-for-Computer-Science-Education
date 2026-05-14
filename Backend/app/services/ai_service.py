@@ -1,12 +1,13 @@
 """
 AI Service - Handles all LLM interactions for code evaluation and feedback
+Supports multiple LLM providers (Gemini and Ollama)
+Users can choose which provider to use for each request
 """
 import json
 import logging
 import re
 from typing import Dict, List, Any, Optional
-import google.generativeai as genai
-from app.core.config import settings
+from app.services.llm_provider import provider_manager
 from app.schemas.schemas import AIFeedback, TestCaseResult
 
 
@@ -14,11 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 class AIService:
-    """Service for AI-powered code evaluation and feedback"""
+    """Service for AI-powered code evaluation and feedback with multi-provider support"""
     
     def __init__(self):
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = settings.LLM_MODEL
+        self.provider_manager = provider_manager
 
     def _extract_json(self, text: str) -> Dict[str, Any]:
         """Extract JSON object from model output, handling markdown fences."""
@@ -43,32 +43,24 @@ class AIService:
         system_prompt: Optional[str] = None,
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
+        provider: str = "gemini",
     ) -> str:
-        """Generate text from Gemini and normalize empty responses."""
-        model = genai.GenerativeModel(
-            model_name=self.model,
-            system_instruction=system_prompt,
-        )
-
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                max_output_tokens=max_tokens or settings.LLM_MAX_TOKENS,
-                temperature=settings.LLM_TEMPERATURE if temperature is None else temperature,
-            ),
-        )
-
-        if hasattr(response, "text") and response.text:
-            return response.text.strip()
-
-        finish_reason = "unknown"
-        if getattr(response, "candidates", None):
-            candidate = response.candidates[0]
-            finish_reason = str(getattr(candidate, "finish_reason", "unknown"))
-
-        prompt_feedback = str(getattr(response, "prompt_feedback", "none"))
-        raise ValueError(
-            f"Gemini returned empty response (finish_reason={finish_reason}, prompt_feedback={prompt_feedback})"
+        """
+        Generate text using specified provider (gemini or ollama)
+        
+        Args:
+            prompt: The prompt to send
+            system_prompt: System instruction/context
+            max_tokens: Max tokens in response
+            temperature: Temperature for generation
+            provider: Which provider to use ("gemini" or "ollama"), defaults to "gemini"
+        """
+        llm_provider = self.provider_manager.get_provider(provider)
+        return llm_provider.generate_text(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
         )
 
     def _safe_error_message(self, err: Exception) -> str:
@@ -84,10 +76,11 @@ class AIService:
         problem_description: str,
         test_results: List[TestCaseResult],
         evaluation_criteria: Dict[str, Any],
-        language: str = "python"
+        language: str = "python",
+        provider: str = "gemini",
     ) -> AIFeedback:
         """
-        Comprehensive code evaluation using Gemini
+        Comprehensive code evaluation using specified LLM provider
         
         Args:
             code: Student's submitted code
@@ -95,10 +88,15 @@ class AIService:
             test_results: Results from running test cases
             evaluation_criteria: What to evaluate (correctness, style, efficiency)
             language: Programming language
+            provider: LLM provider to use ("gemini" or "ollama"), defaults to "gemini"
             
         Returns:
             AIFeedback with detailed analysis
         """
+        
+        # Extract provider value if it's an enum
+        if hasattr(provider, 'value'):
+            provider = provider.value
         
         # Calculate test pass rate
         total_tests = len(test_results)
@@ -163,15 +161,16 @@ Respond ONLY with valid JSON, no additional text."""
         try:
             feedback_text = self._generate_text(
                 prompt=prompt,
-                max_tokens=settings.LLM_MAX_TOKENS,
-                temperature=settings.LLM_TEMPERATURE,
+                max_tokens=4000,
+                temperature=0.7,
+                provider=provider,
             )
             feedback_data = self._extract_json(feedback_text)
             
             return AIFeedback(**feedback_data)
             
         except Exception as e:
-            logger.exception("Error in AI evaluation")
+            logger.exception(f"Error in AI evaluation using {provider}")
             # Return fallback feedback
             return AIFeedback(
                 overall_assessment=f"Test pass rate: {test_pass_rate:.1f}%. Error in detailed AI evaluation.",
@@ -189,7 +188,8 @@ Respond ONLY with valid JSON, no additional text."""
         problem_description: str,
         current_code: Optional[str],
         hint_level: int,
-        previous_hints: List[str] = None
+        previous_hints: List[str] = None,
+        provider: str = "gemini",
     ) -> str:
         """
         Generate progressive hints for a problem
@@ -199,10 +199,15 @@ Respond ONLY with valid JSON, no additional text."""
             current_code: Student's current attempt (if any)
             hint_level: 1 (gentle) to 3 (more specific)
             previous_hints: Previously given hints
+            provider: LLM provider to use ("gemini" or "ollama"), defaults to "gemini"
             
         Returns:
             A hint appropriate for the level
         """
+        
+        # Extract provider value if it's an enum
+        if hasattr(provider, 'value'):
+            provider = provider.value
         
         hint_guidance = {
             1: "Give a gentle nudge in the right direction without revealing the solution. Focus on the approach or concept.",
@@ -251,20 +256,22 @@ Provide just the hint text, no extra formatting."""
                 prompt=prompt,
                 max_tokens=1000,
                 temperature=0.7,
+                provider=provider,
             )
             return hint_text
             
         except Exception as e:
-            logger.exception("Error generating hint")
+            logger.exception(f"Error generating hint using {provider}")
             error_summary = self._safe_error_message(e)
-            return f"Hint service is temporarily unavailable. Gemini error: {error_summary}"
+            return f"Hint service is temporarily unavailable. {provider} error: {error_summary}"
     
     async def chat_assistance(
         self,
         user_message: str,
         problem_context: Optional[str] = None,
         current_code: Optional[str] = None,
-        conversation_history: List[Dict[str, str]] = None
+        conversation_history: List[Dict[str, str]] = None,
+        provider: str = "gemini",
     ) -> str:
         """
         Provide conversational AI assistance
@@ -274,10 +281,15 @@ Provide just the hint text, no extra formatting."""
             problem_context: Current problem being worked on
             current_code: Student's current code
             conversation_history: Previous messages in this conversation
+            provider: LLM provider to use ("gemini" or "ollama"), defaults to "gemini"
             
         Returns:
             AI assistant's response
         """
+        
+        # Extract provider value if it's an enum
+        if hasattr(provider, 'value'):
+            provider = provider.value
         
         system_prompt = """You are an encouraging and knowledgeable programming tutor. Your role is to:
 1. Help students understand programming concepts
@@ -319,12 +331,17 @@ Important guidelines:
                 system_prompt=system_prompt,
                 max_tokens=2000,
                 temperature=0.8,
+                provider=provider,
             )
             return reply_text
             
         except Exception as e:
-            logger.exception("Error in chat assistance")
+            logger.exception(f"Error in chat assistance using {provider}")
             return "I'm having trouble connecting right now. Could you try rephrasing your question?"
+    
+    def list_available_providers(self) -> Dict[str, bool]:
+        """List available LLM providers and their status"""
+        return self.provider_manager.list_available_providers()
 
 
 # Global AI service instance

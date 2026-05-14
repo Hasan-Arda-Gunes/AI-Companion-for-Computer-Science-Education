@@ -1,10 +1,13 @@
-export type SubmissionStatus = 'pending' | 'running' | 'correct' | 'incorrect' | 'error'
+import type { LLMProvider } from '../ai/types'
+
+export type SubmissionStatus = 'pending' | 'running' | 'correct' | 'incorrect' | 'partial' | 'error'
 
 export type SubmitCodeRequest = {
     problem_id: number
     code: string
     language: string
     session_id: number
+    provider?: LLMProvider
 }
 
 export type SubmitCodeResponse = {
@@ -46,6 +49,7 @@ export type SubmissionDetails = {
     language: string
     status: SubmissionStatus
     score?: number
+    provider_used?: LLMProvider
     test_results?: SubmissionTestResult[]
     execution_time?: number
     ai_feedback?: SubmissionAiFeedback

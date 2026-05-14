@@ -1,8 +1,11 @@
+export type UserRole = 'student' | 'teacher'
+
 export type RegisterRequest = {
     email: string
     username: string
     password: string
     full_name: string
+    role: UserRole
 }
 
 export type User = {
@@ -10,6 +13,7 @@ export type User = {
     email: string
     username: string
     full_name: string
+    role: UserRole
     is_active: boolean
     created_at: string
 }

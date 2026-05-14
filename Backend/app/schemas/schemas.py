@@ -27,6 +27,11 @@ class SubmissionStatus(str, Enum):
     ERROR = "error"
 
 
+class LLMProvider(str, Enum):
+    GEMINI = "gemini"
+    OLLAMA = "ollama"
+
+
 # User Schemas
 class UserBase(BaseModel):
     email: EmailStr
@@ -54,6 +59,17 @@ class UserResponse(UserBase):
         from_attributes = True
 
 
+class UserSummary(BaseModel):
+    id: int
+    email: EmailStr
+    username: str
+    full_name: Optional[str] = None
+    role: UserRole
+
+    class Config:
+        from_attributes = True
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -68,6 +84,7 @@ class ProblemBase(BaseModel):
 
 
 class ProblemCreate(ProblemBase):
+    class_id: Optional[int] = None  # Optional: if set, only students in this class can see it
     constraints: Optional[Dict[str, Any]] = None
     examples: List[Dict[str, Any]]
     test_cases: List[Dict[str, Any]]
@@ -86,6 +103,7 @@ class ProblemUpdate(BaseModel):
     description: Optional[str] = None
     difficulty: Optional[DifficultyLevel] = None
     topic: Optional[str] = None
+    class_id: Optional[int] = None
     constraints: Optional[Dict[str, Any]] = None
     examples: Optional[List[Dict[str, Any]]] = None
     test_cases: Optional[List[Dict[str, Any]]] = None
@@ -97,6 +115,7 @@ class ProblemResponse(ProblemBase):
     id: int
     constraints: Optional[Dict[str, Any]]
     examples: List[Dict[str, Any]]
+    test_cases: List[Dict[str, Any]]
     starter_code: Optional[str]
     hints: Optional[List[str]]
     learning_objectives: Optional[List[str]]
@@ -120,6 +139,7 @@ class SubmissionCreate(BaseModel):
     code: str
     language: str = "python"
     session_id: Optional[int] = None
+    provider: str = "gemini"  # Default to Gemini
 
 
 class TestCaseResult(BaseModel):
@@ -154,6 +174,7 @@ class SubmissionResponse(BaseModel):
     ai_feedback: Optional[AIFeedback]
     submitted_at: datetime
     evaluated_at: Optional[datetime]
+    provider_used: Optional[str] = None  # Track which LLM provider was used for feedback
     
     class Config:
         from_attributes = True
@@ -182,12 +203,14 @@ class SessionResponse(BaseModel):
 class ChatMessage(BaseModel):
     message: str
     context: Optional[Dict[str, Any]] = None
+    provider: str = "gemini"  # Default to Gemini
 
 
 class ChatResponse(BaseModel):
     response: str
     suggestions: Optional[List[str]] = None
     related_concepts: Optional[List[str]] = None
+    provider_used: str = "gemini"
 
 
 class HintRequest(BaseModel):
@@ -195,12 +218,53 @@ class HintRequest(BaseModel):
     session_id: int
     current_code: Optional[str] = None
     hint_level: int = 1  # Progressive hints
+    provider: str = "gemini"  # Default to Gemini
 
 
 class HintResponse(BaseModel):
     hint: str
     hint_level: int
     remaining_hints: int
+    provider_used: str = "gemini"
+
+
+# Class management schemas
+class ClassBase(BaseModel):
+    name: str = Field(..., min_length=1, max_length=150)
+    description: Optional[str] = None
+
+
+class ClassCreate(ClassBase):
+    pass
+
+
+class ClassResponse(ClassBase):
+    id: int
+    teacher_id: int
+    is_active: bool
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    student_count: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class ClassDetailResponse(ClassResponse):
+    students: List[UserSummary] = []
+
+
+class ClassStudentAddRequest(BaseModel):
+    student_id: int
+
+
+class ClassMembershipResponse(BaseModel):
+    class_id: int
+    student: UserSummary
+    added_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # Progress Schemas
