@@ -311,8 +311,14 @@ export function InstructorCreateQuestionPage() {
     ]
 
     const addTestCase = () => {
+        const maxExistingId = testCases.reduce((maxId, testCase) => {
+            const parsedId = Number.parseInt(testCase.id, 10)
+            if (Number.isNaN(parsedId)) return maxId
+            return Math.max(maxId, parsedId)
+        }, 0)
+
         const newTestCase: TestCase = {
-            id: Date.now().toString(),
+            id: String(maxExistingId + 1),
             input: '',
             expectedOutput: '',
             isHidden: false,
@@ -328,6 +334,10 @@ export function InstructorCreateQuestionPage() {
         setTestCases((prev) =>
             prev.map((testCase) => (testCase.id === id ? { ...testCase, [field]: value } : testCase))
         )
+    }
+
+    const replaceTestCases = (nextTestCases: TestCase[]) => {
+        setTestCases(nextTestCases)
     }
 
     const toggleQuestionPanel = () => {
@@ -547,6 +557,7 @@ export function InstructorCreateQuestionPage() {
                                         onAdd={addTestCase}
                                         onUpdate={updateTestCase}
                                         onDelete={deleteTestCase}
+                                        onReplaceAll={replaceTestCases}
                                         onMaximize={maximizeTestCases}
                                         onCollapse={toggleTestCasesPanel}
                                         isCollapsed={isTestCasesCollapsed}
