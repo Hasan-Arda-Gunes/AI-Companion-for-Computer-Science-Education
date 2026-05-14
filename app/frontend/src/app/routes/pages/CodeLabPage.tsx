@@ -33,6 +33,11 @@ const sampleQuestion: QuestionData = {
         { id: 'ex-2', input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
         { id: 'ex-3', input: 'nums = [3,3], target = 6', output: '[0,1]' },
     ],
+    testCases: [
+        { id: 'tc-1', input: 'nums = [2,7,11,15], target = 9', expectedOutput: '[0,1]', functionName: 'two_sum' },
+        { id: 'tc-2', input: 'nums = [3,2,4], target = 6', expectedOutput: '[1,2]', functionName: 'two_sum' },
+        { id: 'tc-3', input: 'nums = [3,3], target = 6', expectedOutput: '[0,1]', functionName: 'two_sum' },
+    ],
     constraints: ['2 <= nums.length <= 10^4', '-10^9 <= nums[i] <= 10^9', '-10^9 <= target <= 10^9'],
     followUp: 'Can you come up with an algorithm that is less than O(n^2) time complexity?',
     markdownContent: `# Two Sum
@@ -267,6 +272,7 @@ export function CodeLabPage() {
     const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
     const [questionData, setQuestionData] = useState<QuestionData>(sampleQuestion)
     const [consoleData, setConsoleData] = useState<ConsoleData>(sampleConsole)
+    const [latestSubmission, setLatestSubmission] = useState<SubmissionDetails | null>(null)
     const [headerData, setHeaderData] = useState<CodeLabHeaderData>({
         isLoggedIn: true,
         username: 'Student',
@@ -436,10 +442,6 @@ export function CodeLabPage() {
                     )
                 }
 
-                if (details.ai_feedback?.overall_assessment) {
-                    appendLogs([createLog('info', `AI: ${details.ai_feedback.overall_assessment}`)])
-                }
-
                 if (typeof details.score === 'number') {
                     const active = getActiveLearningSession()
                     if (active && active.id === activeSessionId) {
@@ -450,11 +452,8 @@ export function CodeLabPage() {
                     }
                 }
 
-                if (details.ai_feedback?.suggestions?.length) {
-                    appendLogs([
-                        createLog('info', 'AI Suggestions:'),
-                        ...details.ai_feedback.suggestions.map((suggestion) => createLog('log', `- ${suggestion}`)),
-                    ])
+                if (isTerminalStatus(details.status)) {
+                    setLatestSubmission(details)
                 }
             } catch (error) {
                 const message = error instanceof Error ? error.message : 'Submission failed'
@@ -542,6 +541,7 @@ export function CodeLabPage() {
             setCurrentCode(sampleEditor.codeTemplates.python)
             setHintLevel(1)
             setActiveSessionId(null)
+            setLatestSubmission(null)
             setDefaultLanguageId(getDefaultEditorLanguage())
             return
         }
@@ -549,10 +549,12 @@ export function CodeLabPage() {
         const parsedProblemId = Number(selectedProblemId)
         if (!Number.isFinite(parsedProblemId) || parsedProblemId <= 0) {
             setQuestionData(sampleQuestion)
+            setLatestSubmission(null)
             appendLogs([createLog('error', 'Invalid problem id in URL.')])
             return
         }
 
+        setLatestSubmission(null)
         let isMounted = true
 
         const formatUnknown = (value: unknown) => {
@@ -627,6 +629,14 @@ export function CodeLabPage() {
                         input: formatUnknown(example.input),
                         output: formatUnknown(example.expected_output),
                     })),
+                    testCases: (detail as { test_cases?: Array<{ id?: string; input: unknown; expected_output: unknown; function_name?: string }> }).test_cases?.map(
+                        (testCase, index) => ({
+                            id: testCase.id ?? `api-test-case-${index + 1}`,
+                            input: formatUnknown(testCase.input),
+                            expectedOutput: formatUnknown(testCase.expected_output),
+                            functionName: testCase.function_name ?? 'solution',
+                        }),
+                    ) ?? [],
                     constraints: detail.constraints
                         ? Object.entries(detail.constraints).map(([key, value]) => `${key}: ${formatUnknown(value)}`)
                         : [],
@@ -665,6 +675,7 @@ export function CodeLabPage() {
         <DashboardLayout
             title="Code Lab"
             subtitle="Solve algorithm problems with guided AI support and an integrated coding workspace."
+            showHeader={false}
             sidebar={
                 <RoleAwareSidebar
                     className="hidden lg:flex"
@@ -691,6 +702,7 @@ export function CodeLabPage() {
                     question={questionData}
                     editor={resolvedEditor}
                     consoleData={consoleData}
+                    latestSubmission={latestSubmission}
                     mentor={sampleMentor}
                     mentorOpen={mentorOpen}
                     onToggleMentor={() => setMentorOpen((prev) => !prev)}
