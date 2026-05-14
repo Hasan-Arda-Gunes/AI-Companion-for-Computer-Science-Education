@@ -3,11 +3,16 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies including Java
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     gcc \
     postgresql-client \
+    default-jdk-headless \
     && rm -rf /var/lib/apt/lists/*
+
+# Verify Java installation
+RUN java -version
 
 # Copy requirements
 COPY requirements.txt .
