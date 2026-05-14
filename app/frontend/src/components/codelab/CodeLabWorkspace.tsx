@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { CodeLabTopBar } from './CodeLabTopBar'
-import { ConsolePanel } from './ConsolePanel'
 import { EditorPanel } from './EditorPanel'
 import { MentorPanel } from './MentorPanel'
 import { QuestionPanel } from './QuestionPanel'
+import { SubmissionResultsPanel } from './SubmissionResultsPanel'
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, EvolutionStage, MentorData, QuestionData } from './types'
 import type { LLMProvider } from '../../features/ai/types'
+import type { SubmissionDetails } from '../../features/submissions/types'
 
 type CodeLabWorkspaceProps = {
     title: string
@@ -15,6 +16,7 @@ type CodeLabWorkspaceProps = {
     question: QuestionData
     editor: CodeEditorData
     consoleData: ConsoleData
+    latestSubmission: SubmissionDetails | null
     mentor: MentorData
     mentorOpen: boolean
     onToggleMentor: () => void
@@ -28,6 +30,7 @@ type CodeLabWorkspaceProps = {
     onMentorRequestHint?: (provider: LLMProvider) => Promise<string>
     onMentorChat?: (message: string, provider: LLMProvider) => Promise<string>
     onMentorExplainError?: (provider: LLMProvider) => Promise<string>
+    showConsoleTab?: boolean
 }
 
 export function CodeLabWorkspace({
@@ -37,6 +40,7 @@ export function CodeLabWorkspace({
     question,
     editor,
     consoleData,
+    latestSubmission,
     mentor,
     mentorOpen,
     onToggleMentor,
@@ -50,6 +54,7 @@ export function CodeLabWorkspace({
     onMentorRequestHint,
     onMentorChat,
     onMentorExplainError,
+    showConsoleTab = true,
 }: CodeLabWorkspaceProps) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const centerRef = useRef<HTMLDivElement | null>(null)
@@ -58,7 +63,14 @@ export function CodeLabWorkspace({
     const [editorHeight, setEditorHeight] = useState(68)
     const [consoleCollapsed, setConsoleCollapsed] = useState(false)
     const [activeHandle, setActiveHandle] = useState<'left' | 'right' | 'console' | null>(null)
+    const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false)
     const editorInstanceKey = `${editor.defaultLanguageId}:${editor.codeTemplates[editor.defaultLanguageId] ?? ''}`
+
+    useEffect(() => {
+        if (!latestSubmission) {
+            setIsFeedbackDialogOpen(false)
+        }
+    }, [latestSubmission])
 
     useEffect(() => {
         if (!activeHandle) {
@@ -85,16 +97,14 @@ export function CodeLabWorkspace({
                 const pointerPercent = ((event.clientX - rect.left) / totalWidth) * 100
                 const reservedRight = mentorOpen ? rightWidth : 0
                 const maxLeft = 100 - reservedRight - minCenter
-                const nextLeft = Math.max(minLeft, Math.min(maxLeft, pointerPercent))
-                setLeftWidth(nextLeft)
+                setLeftWidth(Math.max(minLeft, Math.min(maxLeft, pointerPercent)))
             }
 
             if (activeHandle === 'right' && mentorOpen) {
                 const pointerPercentFromLeft = ((event.clientX - rect.left) / totalWidth) * 100
                 const pointerRight = 100 - pointerPercentFromLeft
                 const maxRightByCenter = 100 - leftWidth - minCenter
-                const boundedRight = Math.max(minRight, Math.min(Math.min(maxRight, maxRightByCenter), pointerRight))
-                setRightWidth(boundedRight)
+                setRightWidth(Math.max(minRight, Math.min(Math.min(maxRight, maxRightByCenter), pointerRight)))
             }
 
             if (activeHandle === 'console' && !consoleCollapsed && centerRef.current) {
@@ -105,8 +115,7 @@ export function CodeLabWorkspace({
                     const pointerPercent = ((event.clientY - centerRect.top) / centerHeight) * 100
                     const minEditor = 30
                     const maxEditor = 82
-                    const nextEditorHeight = Math.max(minEditor, Math.min(maxEditor, pointerPercent))
-                    setEditorHeight(nextEditorHeight)
+                    setEditorHeight(Math.max(minEditor, Math.min(maxEditor, pointerPercent)))
                 }
             }
         }
@@ -126,14 +135,7 @@ export function CodeLabWorkspace({
 
     return (
         <div className="grid h-full min-h-0 grid-rows-[auto_1fr] bg-background">
-            <CodeLabTopBar
-                title={title}
-                stages={stages}
-                headerData={headerData}
-                onSignIn={onSignIn}
-                onSignUp={onSignUp}
-                onLogout={onLogout}
-            />
+            <CodeLabTopBar title={title} stages={stages} headerData={headerData} onSignIn={onSignIn} onSignUp={onSignUp} onLogout={onLogout} />
 
             <div className="relative min-h-0 overflow-hidden">
                 <div className="flex h-full min-h-0 flex-col overflow-y-auto lg:hidden">
@@ -146,7 +148,17 @@ export function CodeLabWorkspace({
                         </div>
                     </div>
                     <div className="shrink-0">
-                        <ConsolePanel consoleData={consoleData} onClear={onClearConsole} useInternalScroll={false} />
+                        <SubmissionResultsPanel
+                            question={question}
+                            consoleData={consoleData}
+                            latestSubmission={latestSubmission}
+                            onClearConsole={onClearConsole}
+                            useInternalScroll={false}
+                            showConsoleTab={showConsoleTab}
+                            isFeedbackDialogOpen={isFeedbackDialogOpen}
+                            onOpenFeedbackDialog={() => setIsFeedbackDialogOpen(true)}
+                            onCloseFeedbackDialog={() => setIsFeedbackDialogOpen(false)}
+                        />
                     </div>
                 </div>
 
@@ -225,7 +237,16 @@ export function CodeLabWorkspace({
                                     </button>
                                 </div>
                                 <div className="min-h-0" style={{ height: `${100 - editorHeight}%` }}>
-                                    <ConsolePanel consoleData={consoleData} onClear={onClearConsole} />
+                                    <SubmissionResultsPanel
+                                        question={question}
+                                        consoleData={consoleData}
+                                        latestSubmission={latestSubmission}
+                                        onClearConsole={onClearConsole}
+                                        showConsoleTab={showConsoleTab}
+                                        isFeedbackDialogOpen={isFeedbackDialogOpen}
+                                        onOpenFeedbackDialog={() => setIsFeedbackDialogOpen(true)}
+                                        onCloseFeedbackDialog={() => setIsFeedbackDialogOpen(false)}
+                                    />
                                 </div>
                             </>
                         )}

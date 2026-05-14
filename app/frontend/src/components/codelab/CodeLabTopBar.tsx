@@ -1,7 +1,6 @@
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { ChevronDown, LogOut, Settings, Sparkles, User } from 'lucide-react'
+import { motion } from 'framer-motion'
 import type { CodeLabHeaderData, EvolutionStage } from './types'
+import { Sparkles } from 'lucide-react'
 
 type CodeLabTopBarProps = {
     title: string
@@ -12,9 +11,10 @@ type CodeLabTopBarProps = {
     onLogout: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function CodeLabTopBar({ title, stages, headerData, onSignIn, onSignUp, onLogout }: CodeLabTopBarProps) {
-    const [showDropdown, setShowDropdown] = useState(false)
-    const initial = headerData.username?.charAt(0).toUpperCase() ?? 'U'
+    // const [showDropdown, setShowDropdown] = useState(false)
+    // const initial = headerData.username?.charAt(0).toUpperCase() ?? 'U'
 
     return (
         <header className="border-b border-border bg-card">
@@ -36,7 +36,7 @@ export function CodeLabTopBar({ title, stages, headerData, onSignIn, onSignUp, o
                     <h1 className="text-lg font-bold text-foreground">{title}</h1>
                 </div>
 
-                <div className="relative z-10 flex items-center gap-3">
+                {/* <div className="relative z-10 flex items-center gap-3">
                     {headerData.isLoggedIn ? (
                         <div className="relative">
                             <motion.button
@@ -144,10 +144,10 @@ export function CodeLabTopBar({ title, stages, headerData, onSignIn, onSignUp, o
                             </motion.button>
                         </>
                     )}
-                </div>
+                </div> */}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 border-t border-border px-6 py-3">
+            {/* <div className="flex flex-wrap items-center gap-3 border-t border-border px-6 py-3">
                 <p className="text-xs text-muted-foreground">Current Evolution</p>
                 {stages.map((stage) => (
                     <motion.div
@@ -165,7 +165,7 @@ export function CodeLabTopBar({ title, stages, headerData, onSignIn, onSignUp, o
                         {stage.label}
                     </motion.div>
                 ))}
-            </div>
+            </div> */}
         </header>
     )
 }

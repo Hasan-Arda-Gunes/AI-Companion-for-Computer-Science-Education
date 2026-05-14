@@ -18,10 +18,18 @@ export type ProblemExample = {
   explanation?: string
 }
 
+export type ProblemTestCase = {
+  id: string
+  input: string
+  expectedOutput: string
+  functionName: string
+}
+
 export type QuestionData = {
   title: string
   description: string
   examples: ProblemExample[]
+  testCases: ProblemTestCase[]
   constraints: string[]
   followUp?: string
   markdownContent?: string

@@ -7,6 +7,7 @@ type ConsolePanelProps = {
     consoleData: ConsoleData
     onClear?: () => void
     useInternalScroll?: boolean
+    embedded?: boolean
 }
 
 const getLogIcon = (type: ConsoleLogType) => {
@@ -35,9 +36,9 @@ const getLogTextColor = (type: ConsoleLogType) => {
     }
 }
 
-export function ConsolePanel({ consoleData, onClear, useInternalScroll = true }: ConsolePanelProps) {
+export function ConsolePanel({ consoleData, onClear, useInternalScroll = true, embedded = false }: ConsolePanelProps) {
     return (
-        <section className={[useInternalScroll ? 'flex h-full min-h-0 flex-col' : 'flex flex-col', 'border-t border-border bg-background'].join(' ')}>
+        <section className={[useInternalScroll ? 'flex h-full min-h-0 flex-col' : 'flex flex-col', embedded ? 'bg-background' : 'border-t border-border bg-background'].join(' ')}>
             <div className="flex items-center justify-between border-b border-border bg-secondary px-4 py-2">
                 <div className="flex items-center gap-2">
                     <Terminal className="size-4 text-muted-foreground" />
