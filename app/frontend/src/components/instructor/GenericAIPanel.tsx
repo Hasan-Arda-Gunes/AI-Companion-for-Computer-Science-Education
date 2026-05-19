@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, CheckCircle, ChevronDown, Copy, Cpu, Maximize2, Minimize2, Send, Sparkles, X } from 'lucide-react'
+import { Check, CheckCircle, ChevronDown, Copy, Cpu, Send, Sparkles, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import type { ChatMessage, ShortcutAction } from './questionCreationTypes'
 
@@ -10,10 +10,8 @@ export type GenericAIPanelProps = {
     isTyping: boolean
     quickActions: ShortcutAction[]
     onSendMessage: (message: string) => void
-    onMaximize: () => void
     onCollapse: () => void
     onProviderChange?: (providerId: string) => void
-    isMaximized: boolean
 }
 
 type LLMProvider = {
@@ -61,10 +59,8 @@ export function GenericAIPanel({
     isTyping,
     quickActions,
     onSendMessage,
-    onMaximize,
     onCollapse,
     onProviderChange,
-    isMaximized,
 }: GenericAIPanelProps) {
     const [selectedProvider, setSelectedProvider] = useState<LLMProvider>(
         () => llmProviders.find((provider) => provider.id === 'gemini') ?? llmProviders[0]
@@ -171,17 +167,6 @@ export function GenericAIPanel({
                     </div>
                 </div>
                 <div className="flex items-center gap-1">
-                    <button
-                        onClick={onMaximize}
-                        className="p-1.5 rounded-md hover:bg-(--slate-gray) transition-colors"
-                        title={isMaximized ? 'Restore' : 'Maximize'}
-                    >
-                        {isMaximized ? (
-                            <Minimize2 className="w-3.5 h-3.5 text-muted-foreground" />
-                        ) : (
-                            <Maximize2 className="w-3.5 h-3.5 text-muted-foreground" />
-                        )}
-                    </button>
                     <button
                         onClick={onCollapse}
                         className="p-1.5 rounded-md hover:bg-(--slate-gray) transition-colors"
