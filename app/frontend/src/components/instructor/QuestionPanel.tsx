@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { ProblemForm } from './questionCreationTypes'
+import { ScrollArea } from '../ui/scroll-area'
 
 export type QuestionPanelProps = {
     problemForm: ProblemForm
@@ -105,7 +106,7 @@ export function QuestionPanel({
             </div>
 
             {!isCollapsed && (
-                <div className="flex-1 overflow-y-auto">
+                <ScrollArea className="min-h-0 flex-1">
                     {leftView === 'edit' ? (
                         <div className="p-4 space-y-5">
                             <div className="grid grid-cols-3 gap-3">
@@ -505,7 +506,7 @@ export function QuestionPanel({
                             </div>
                         </div>
                     )}
-                </div>
+                </ScrollArea>
             )}
         </div>
     )
