@@ -1,19 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, CheckCircle, ChevronDown, Copy, Cpu, Maximize2, Minimize2, Send, Sparkles, X } from 'lucide-react'
+import { Check, CheckCircle, ChevronDown, Copy, Cpu, Send, Sparkles, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import type { ChatMessage, ShortcutAction } from './questionCreationTypes'
+import { ScrollArea } from '../ui/scroll-area'
 
 export type GenericAIPanelProps = {
     messages: ChatMessage[]
     isTyping: boolean
     quickActions: ShortcutAction[]
     onSendMessage: (message: string) => void
-    onMaximize: () => void
     onCollapse: () => void
     onProviderChange?: (providerId: string) => void
-    isMaximized: boolean
 }
 
 type LLMProvider = {
@@ -61,10 +60,8 @@ export function GenericAIPanel({
     isTyping,
     quickActions,
     onSendMessage,
-    onMaximize,
     onCollapse,
     onProviderChange,
-    isMaximized,
 }: GenericAIPanelProps) {
     const [selectedProvider, setSelectedProvider] = useState<LLMProvider>(
         () => llmProviders.find((provider) => provider.id === 'gemini') ?? llmProviders[0]
@@ -172,17 +169,6 @@ export function GenericAIPanel({
                 </div>
                 <div className="flex items-center gap-1">
                     <button
-                        onClick={onMaximize}
-                        className="p-1.5 rounded-md hover:bg-(--slate-gray) transition-colors"
-                        title={isMaximized ? 'Restore' : 'Maximize'}
-                    >
-                        {isMaximized ? (
-                            <Minimize2 className="w-3.5 h-3.5 text-muted-foreground" />
-                        ) : (
-                            <Maximize2 className="w-3.5 h-3.5 text-muted-foreground" />
-                        )}
-                    </button>
-                    <button
                         onClick={onCollapse}
                         className="p-1.5 rounded-md hover:bg-(--slate-gray) transition-colors"
                         title="Close"
@@ -210,114 +196,116 @@ export function GenericAIPanel({
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((message) => (
-                    <motion.div
-                        key={message.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                        <div
-                            className={`max-w-[80%] rounded-lg p-3 ${message.role === 'user'
-                                ? 'bg-(--electric-purple) text-white'
-                                : 'bg-(--charcoal) text-foreground border border-border'
-                                }`}
-                        >
-                            <div className="flex items-start gap-2">
-                                <div className="flex-1">
-                                    <ReactMarkdown
-                                        components={{
-                                            p: ({ children }) => (
-                                                <p className="text-sm leading-relaxed mb-2 last:mb-0">{children}</p>
-                                            ),
-                                            code({ className, children, ...props }) {
-                                                const isInline = !className
-                                                return isInline ? (
-                                                    <code
-                                                        className="bg-black/20 px-1.5 py-0.5 rounded text-xs"
-                                                        {...props}
-                                                    >
-                                                        {children}
-                                                    </code>
-                                                ) : (
-                                                    <code
-                                                        className="block bg-black/20 p-2 rounded text-xs my-2"
-                                                        {...props}
-                                                    >
-                                                        {children}
-                                                    </code>
-                                                )
-                                            },
-                                            ul: ({ children }) => (
-                                                <ul className="list-disc list-inside text-sm space-y-1 mb-2">
-                                                    {children}
-                                                </ul>
-                                            ),
-                                            strong: ({ children }) => (
-                                                <strong className="font-semibold">{children}</strong>
-                                            ),
-                                        }}
-                                    >
-                                        {message.content}
-                                    </ReactMarkdown>
-                                </div>
-                                {message.role === 'assistant' && (
-                                    <button
-                                        onClick={() => handleCopy(message.content, message.id)}
-                                        className="p-1 rounded hover:bg-(--slate-gray) transition-colors shrink-0"
-                                    >
-                                        {copiedId === message.id ? (
-                                            <Check className="w-3 h-3 text-green-500" />
-                                        ) : (
-                                            <Copy className="w-3 h-3 text-muted-foreground" />
-                                        )}
-                                    </button>
-                                )}
-                            </div>
-                            <div
-                                className={`text-[10px] mt-1 ${message.role === 'user' ? 'text-white/60' : 'text-muted-foreground'
-                                    }`}
-                            >
-                                {message.timestamp.toLocaleTimeString()}
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
-
-                <AnimatePresence>
-                    {isTyping && (
+            <ScrollArea className="min-h-0 flex-1">
+                <div className="p-4 space-y-4">
+                    {messages.map((message) => (
                         <motion.div
+                            key={message.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            className="flex justify-start"
+                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className="bg-(--charcoal) border border-border rounded-lg p-3">
-                                <div className="flex gap-1">
-                                    <motion.div
-                                        animate={{ opacity: [0.4, 1, 0.4] }}
-                                        transition={{ duration: 1, repeat: Infinity }}
-                                        className="w-2 h-2 rounded-full bg-(--electric-purple)"
-                                    />
-                                    <motion.div
-                                        animate={{ opacity: [0.4, 1, 0.4] }}
-                                        transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-                                        className="w-2 h-2 rounded-full bg-(--electric-purple)"
-                                    />
-                                    <motion.div
-                                        animate={{ opacity: [0.4, 1, 0.4] }}
-                                        transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-                                        className="w-2 h-2 rounded-full bg-(--electric-purple)"
-                                    />
+                            <div
+                                className={`max-w-[80%] rounded-lg p-3 ${message.role === 'user'
+                                    ? 'bg-(--electric-purple) text-white'
+                                    : 'bg-(--charcoal) text-foreground border border-border'
+                                    }`}
+                            >
+                                <div className="flex items-start gap-2">
+                                    <div className="flex-1">
+                                        <ReactMarkdown
+                                            components={{
+                                                p: ({ children }) => (
+                                                    <p className="text-sm leading-relaxed mb-2 last:mb-0">{children}</p>
+                                                ),
+                                                code({ className, children, ...props }) {
+                                                    const isInline = !className
+                                                    return isInline ? (
+                                                        <code
+                                                            className="bg-black/20 px-1.5 py-0.5 rounded text-xs"
+                                                            {...props}
+                                                        >
+                                                            {children}
+                                                        </code>
+                                                    ) : (
+                                                        <code
+                                                            className="block bg-black/20 p-2 rounded text-xs my-2"
+                                                            {...props}
+                                                        >
+                                                            {children}
+                                                        </code>
+                                                    )
+                                                },
+                                                ul: ({ children }) => (
+                                                    <ul className="list-disc list-inside text-sm space-y-1 mb-2">
+                                                        {children}
+                                                    </ul>
+                                                ),
+                                                strong: ({ children }) => (
+                                                    <strong className="font-semibold">{children}</strong>
+                                                ),
+                                            }}
+                                        >
+                                            {message.content}
+                                        </ReactMarkdown>
+                                    </div>
+                                    {message.role === 'assistant' && (
+                                        <button
+                                            onClick={() => handleCopy(message.content, message.id)}
+                                            className="p-1 rounded hover:bg-(--slate-gray) transition-colors shrink-0"
+                                        >
+                                            {copiedId === message.id ? (
+                                                <Check className="w-3 h-3 text-green-500" />
+                                            ) : (
+                                                <Copy className="w-3 h-3 text-muted-foreground" />
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
+                                <div
+                                    className={`text-[10px] mt-1 ${message.role === 'user' ? 'text-white/60' : 'text-muted-foreground'
+                                        }`}
+                                >
+                                    {message.timestamp.toLocaleTimeString()}
                                 </div>
                             </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
+                    ))}
 
-                <div ref={messagesEndRef} />
-            </div>
+                    <AnimatePresence>
+                        {isTyping && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="flex justify-start"
+                            >
+                                <div className="bg-(--charcoal) border border-border rounded-lg p-3">
+                                    <div className="flex gap-1">
+                                        <motion.div
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1, repeat: Infinity }}
+                                            className="w-2 h-2 rounded-full bg-(--electric-purple)"
+                                        />
+                                        <motion.div
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                                            className="w-2 h-2 rounded-full bg-(--electric-purple)"
+                                        />
+                                        <motion.div
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                                            className="w-2 h-2 rounded-full bg-(--electric-purple)"
+                                        />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <div ref={messagesEndRef} />
+                </div>
+            </ScrollArea>
 
             <div className="p-4 border-t border-border bg-(--charcoal)/30">
                 <div className="flex gap-2">

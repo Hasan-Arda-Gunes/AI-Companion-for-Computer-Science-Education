@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { motion } from 'motion/react'
 import { ChevronDown, ChevronUp, Eye, EyeOff, FlaskConical, Maximize2, Minimize2, Plus, Trash2 } from 'lucide-react'
 import type { TestCase } from './questionCreationTypes'
+import { ScrollArea } from '../ui/scroll-area'
 
 export type TestCasePanelProps = {
     testCases: TestCase[]
@@ -227,113 +228,115 @@ export function TestCasePanel({
             </div>
 
             {!isCollapsed && (
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    {showRawJson && (
-                        <div className="p-3 bg-[var(--slate-gray)] border border-[var(--border)] rounded-lg space-y-2">
-                            <label className="text-xs text-[var(--muted-foreground)] block">
-                                Edit test cases in JSON array format
-                            </label>
-                            <textarea
-                                value={rawJson}
-                                onChange={(event) => {
-                                    setRawJson(event.target.value)
-                                    setIsRawJsonDirty(true)
-                                    if (jsonError) setJsonError(null)
-                                }}
-                                className="w-full min-h-44 px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
-                            />
-                            {jsonError ? (
-                                <div className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300">
-                                    {jsonError}
-                                </div>
-                            ) : null}
-                            <div className="flex items-center justify-end gap-2">
-                                <button
-                                    onClick={() => {
-                                        setRawJson(formatTestCasesAsJson(testCases))
-                                        setIsRawJsonDirty(false)
-                                        setJsonError(null)
+                <ScrollArea className="min-h-0 flex-1">
+                    <div className="p-4 space-y-3">
+                        {showRawJson && (
+                            <div className="p-3 bg-[var(--slate-gray)] border border-[var(--border)] rounded-lg space-y-2">
+                                <label className="text-xs text-[var(--muted-foreground)] block">
+                                    Edit test cases in JSON array format
+                                </label>
+                                <textarea
+                                    value={rawJson}
+                                    onChange={(event) => {
+                                        setRawJson(event.target.value)
+                                        setIsRawJsonDirty(true)
+                                        if (jsonError) setJsonError(null)
                                     }}
-                                    className="px-2 py-1 rounded-md hover:bg-[var(--charcoal)] transition-colors text-xs text-[var(--muted-foreground)]"
-                                >
-                                    Reset
-                                </button>
-                                <button
-                                    onClick={applyRawJson}
-                                    className="px-2 py-1 rounded-md bg-[var(--electric-purple)]/20 text-[var(--electric-purple)] hover:bg-[var(--electric-purple)]/30 transition-colors text-xs font-medium"
-                                >
-                                    Apply JSON
-                                </button>
+                                    className="w-full min-h-44 px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
+                                />
+                                {jsonError ? (
+                                    <div className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300">
+                                        {jsonError}
+                                    </div>
+                                ) : null}
+                                <div className="flex items-center justify-end gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setRawJson(formatTestCasesAsJson(testCases))
+                                            setIsRawJsonDirty(false)
+                                            setJsonError(null)
+                                        }}
+                                        className="px-2 py-1 rounded-md hover:bg-[var(--charcoal)] transition-colors text-xs text-[var(--muted-foreground)]"
+                                    >
+                                        Reset
+                                    </button>
+                                    <button
+                                        onClick={applyRawJson}
+                                        className="px-2 py-1 rounded-md bg-[var(--electric-purple)]/20 text-[var(--electric-purple)] hover:bg-[var(--electric-purple)]/30 transition-colors text-xs font-medium"
+                                    >
+                                        Apply JSON
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {testCases.map((testCase, index) => (
-                        <motion.div
-                            key={testCase.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="p-3 bg-[var(--slate-gray)] border border-[var(--border)] rounded-lg"
-                        >
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs font-semibold text-[var(--foreground)]">
-                                        Test Case {index + 1}
-                                    </span>
-                                    {testCase.isHidden && (
-                                        <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium">
-                                            Hidden
+                        {testCases.map((testCase, index) => (
+                            <motion.div
+                                key={testCase.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="p-3 bg-[var(--slate-gray)] border border-[var(--border)] rounded-lg"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-semibold text-[var(--foreground)]">
+                                            Test Case {index + 1}
                                         </span>
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={() => onUpdate(testCase.id, 'isHidden', !testCase.isHidden)}
-                                        className="p-1 rounded hover:bg-[var(--charcoal)] transition-colors"
-                                        title={testCase.isHidden ? 'Make visible' : 'Make hidden'}
-                                    >
-                                        {testCase.isHidden ? (
-                                            <EyeOff className="w-3 h-3 text-[var(--muted-foreground)]" />
-                                        ) : (
-                                            <Eye className="w-3 h-3 text-[var(--muted-foreground)]" />
+                                        {testCase.isHidden && (
+                                            <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium">
+                                                Hidden
+                                            </span>
                                         )}
-                                    </button>
-                                    <button
-                                        onClick={() => onDelete(testCase.id)}
-                                        className="p-1 rounded hover:bg-[var(--charcoal)] transition-colors"
-                                        title="Delete test case"
-                                    >
-                                        <Trash2 className="w-3 h-3 text-red-400" />
-                                    </button>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => onUpdate(testCase.id, 'isHidden', !testCase.isHidden)}
+                                            className="p-1 rounded hover:bg-[var(--charcoal)] transition-colors"
+                                            title={testCase.isHidden ? 'Make visible' : 'Make hidden'}
+                                        >
+                                            {testCase.isHidden ? (
+                                                <EyeOff className="w-3 h-3 text-[var(--muted-foreground)]" />
+                                            ) : (
+                                                <Eye className="w-3 h-3 text-[var(--muted-foreground)]" />
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={() => onDelete(testCase.id)}
+                                            className="p-1 rounded hover:bg-[var(--charcoal)] transition-colors"
+                                            title="Delete test case"
+                                        >
+                                            <Trash2 className="w-3 h-3 text-red-400" />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="space-y-2">
-                                <div>
-                                    <label className="text-xs text-[var(--muted-foreground)] mb-1 block">Input</label>
-                                    <input
-                                        type="text"
-                                        value={testCase.input}
-                                        onChange={(e) => onUpdate(testCase.id, 'input', e.target.value)}
-                                        className="w-full px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
-                                        placeholder='e.g., [2, 7, 11, 15], 9 or "hello"'
-                                    />
+                                <div className="space-y-2">
+                                    <div>
+                                        <label className="text-xs text-[var(--muted-foreground)] mb-1 block">Input</label>
+                                        <input
+                                            type="text"
+                                            value={testCase.input}
+                                            onChange={(e) => onUpdate(testCase.id, 'input', e.target.value)}
+                                            className="w-full px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
+                                            placeholder='e.g., [2, 7, 11, 15], 9 or "hello"'
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-[var(--muted-foreground)] mb-1 block">
+                                            Expected Output
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={testCase.expectedOutput}
+                                            onChange={(e) => onUpdate(testCase.id, 'expectedOutput', e.target.value)}
+                                            className="w-full px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
+                                            placeholder='e.g., [0, 1] or "answer"'
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="text-xs text-[var(--muted-foreground)] mb-1 block">
-                                        Expected Output
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={testCase.expectedOutput}
-                                        onChange={(e) => onUpdate(testCase.id, 'expectedOutput', e.target.value)}
-                                        className="w-full px-2 py-1.5 bg-[var(--charcoal)] border border-[var(--border)] rounded text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] font-mono"
-                                        placeholder='e.g., [0, 1] or "answer"'
-                                    />
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </ScrollArea>
             )}
         </div>
     )

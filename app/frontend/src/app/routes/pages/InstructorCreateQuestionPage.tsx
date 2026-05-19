@@ -1,10 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import {
     CheckCircle,
     ChevronDown,
     ChevronLeft,
-    ChevronRight,
     ChevronUp,
     Code,
     FlaskConical,
@@ -133,14 +132,13 @@ export function InstructorCreateQuestionPage() {
     const testCasesPanelRef = usePanelRef()
     const aiPanelRef = usePanelRef()
 
-    const [isLeftColumnCollapsed, setIsLeftColumnCollapsed] = useState(false)
+    const isLeftColumnCollapsed = false
     const [isQuestionCollapsed, setIsQuestionCollapsed] = useState(false)
     const [isTestCasesCollapsed, setIsTestCasesCollapsed] = useState(false)
     const [isAiCollapsed, setIsAiCollapsed] = useState(false)
 
     const [isQuestionMaximized, setIsQuestionMaximized] = useState(false)
     const [isTestCasesMaximized, setIsTestCasesMaximized] = useState(false)
-    const [isAiMaximized, setIsAiMaximized] = useState(false)
 
     const aiContext = useMemo(() => {
         return {
@@ -362,27 +360,31 @@ export function InstructorCreateQuestionPage() {
         setIsTestCasesCollapsed((prev) => !prev)
     }
 
-    const toggleAiPanel = () => {
-        const panel = aiPanelRef.current
-        if (!panel) return
-        if (isAiCollapsed) {
-            panel.expand()
-        } else {
-            panel.collapse()
-        }
-        setIsAiCollapsed((prev) => !prev)
+    const closeAiPanel = () => {
+        aiPanelRef.current?.resize('0%')
+        aiPanelRef.current?.collapse()
+        setIsAiCollapsed(true)
     }
 
-    const toggleLeftColumn = () => {
-        const panel = leftColumnRef.current
-        if (!panel) return
-        if (isLeftColumnCollapsed) {
-            panel.expand()
-        } else {
-            panel.collapse()
-        }
-        setIsLeftColumnCollapsed((prev) => !prev)
+    const openAiPanel = () => {
+        aiPanelRef.current?.expand()
+        setIsAiCollapsed(false)
     }
+
+    useEffect(() => {
+        const panel = aiPanelRef.current
+        const leftPanel = leftColumnRef.current
+        if (!panel) return
+        if (isAiCollapsed) {
+            panel.resize('0%')
+            panel.collapse()
+            leftPanel?.resize('100%')
+        } else {
+            panel.expand()
+            panel.resize('50%')
+            leftPanel?.resize('50%')
+        }
+    }, [aiPanelRef, isAiCollapsed, leftColumnRef])
 
     const maximizeQuestion = () => {
         setIsQuestionMaximized((prev) => !prev)
@@ -403,17 +405,6 @@ export function InstructorCreateQuestionPage() {
         } else {
             questionPanelRef.current?.expand()
             setIsQuestionCollapsed(false)
-        }
-    }
-
-    const maximizeAi = () => {
-        setIsAiMaximized((prev) => !prev)
-        if (!isAiMaximized) {
-            leftColumnRef.current?.collapse()
-            setIsLeftColumnCollapsed(true)
-        } else {
-            leftColumnRef.current?.expand()
-            setIsLeftColumnCollapsed(false)
         }
     }
 
@@ -514,22 +505,25 @@ export function InstructorCreateQuestionPage() {
                 )}
 
                 <div className="flex-1 overflow-hidden relative">
-                    <Group orientation="horizontal">
+                    <Group
+                        orientation="horizontal"
+                        resizeTargetMinimumSize={{ coarse: 30, fine: 12 }}
+                    >
                         <Panel
                             panelRef={leftColumnRef}
-                            defaultSize={50}
-                            minSize={25}
-                            maxSize={75}
+                            defaultSize="50%"
+                            minSize="25%"
+                            maxSize={isAiCollapsed ? '100%' : '75%'}
                             collapsible
-                            collapsedSize={0}
+                            collapsedSize="0%"
                         >
                             <Group orientation="vertical">
                                 <Panel
                                     panelRef={questionPanelRef}
-                                    defaultSize={60}
-                                    minSize={5}
+                                    defaultSize="60%"
+                                    minSize="5%"
                                     collapsible
-                                    collapsedSize={5}
+                                    collapsedSize="5%"
                                 >
                                     <QuestionPanel
                                         problemForm={problemForm}
@@ -547,10 +541,10 @@ export function InstructorCreateQuestionPage() {
 
                                 <Panel
                                     panelRef={testCasesPanelRef}
-                                    defaultSize={40}
-                                    minSize={5}
+                                    defaultSize="40%"
+                                    minSize="5%"
                                     collapsible
-                                    collapsedSize={5}
+                                    collapsedSize="5%"
                                 >
                                     <TestCasePanel
                                         testCases={testCases}
@@ -567,73 +561,31 @@ export function InstructorCreateQuestionPage() {
                             </Group>
                         </Panel>
 
-                        <Separator className="w-1 bg-border hover:bg-(--electric-purple) transition-colors relative" />
+                        <Separator
+                            className={`w-2 h-full bg-border hover:bg-(--electric-purple) transition-colors relative cursor-col-resize ${isAiCollapsed ? 'opacity-0 pointer-events-none' : ''}`}
+                            style={{ touchAction: 'none' }}
+                        />
 
                         <Panel
                             panelRef={aiPanelRef}
-                            defaultSize={50}
-                            minSize={25}
-                            maxSize={75}
+                            defaultSize={isAiCollapsed ? '0%' : '50%'}
+                            minSize="0%"
+                            maxSize={isAiCollapsed ? '0%' : '75%'}
                             collapsible
-                            collapsedSize={0}
+                            collapsedSize="0%"
                         >
                             <GenericAIPanel
                                 messages={messages}
                                 isTyping={isTyping}
                                 quickActions={quickActions}
                                 onSendMessage={sendInstructorMessage}
-                                onMaximize={maximizeAi}
-                                onCollapse={toggleAiPanel}
+                                onCollapse={closeAiPanel}
                                 onProviderChange={setSelectedProviderId}
-                                isMaximized={isAiMaximized}
                             />
                         </Panel>
                     </Group>
 
-                    <AnimatePresence>
-                        {!isLeftColumnCollapsed && (
-                            <motion.button
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={toggleLeftColumn}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-16 bg-(--charcoal) border border-border border-l-0 rounded-r-md flex items-center justify-center hover:bg-(--slate-gray) transition-colors z-10 group"
-                                title="Collapse left panel"
-                            >
-                                <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-(--electric-purple)" />
-                            </motion.button>
-                        )}
-                    </AnimatePresence>
-
-                    <AnimatePresence>
-                        {isLeftColumnCollapsed && (
-                            <motion.button
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={toggleLeftColumn}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-16 bg-(--charcoal) border border-border rounded-r-md flex items-center justify-center hover:bg-(--slate-gray) transition-colors z-10 group"
-                                title="Expand left panel"
-                            >
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-(--electric-purple)" />
-                            </motion.button>
-                        )}
-                    </AnimatePresence>
-
-                    <AnimatePresence>
-                        {!isAiCollapsed && (
-                            <motion.button
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={toggleAiPanel}
-                                className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-16 bg-(--charcoal) border border-border border-r-0 rounded-l-md flex items-center justify-center hover:bg-(--slate-gray) transition-colors z-10 group"
-                                title="Close AI panel"
-                            >
-                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-(--electric-purple)" />
-                            </motion.button>
-                        )}
-                    </AnimatePresence>
+                    {/* Left-side collapse buttons removed */}
 
                     <AnimatePresence>
                         {isAiCollapsed && (
@@ -641,8 +593,8 @@ export function InstructorCreateQuestionPage() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                onClick={toggleAiPanel}
-                                className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-16 bg-(--charcoal) border border-border rounded-l-md flex items-center justify-center hover:bg-(--slate-gray) transition-colors z-10 group"
+                                onClick={openAiPanel}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-16 bg-(--charcoal) border border-border border-r-0 rounded-l-md flex items-center justify-center hover:bg-(--slate-gray) transition-colors z-10 group"
                                 title="Open AI panel"
                             >
                                 <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-(--electric-purple)" />
