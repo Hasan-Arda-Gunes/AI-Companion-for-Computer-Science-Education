@@ -49,6 +49,7 @@ async def create_problem(
         examples=problem_data.examples,
         test_cases=problem_data.test_cases,
         starter_code=problem_data.starter_code,
+        starter_code_java=problem_data.starter_code_java,
         solution_template=problem_data.solution_template,
         evaluation_criteria=problem_data.evaluation_criteria,
         time_limit=problem_data.time_limit,
