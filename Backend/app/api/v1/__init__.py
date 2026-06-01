@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     auth,
+    users,
     problem_generation,
     problems,
     submissions,
@@ -18,6 +19,7 @@ api_router = APIRouter()
 
 # Include all endpoint routers
 api_router.include_router(auth.router)
+api_router.include_router(users.router)
 api_router.include_router(problem_generation.router)
 api_router.include_router(problems.router)
 api_router.include_router(submissions.router)

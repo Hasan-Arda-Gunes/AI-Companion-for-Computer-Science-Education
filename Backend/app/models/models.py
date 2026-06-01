@@ -66,7 +66,8 @@ class Problem(Base):
     constraints = Column(JSON)  # Input constraints, limits
     examples = Column(JSON)  # Example inputs/outputs
     test_cases = Column(JSON)  # Hidden test cases
-    starter_code = Column(Text)  # Template code for student
+    starter_code = Column(Text)  # Template code for student (Python)
+    starter_code_java = Column(Text)  # Template code for Java
     solution_template = Column(Text)  # Reference solution
     
     # Evaluation criteria

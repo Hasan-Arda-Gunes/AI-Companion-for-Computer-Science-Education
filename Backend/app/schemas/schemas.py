@@ -59,6 +59,16 @@ class UserResponse(UserBase):
         from_attributes = True
 
 
+class UserUpdate(BaseModel):
+    """Schema for updating user profile"""
+    email: Optional[EmailStr] = None
+    username: Optional[str] = None
+    full_name: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
 class UserSummary(BaseModel):
     id: int
     email: EmailStr
@@ -89,6 +99,7 @@ class ProblemCreate(ProblemBase):
     examples: List[Dict[str, Any]]
     test_cases: List[Dict[str, Any]]
     starter_code: Optional[str] = None
+    starter_code_java: Optional[str] = None
     solution_template: Optional[str] = None
     evaluation_criteria: Dict[str, Any]
     time_limit: int = 5000  # ms
@@ -108,6 +119,7 @@ class ProblemUpdate(BaseModel):
     examples: Optional[List[Dict[str, Any]]] = None
     test_cases: Optional[List[Dict[str, Any]]] = None
     starter_code: Optional[str] = None
+    starter_code_java: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -117,6 +129,7 @@ class ProblemResponse(ProblemBase):
     examples: List[Dict[str, Any]]
     test_cases: List[Dict[str, Any]]
     starter_code: Optional[str]
+    starter_code_java: Optional[str]
     hints: Optional[List[str]]
     learning_objectives: Optional[List[str]]
     related_concepts: Optional[List[str]]
