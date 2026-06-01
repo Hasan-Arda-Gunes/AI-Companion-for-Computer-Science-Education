@@ -39,6 +39,7 @@ const defaultProblemForm: ProblemForm = {
     difficulty: 'intermediate',
     topic: 'arrays',
     starter_code: 'def two_sum(nums, target):\n    pass',
+    starter_code_java: 'public int[] two_sum(int[] nums, int target) {\n    return new int[0];\n}',
     function_name: 'two_sum',
     hints: ['Consider using a hash map for O(n) solution'],
     time_limit: 5000,
@@ -441,6 +442,7 @@ export function InstructorCreateQuestionPage() {
                 function_name: functionName,
             })),
             starter_code: problemForm.starter_code,
+            starter_code_java: problemForm.starter_code_java,
             evaluation_criteria: {
                 check_correctness: problemForm.check_correctness,
                 check_efficiency: problemForm.check_efficiency,

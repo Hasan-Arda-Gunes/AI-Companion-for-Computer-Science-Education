@@ -219,7 +219,7 @@ function NestedGroupWrapper({
             panelRef={wrapperRef}
             id={wrapperId}
             defaultSize={toPercent(defaultSize)}
-            minSize={COLLAPSED_SIZE}
+            minSize={toPercent(minSize) || COLLAPSED_SIZE}
             collapsible
             collapsedSize={COLLAPSED_SIZE}
             onResize={handleResize}

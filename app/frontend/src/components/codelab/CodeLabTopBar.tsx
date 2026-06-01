@@ -12,7 +12,7 @@ type CodeLabTopBarProps = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function CodeLabTopBar({ title, stages, headerData, onSignIn, onSignUp, onLogout }: CodeLabTopBarProps) {
+export function CodeLabTopBar({ title }: CodeLabTopBarProps) {
     // const [showDropdown, setShowDropdown] = useState(false)
     // const initial = headerData.username?.charAt(0).toUpperCase() ?? 'U'
 

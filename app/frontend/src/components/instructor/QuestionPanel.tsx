@@ -219,6 +219,24 @@ export function QuestionPanel({
                             </div>
 
                             <div>
+                                <label className="block text-xs font-medium text-[var(--muted-foreground)] mb-1 uppercase tracking-wider">
+                                    Starter Code (Java)
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    value={problemForm.starter_code_java || ''}
+                                    onChange={(e) =>
+                                        onChange((prev) => ({
+                                            ...prev,
+                                            starter_code_java: e.target.value,
+                                        }))
+                                    }
+                                    className="w-full px-3 py-2 bg-[var(--charcoal)] border border-[var(--border)] rounded-lg text-sm font-mono text-[var(--electric-purple)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--electric-purple)] focus:ring-1 focus:ring-[var(--electric-purple)] resize-none"
+                                    placeholder="public int[] solution(int[] nums, int target) {\n    return new int[0];\n}"
+                                />
+                            </div>
+
+                            <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <label className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
                                         Examples
@@ -433,14 +451,14 @@ export function QuestionPanel({
                             <div className="prose prose-invert max-w-none">
                                 <ReactMarkdown
                                     components={{
-                                        code({ inline, className, children, ...props }) {
+                                        code({ inline, className, children, ...props }: any) {
                                             const match = /language-(\w+)/.exec(className || '')
                                             return !inline && match ? (
                                                 <SyntaxHighlighter
-                                                    style={vscDarkPlus}
+                                                    style={vscDarkPlus as any}
                                                     language={match[1]}
                                                     PreTag="div"
-                                                    {...props}
+                                                    {...(props as any)}
                                                 >
                                                     {String(children).replace(/\n$/, '')}
                                                 </SyntaxHighlighter>
@@ -493,7 +511,10 @@ export function QuestionPanel({
                                                 )
                                                 .join('\n\n')}`
                                             : '',
-                                        `\n## Starter Code\n\n\`\`\`python\n${problemForm.starter_code}\n\`\`\``,
+                                        `\n## Starter Code\n\n\`\`\`python\n${problemForm.starter_code}\n\`\`\`` +
+                                        (problemForm.starter_code_java
+                                            ? `\n\n\`\`\`java\n${problemForm.starter_code_java}\n\`\`\``
+                                            : ''),
                                         problemForm.hints.filter(Boolean).length > 0
                                             ? `\n## Hints\n\n${problemForm.hints
                                                 .filter(Boolean)

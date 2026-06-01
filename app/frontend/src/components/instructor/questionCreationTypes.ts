@@ -34,6 +34,7 @@ export type ProblemForm = {
     difficulty: 'beginner' | 'intermediate' | 'advanced'
     topic: string
     starter_code: string
+    starter_code_java?: string
     function_name: string
     hints: string[]
     time_limit: number

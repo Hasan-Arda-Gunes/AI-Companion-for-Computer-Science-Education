@@ -648,9 +648,12 @@ export function CodeLabPage() {
                 }
 
                 setQuestionData(mappedQuestion)
-                const resolvedStarterCode = detail.starter_code ?? null
+                const resolvedStarterCode = (defaultLanguageId === 'java' && (detail as any).starter_code_java)
+                    ? (detail as any).starter_code_java
+                    : detail.starter_code
                 setStarterCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : null)
-                setCurrentCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : sampleEditor.codeTemplates.python)
+                const defaultTemplate = defaultLanguageId === 'java' ? sampleEditor.codeTemplates.java : sampleEditor.codeTemplates.python
+                setCurrentCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : defaultTemplate)
                 setHintLevel(1)
                 setDefaultLanguageId(getDefaultEditorLanguage())
                 appendLogs([createLog('success', `Loaded problem: ${detail.title}`)])

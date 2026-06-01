@@ -93,6 +93,7 @@ export function StudentCreateQuestionTempPage() {
                 },
             ],
             starter_code: 'def solution():\n    pass',
+            starter_code_java: 'public int[] solution(int[] nums, int target) {\n    return new int[0];\n}',
             evaluation_criteria: {
                 check_correctness: true,
                 check_efficiency: true,

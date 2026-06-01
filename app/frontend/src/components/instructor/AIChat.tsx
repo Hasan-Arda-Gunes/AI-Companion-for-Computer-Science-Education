@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { instructorChat } from '../../features/ai/api/instructorAiApi'
+import { instructorChat } from '../../features/ai/api/aiApi'
 import type { InstructorChatRequest } from '../../features/ai/types'
 import type { ChatMessage, QuestionFormData } from './types'
 import styles from './AIChat.module.css'

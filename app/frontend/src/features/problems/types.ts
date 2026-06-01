@@ -27,6 +27,7 @@ export type Problem = {
         class_id?: number
     examples: ProblemExample[]
     starter_code: string
+    starter_code_java?: string
     hints: string[]
     created_at: string
 }
@@ -45,6 +46,7 @@ export type ProblemDetails = {
         expected_output: unknown
     }>
     starter_code?: string
+    starter_code_java?: string
     hints?: string[]
     learning_objectives?: string[]
     related_concepts?: string[]
@@ -75,6 +77,7 @@ export type CreateProblemRequest = {
     examples: ProblemExample[]
     test_cases: ProblemTestCase[]
     starter_code: string
+    starter_code_java?: string
     evaluation_criteria: ProblemEvaluationCriteria
     hints: string[]
     time_limit: number
@@ -93,5 +96,6 @@ export type UpdateProblemRequest = {
     examples?: ProblemExample[]
     test_cases?: ProblemTestCase[]
     starter_code?: string
+    starter_code_java?: string
     is_active?: boolean
 }

@@ -15,6 +15,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "incremental": true,
 
     /* Linting */
     "strict": true,
