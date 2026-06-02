@@ -316,6 +316,21 @@ type TestResultRowProps = {
     test: SubmissionTestResult
 }
 
+const FormatValue = ({ value }: { value: unknown }) => {
+    if (typeof value === 'string') {
+        return value
+    } else if (typeof value === 'object') {
+        try {
+            return JSON.stringify(value, null)
+        }
+        catch {
+            return String(value)
+        }
+    } else {
+        return String(value)
+    }
+}
+
 function TestResultRow({ test }: TestResultRowProps) {
     return (
         <div className="rounded-xl border border-border bg-secondary/20 p-4">
@@ -332,8 +347,8 @@ function TestResultRow({ test }: TestResultRowProps) {
             </div>
 
             <div className="mt-3 grid gap-3 md:grid-cols-2">
-                <DetailBlock label="Expected" value={test.expected} />
-                <DetailBlock label="Actual" value={test.actual} />
+                <DetailBlock label="Expected" value={FormatValue({ value: test.expected })} />
+                <DetailBlock label="Actual" value={FormatValue({ value: test.actual })} />
             </div>
         </div>
     )
