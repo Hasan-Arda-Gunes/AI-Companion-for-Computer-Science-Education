@@ -14,12 +14,12 @@ import { getSubmission, submitCode } from '../../../features/submissions/api/sub
 import type { CodeEditorData, CodeLabHeaderData, ConsoleData, ConsoleLog, EvolutionStage, MentorData, QuestionData } from '../../../components/codelab/types'
 import type { LLMProvider } from '../../../features/ai/types'
 import type { SubmissionDetails } from '../../../features/submissions/types'
+import type { ProblemDetails } from '../../../features/problems/types'
 import { useAuthSession } from '../../../features/auth/context/useAuthSession'
 import { defaultInstructorSidebarPagePathMap } from '../../../components/layout/instructorSidebarConfig'
 import { defaultStudentSidebarPagePathMap } from '../../../components/layout/studentSidebarConfig'
 import { DashboardLayout } from '../../../components/layout/DashboardLayout'
 import { RoleAwareSidebar } from '../../../components/layout/RoleAwareSidebar'
-
 const sampleStages: EvolutionStage[] = [
     { id: 'stage-1', label: 'Stage 1', active: true },
     { id: 'stage-2', label: 'Stage 2', locked: true },
@@ -83,18 +83,10 @@ Can you come up with an algorithm that is less than O(n^2) time complexity?
 const sampleEditor: CodeEditorData = {
     fileBaseName: 'solution',
     defaultLanguageId: 'python',
-    runButtonLabel: 'Run Evolution',
+    runButtonLabel: 'Run Code',
     languages: [
-        { id: 'javascript', name: 'JavaScript', extension: '.js' },
-        { id: 'typescript', name: 'TypeScript', extension: '.ts' },
         { id: 'python', name: 'Python', extension: '.py' },
         { id: 'java', name: 'Java', extension: '.java' },
-        { id: 'cpp', name: 'C++', extension: '.cpp' },
-        { id: 'csharp', name: 'C#', extension: '.cs' },
-        { id: 'go', name: 'Go', extension: '.go' },
-        { id: 'rust', name: 'Rust', extension: '.rs' },
-        { id: 'ruby', name: 'Ruby', extension: '.rb' },
-        { id: 'php', name: 'PHP', extension: '.php' },
     ],
     codeTemplates: {
         javascript: `function twoSum(nums, target) {
@@ -258,6 +250,7 @@ const sampleMentor: MentorData = {
     inputPlaceholder: 'Ask your mentor a question...',
 }
 
+
 export function CodeLabPage() {
     const navigate = useNavigate()
     const { user, signOut } = useAuthSession()
@@ -267,8 +260,8 @@ export function CodeLabPage() {
     const [mentorOpen, setMentorOpen] = useState(true)
     const [isRunning, setIsRunning] = useState(false)
     const [hintLevel, setHintLevel] = useState(1)
-    const [starterCode, setStarterCode] = useState<string | null>(null)
-    const [currentCode, setCurrentCode] = useState(sampleEditor.codeTemplates.python)
+    const [loadedProblem, setLoadedProblem] = useState<ProblemDetails | null>(null)
+    const [currentCode, setCurrentCode] = useState('')
     const [activeSessionId, setActiveSessionId] = useState<number | null>(null)
     const [questionData, setQuestionData] = useState<QuestionData>(sampleQuestion)
     const [consoleData, setConsoleData] = useState<ConsoleData>(sampleConsole)
@@ -288,17 +281,18 @@ export function CodeLabPage() {
     const resolvedEditor = useMemo<CodeEditorData>(() => {
         const languageExists = sampleEditor.languages.some((language) => language.id === defaultLanguageId)
         const resolvedDefaultLanguage = languageExists ? defaultLanguageId : 'python'
+        const codeTemplates = {
+            python: loadedProblem?.starter_code ?? '',
+            java: loadedProblem?.starter_code_java ?? '',
+        }
 
         return {
             ...sampleEditor,
             defaultLanguageId: resolvedDefaultLanguage,
-            codeTemplates: {
-                ...sampleEditor.codeTemplates,
-                python: starterCode && starterCode.length > 0 ? starterCode : sampleEditor.codeTemplates.python,
-            },
+            codeTemplates,
             tabSize,
         }
-    }, [defaultLanguageId, starterCode, tabSize])
+    }, [defaultLanguageId, loadedProblem, tabSize])
 
     const createLog = (type: ConsoleLog['type'], message: string): ConsoleLog => ({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -320,7 +314,7 @@ export function CodeLabPage() {
             username: 'Student',
             xp: 1280,
         })
-        appendLogs([createLog('info', 'Signed in (placeholder action).')])
+        appendLogs([createLog('success', 'Signed in (placeholder action).')])
     }
 
     const handleSignUp = () => {
@@ -353,107 +347,41 @@ export function CodeLabPage() {
         }
 
         const normalizedLanguageMap: Record<string, string> = {
-            javascript: 'javascript',
-            typescript: 'typescript',
             python: 'python',
             java: 'java',
-            cpp: 'cpp',
-            csharp: 'csharp',
-            go: 'go',
-            rust: 'rust',
-            ruby: 'ruby',
-            php: 'php',
         }
         const backendLanguage = normalizedLanguageMap[languageId] ?? languageId
 
-        const toDisplayText = (value: unknown) => {
-            if (typeof value === 'string') {
-                return value
-            }
-            try {
-                return JSON.stringify(value)
-            } catch {
-                return String(value)
-            }
-        }
-
         const isTerminalStatus = (status: string) => !['pending', 'running'].includes(status)
-
-        const pollSubmission = async (submissionId: number): Promise<SubmissionDetails> => {
-            const maxAttempts = 15
-            const delayMs = 1200
-
-            for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-                const details = await getSubmission(submissionId)
-                appendLogs([createLog('log', `Submission #${submissionId} status: ${details.status} (check ${attempt}/${maxAttempts})`)])
-
-                if (isTerminalStatus(details.status)) {
-                    return details
-                }
-
-                await new Promise((resolve) => {
-                    window.setTimeout(resolve, delayMs)
-                })
-            }
-
-            return await getSubmission(submissionId)
-        }
 
         const runSubmission = async () => {
             setIsRunning(true)
-            appendLogs([
-                createLog('info', `Submitting ${backendLanguage} solution for problem #${resolvedProblemId}...`),
-                createLog('log', `Session ID: ${activeSessionId}`),
-            ])
+            appendLogs([createLog('info', `Submitting ${backendLanguage} solution for problem #${resolvedProblemId}...`)])
 
             try {
-                const sanitizedCode = code.replace(/\t/g, ' '.repeat(tabSize))
-                const submission = await submitCode({
+                const details = await submitCode({
                     problem_id: resolvedProblemId,
-                    code: sanitizedCode,
+                    code,
                     language: backendLanguage,
                     session_id: activeSessionId,
                 })
+                const submissionDetails = await getSubmission(details.id)
 
                 appendLogs([
-                    createLog('success', `Submission created: #${submission.id}`),
-                    createLog('info', 'Fetching evaluation result...'),
+                    createLog('success', `Submission ${details.id} accepted by backend.`),
+                    createLog('info', `Status: ${submissionDetails.status}`),
                 ])
 
-                const details = await pollSubmission(submission.id)
-                const summaryType = details.status === 'correct' ? 'success' : details.status === 'error' ? 'error' : 'info'
-                appendLogs([
-                    createLog(summaryType, `Final status: ${details.status}`),
-                    ...(typeof details.score === 'number' ? [createLog('log', `Score: ${details.score}`)] : []),
-                    ...(typeof details.execution_time === 'number'
-                        ? [createLog('log', `Execution time: ${details.execution_time} ms`)]
-                        : []),
-                ])
-
-                if (details.test_results?.length) {
-                    appendLogs([createLog('info', `Test results (${details.test_results.length}):`)])
-                    appendLogs(
-                        details.test_results.map((test) =>
-                            createLog(
-                                test.passed ? 'success' : 'error',
-                                `${test.test_id}: ${test.passed ? 'PASSED' : 'FAILED'} | expected=${toDisplayText(test.expected)} | actual=${toDisplayText(test.actual)}`,
-                            ),
-                        ),
-                    )
+                const active = getActiveLearningSession()
+                if (active && active.id === activeSessionId) {
+                    setActiveLearningSession({
+                        ...active,
+                        bestScore: Math.max(active.bestScore, submissionDetails.score ?? 0),
+                    })
                 }
 
-                if (typeof details.score === 'number') {
-                    const active = getActiveLearningSession()
-                    if (active && active.id === activeSessionId) {
-                        setActiveLearningSession({
-                            ...active,
-                            bestScore: Math.max(active.bestScore, details.score),
-                        })
-                    }
-                }
-
-                if (isTerminalStatus(details.status)) {
-                    setLatestSubmission(details)
+                if (isTerminalStatus(submissionDetails.status)) {
+                    setLatestSubmission(submissionDetails)
                 }
             } catch (error) {
                 const message = error instanceof Error ? error.message : 'Submission failed'
@@ -537,8 +465,8 @@ export function CodeLabPage() {
     useEffect(() => {
         if (!selectedProblemId) {
             setQuestionData(sampleQuestion)
-            setStarterCode(null)
-            setCurrentCode(sampleEditor.codeTemplates.python)
+            setLoadedProblem(null)
+            setCurrentCode('')
             setHintLevel(1)
             setActiveSessionId(null)
             setLatestSubmission(null)
@@ -596,20 +524,16 @@ export function CodeLabPage() {
                     return
                 }
 
+                const examplesMarkdown = (detail.examples ?? []).map((example, index) => [
+                    `### Example ${index + 1}`,
+                    '',
+                    `Input: ${formatUnknown(example.input)}`,
+                    `Expected Output: ${formatUnknown(example.expected_output)}`,
+                ].join('\n'))
+
                 const constraintsList = detail.constraints
                     ? Object.entries(detail.constraints).map(([key, value]) => `- ${key}: ${formatUnknown(value)}`)
                     : []
-
-                const examplesMarkdown = (detail.examples ?? []).map((example, index) => {
-                    return [
-                        `### Example ${index + 1}`,
-                        '',
-                        '```',
-                        `Input: ${formatUnknown(example.input)}`,
-                        `Expected Output: ${formatUnknown(example.expected_output)}`,
-                        '```',
-                    ].join('\n')
-                })
 
                 const markdownSections = [
                     `# ${detail.title}`,
@@ -648,12 +572,7 @@ export function CodeLabPage() {
                 }
 
                 setQuestionData(mappedQuestion)
-                const resolvedStarterCode = (defaultLanguageId === 'java' && (detail as any).starter_code_java)
-                    ? (detail as any).starter_code_java
-                    : detail.starter_code
-                setStarterCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : null)
-                const defaultTemplate = defaultLanguageId === 'java' ? sampleEditor.codeTemplates.java : sampleEditor.codeTemplates.python
-                setCurrentCode(resolvedStarterCode && resolvedStarterCode.length > 0 ? resolvedStarterCode : defaultTemplate)
+                setLoadedProblem(detail)
                 setHintLevel(1)
                 setDefaultLanguageId(getDefaultEditorLanguage())
                 appendLogs([createLog('success', `Loaded problem: ${detail.title}`)])
@@ -673,6 +592,37 @@ export function CodeLabPage() {
             isMounted = false
         }
     }, [selectedProblemId])
+
+    useEffect(() => {
+        if (!loadedProblem) {
+            return
+        }
+
+        const resolvedLanguage = sampleEditor.languages.some((language) => language.id === defaultLanguageId)
+            ? defaultLanguageId
+            : 'python'
+
+        const resolvedStarterCode = resolvedLanguage === 'java'
+            ? loadedProblem.starter_code_java ?? ''
+            : loadedProblem.starter_code ?? ''
+
+        setCurrentCode(resolvedStarterCode)
+    }, [defaultLanguageId, loadedProblem])
+
+    useEffect(() => {
+        if (!loadedProblem) {
+            return
+        }
+
+        const resolvedLanguage = sampleEditor.languages.some((language) => language.id === defaultLanguageId)
+            ? defaultLanguageId
+            : 'python'
+        const resolvedStarterCode = resolvedLanguage === 'java'
+            ? loadedProblem.starter_code_java ?? ''
+            : loadedProblem.starter_code ?? ''
+
+        setCurrentCode(resolvedStarterCode)
+    }, [defaultLanguageId, loadedProblem])
 
     return (
         <DashboardLayout

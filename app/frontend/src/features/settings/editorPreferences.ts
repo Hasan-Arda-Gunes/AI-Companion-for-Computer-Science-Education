@@ -2,16 +2,8 @@ export const DEFAULT_EDITOR_LANGUAGE_STORAGE_KEY = 'codelab.defaultLanguage'
 export const DEFAULT_EDITOR_TAB_SIZE_STORAGE_KEY = 'codelab.tabSize'
 
 export const AVAILABLE_EDITOR_LANGUAGES = [
-    'javascript',
-    'typescript',
     'python',
-    'java',
-    'cpp',
-    'csharp',
-    'go',
-    'rust',
-    'ruby',
-    'php',
+    'java'
 ] as const
 
 export type EditorLanguageId = (typeof AVAILABLE_EDITOR_LANGUAGES)[number]
