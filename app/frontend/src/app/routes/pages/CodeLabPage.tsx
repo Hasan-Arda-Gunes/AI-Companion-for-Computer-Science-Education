@@ -351,37 +351,94 @@ export function CodeLabPage() {
             java: 'java',
         }
         const backendLanguage = normalizedLanguageMap[languageId] ?? languageId
+        const toDisplayText = (value: unknown) => {
+            if (typeof value === 'string') {
+                return value
+            }
+            try {
+                return JSON.stringify(value)
+            } catch {
+                return String(value)
+            }
+        }
 
         const isTerminalStatus = (status: string) => !['pending', 'running'].includes(status)
 
+        const pollSubmission = async (submissionId: number): Promise<SubmissionDetails> => {
+            const maxAttempts = 15
+            const delayMs = 1200
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+                const details = await getSubmission(submissionId)
+                appendLogs([createLog('log', `Submission #${submissionId} status: ${details.status} (check ${attempt}/${maxAttempts})`)])
+
+                if (isTerminalStatus(details.status)) {
+                    return details
+                }
+
+                await new Promise((resolve) => {
+                    window.setTimeout(resolve, delayMs)
+                })
+            }
+
+            return await getSubmission(submissionId)
+        }
+
         const runSubmission = async () => {
             setIsRunning(true)
-            appendLogs([createLog('info', `Submitting ${backendLanguage} solution for problem #${resolvedProblemId}...`)])
+            appendLogs([
+                createLog('info', `Submitting ${backendLanguage} solution for problem #${resolvedProblemId}...`),
+                createLog('log', `Session ID: ${activeSessionId}`),
+            ])
 
             try {
-                const details = await submitCode({
+                const sanitizedCode = code.replace(/\t/g, ' '.repeat(tabSize))
+                const submission = await submitCode({
                     problem_id: resolvedProblemId,
-                    code,
+                    code: sanitizedCode,
                     language: backendLanguage,
                     session_id: activeSessionId,
                 })
-                const submissionDetails = await getSubmission(details.id)
 
                 appendLogs([
-                    createLog('success', `Submission ${details.id} accepted by backend.`),
-                    createLog('info', `Status: ${submissionDetails.status}`),
+                    createLog('success', `Submission created: #${submission.id}`),
+                    createLog('info', 'Fetching evaluation result...'),
                 ])
 
-                const active = getActiveLearningSession()
-                if (active && active.id === activeSessionId) {
-                    setActiveLearningSession({
-                        ...active,
-                        bestScore: Math.max(active.bestScore, submissionDetails.score ?? 0),
-                    })
+                const details = await pollSubmission(submission.id)
+                const summaryType = details.status === 'correct' ? 'success' : details.status === 'error' ? 'error' : 'info'
+                appendLogs([
+                    createLog(summaryType, `Final status: ${details.status}`),
+                    ...(typeof details.score === 'number' ? [createLog('log', `Score: ${details.score}`)] : []),
+                    ...(typeof details.execution_time === 'number'
+                        ? [createLog('log', `Execution time: ${details.execution_time} ms`)]
+                        : []),
+                ])
+
+                if (details.test_results?.length) {
+                    appendLogs([createLog('info', `Test results (${details.test_results.length}):`)])
+                    appendLogs(
+                        details.test_results.map((test) =>
+                            createLog(
+                                test.passed ? 'success' : 'error',
+                                `${test.test_id}: ${test.passed ? 'PASSED' : 'FAILED'} | expected=${toDisplayText(test.expected)} | actual=${toDisplayText(test.actual)}`,
+                            ),
+                        ),
+                    )
                 }
 
-                if (isTerminalStatus(submissionDetails.status)) {
-                    setLatestSubmission(submissionDetails)
+                if (typeof details.score === 'number') {
+                    const active = getActiveLearningSession()
+                    if (active && active.id === activeSessionId) {
+                        setActiveLearningSession({
+                            ...active,
+                            bestScore: Math.max(active.bestScore, details.score),
+                        })
+                    }
+                }
+
+                if (isTerminalStatus(details.status)) {
+                    setLatestSubmission(details)
                 }
             } catch (error) {
                 const message = error instanceof Error ? error.message : 'Submission failed'
@@ -390,7 +447,6 @@ export function CodeLabPage() {
                 setIsRunning(false)
             }
         }
-
         void runSubmission()
     }
 
