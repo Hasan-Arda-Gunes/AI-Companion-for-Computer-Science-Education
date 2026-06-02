@@ -33,53 +33,22 @@ import { createProblem } from '../../../features/problems/api/problemsApi'
 import type { CreateProblemRequest } from '../../../features/problems/types'
 
 const defaultProblemForm: ProblemForm = {
-    title: 'Two Sum',
-    description:
-        'Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume each input has exactly one solution, and you may not use the same element twice.',
-    difficulty: 'intermediate',
-    topic: 'arrays',
-    starter_code: 'def two_sum(nums, target):\n    pass',
-    starter_code_java: 'public int[] two_sum(int[] nums, int target) {\n    return new int[0];\n}',
-    function_name: 'two_sum',
-    hints: ['Consider using a hash map for O(n) solution'],
+    title: '',
+    description: '',
+    difficulty: 'beginner',
+    topic: '',
+    starter_code: '',
+    starter_code_java: '',
+    function_name: '',
+    hints: [],
     time_limit: 5000,
     memory_limit: 256,
     check_correctness: true,
     check_efficiency: true,
-    examples: [
-        {
-            id: 'ex1',
-            input: '[2,7,11,15], 9',
-            expected_output: '[0,1]',
-        },
-        {
-            id: 'ex2',
-            input: '[3,2,4], 6',
-            expected_output: '[1,2]',
-        },
-    ],
+    examples: [],
 }
 
-const defaultTestCases: TestCase[] = [
-    {
-        id: '1',
-        input: '[2,7,11,15], 9',
-        expectedOutput: '[0,1]',
-        isHidden: false,
-    },
-    {
-        id: '2',
-        input: '[3,2,4], 6',
-        expectedOutput: '[1,2]',
-        isHidden: false,
-    },
-    {
-        id: '3',
-        input: '[3,3], 6',
-        expectedOutput: '[0,1]',
-        isHidden: true,
-    },
-]
+const defaultTestCases: TestCase[] = []
 
 const providerMap: Record<string, LLMProvider> = {
     gemini: 'gemini',
@@ -108,6 +77,86 @@ function parseStructuredInput(value: string): unknown {
     } catch {
         return value
     }
+}
+
+function splitTopLevelCommaSeparated(value: string): string[] | null {
+    const parts: string[] = []
+    let current = ''
+    let bracketDepth = 0
+    let braceDepth = 0
+    let parenDepth = 0
+    let quote: '"' | '\'' | null = null
+    let isEscaped = false
+
+    for (const char of value) {
+        if (isEscaped) {
+            current += char
+            isEscaped = false
+            continue
+        }
+
+        if (char === '\\') {
+            current += char
+            isEscaped = true
+            continue
+        }
+
+        if (quote) {
+            current += char
+            if (char === quote) {
+                quote = null
+            }
+            continue
+        }
+
+        if (char === '"' || char === '\'') {
+            quote = char
+            current += char
+            continue
+        }
+
+        if (char === '[') bracketDepth += 1
+        if (char === ']') bracketDepth -= 1
+        if (char === '{') braceDepth += 1
+        if (char === '}') braceDepth -= 1
+        if (char === '(') parenDepth += 1
+        if (char === ')') parenDepth -= 1
+
+        if (char === ',' && bracketDepth === 0 && braceDepth === 0 && parenDepth === 0) {
+            parts.push(current.trim())
+            current = ''
+            continue
+        }
+
+        current += char
+    }
+
+    parts.push(current.trim())
+
+    if (parts.length <= 1) {
+        return null
+    }
+
+    return parts
+}
+
+function parseTestCaseInput(value: string): unknown {
+    const trimmed = value.trim()
+
+    if (!trimmed) {
+        return ''
+    }
+
+    const parts = splitTopLevelCommaSeparated(trimmed)
+    if (parts) {
+        return parts.map((part) => parseStructuredInput(part))
+    }
+
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        return parseStructuredInput(trimmed)
+    }
+
+    return parseStructuredInput(trimmed)
 }
 
 export function InstructorCreateQuestionPage() {
@@ -437,7 +486,7 @@ export function InstructorCreateQuestionPage() {
             examples: sanitizedExamples,
             test_cases: testCases.map((testCase) => ({
                 id: testCase.id,
-                input: parseStructuredInput(testCase.input),
+                input: parseTestCaseInput(testCase.input),
                 expected_output: parseStructuredInput(testCase.expectedOutput),
                 function_name: functionName,
             })),
