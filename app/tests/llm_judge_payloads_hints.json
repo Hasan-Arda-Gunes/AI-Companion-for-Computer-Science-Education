@@ -1,0 +1,171 @@
+{
+  "chat_tests": [],
+  "submission_tests": [],
+  "hint_tests": [
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Two Sum",
+        "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice."
+      },
+      "student_input": {
+        "current_code": "def two_sum(nums, target):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return [i, j]\n    return []"
+      },
+      "ai_mentor_hint": "Your current solution correctly finds the two numbers! That's a great start. Now, thinking about efficiency, could you find the 'complement' number (the one that adds up to `target` with the current number) more quickly than iterating through the rest of the array each time?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Valid Parentheses",
+        "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. Open brackets must be closed by the same type of brackets in the correct order."
+      },
+      "student_input": {
+        "current_code": "def is_valid(s):\n    while \"()\" in s or \"{}\" in s or \"[]\" in s:\n        s = s.replace(\"()\", \"\").replace(\"{}\", \"\").replace(\"[]\", \"\")\n    return s == \"\""
+      },
+      "ai_mentor_hint": "That's a very creative approach! Your current code correctly handles many cases where valid pairs are adjacent.\n\nThink about how you would manually check if a string like `([)]` is valid"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Container With Most Water",
+        "description": "You are given an integer array height of length n. Find two lines that together with the x-axis form a container, such that the container contains the most water."
+      },
+      "student_input": {
+        "current_code": "def max_area(height):\n    max_water = 0\n    for i in range(len(height)):\n        for j in range(i + 1, len(height)):\n            max_water = max(max_water, min(height[i], height[j]) * (j - i))\n    return max_water"
+      },
+      "ai_mentor_hint": "That's a great start! Your current code correctly calculates the area for every possible pair of lines, which is a very direct way to solve the problem.\n\nWhen thinking about problems that involve finding an optimal pair of elements in an array, sometimes it helps to consider if you can make progress by working from both ends of the array inwards. How might the potential area change if you were to start with the widest possible container and then decide which side to move next?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Longest Substring Without Repeating Characters",
+        "description": "Given a string s, find the length of the longest substring without repeating characters."
+      },
+      "student_input": {
+        "current_code": "def length_of_longest_substring(s):\n    def check(start, end):\n        chars = set()\n        for i in range(start, end + 1):\n            if s[i] in chars:\n                return False\n            chars.add(s[i])\n        return True\n    res = 0\n    for i in range(len(s)):\n        for j in range(i, len(s)):\n            if check(i, j):\n                res = max(res, j - i + 1)\n    return res"
+      },
+      "ai_mentor_hint": "You've done a great job breaking down the problem into checking individual substrings! Your `check` function correctly identifies if a given substring has repeating characters.\n\nNow, think about the efficiency of your nested loops. Are you"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Group Anagrams",
+        "description": "Given an array of strings strs, group the anagrams together. You can return the answer in any order."
+      },
+      "student_input": {
+        "current_code": "def group_anagrams(strs):\n    groups = []\n    for s in strs:\n        found = False\n        for group in groups:\n            if sorted(group[0]) == sorted(s):\n                group.append(s)\n                found = True\n                break\n        if not found:\n            groups.append([s])\n    return groups"
+      },
+      "ai_mentor_hint": "You're off to a great start by recognizing that sorting the characters of a string is a fantastic way to determine if two strings are anagrams! That's a crucial insight for this problem.\n\nNow, think about how you're currently searching through your `groups` list to find a match for each new string. Is there a way to organize your groups so that finding the right one (or knowing if a new"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Top K Frequent Elements",
+        "description": "Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order."
+      },
+      "student_input": {
+        "current_code": "def top_k_frequent(nums, k):\n    from collections import Counter\n    count = Counter(nums)\n    sorted_items = sorted(count.items(), key=lambda x: x[1], reverse=True)\n    return [item[0] for item in sorted_items[:k]]"
+      },
+      "ai_mentor_hint": "Your use of `Counter` is a great start to efficiently get the frequencies! Now, consider the next step: do you need to sort *all* the unique elements by their frequency, or is there a way to keep track of just the `k` most frequent ones as you process them?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Product of Array Except Self",
+        "description": "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i]. Must run in O(n) without division."
+      },
+      "student_input": {
+        "current_code": "def product_except_self(nums):\n    ans = []\n    for i in range(len(nums)):\n        prod = 1\n        for j in range(len(nums)):\n            if i != j:\n                prod *= nums[j]\n        ans.append(prod)\n    return ans"
+      },
+      "ai_mentor_hint": "Your current code correctly calculates the product for each element, which is a great start! To meet the O(n) time complexity requirement, think about how you could pre-calculate the products of elements to the left of `nums[i]` and the products of elements to the right of `nums[i]` more efficiently. Could you build up these products in separate passes?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Subarray Sum Equals K",
+        "description": "Given an array of integers nums and an integer k, return the total number of continuous subarrays whose sum equals to k."
+      },
+      "student_input": {
+        "current_code": "def subarray_sum(nums, k):\n    count = 0\n    for i in range(len(nums)):\n        curr_sum = 0\n        for j in range(i, len(nums)):\n            curr_sum += nums[j]\n            if curr_sum == k:\n                count += 1\n    return count"
+      },
+      "ai_mentor_hint": "Your current approach correctly identifies all subarrays, which is a great start! It's a valid way to solve the problem. For very large arrays, you might find it takes a bit longer. Have you considered if there's a way to keep track of sums more efficiently, perhaps by storing some intermediate results as you iterate through the array?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Number of Islands",
+        "description": "Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands."
+      },
+      "student_input": {
+        "current_code": "def num_islands(grid):\n    islands = 0\n    visited = set()\n    for r in range(len(grid)):\n        for c in range(len(grid[0])):\n            if grid[r][c] == '1' and (r, c) not in visited:\n                islands += 1\n                queue = [(r, c)]\n                while queue:\n                    curr_r, curr_c = queue.pop(0)\n                    if (curr_r, curr_c) not in visited:\n                        visited.add((curr_r, curr_c))\n                        for dr, dc in [(1,0),(-1,0),(0,1),(0,-1)]:\n                            nr, nc = curr_r + dr, curr_c + dc\n                            if 0<=nr<len(grid) and 0<=nc<len(grid[0]) and grid[nr][nc]=='1':\n                                queue.append((nr, nc))\n    return islands"
+      },
+      "ai_mentor_hint": "You've made excellent progress by correctly identifying the need for a `visited` set and using a Breadth-First Search (BFS) approach! Your overall structure for iterating through the grid and initiating"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Merge Intervals",
+        "description": "Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals."
+      },
+      "student_input": {
+        "current_code": "def merge(intervals):\n    merged = []\n    for interval in intervals:\n        overlap = False\n        for m in merged:\n            if max(interval[0], m[0]) <= min(interval[1], m[1]):\n                m[0] = min(interval[0], m[0])\n                m[1] = max(interval[1], m[1])\n                overlap = True\n                break\n        if not overlap:\n            merged.append(interval)\n    return merged"
+      },
+      "ai_mentor_hint": "You're doing a great job thinking about how to detect and combine overlaps! Your overlap condition looks correct. Sometimes, with problems involving intervals, a particular initial step can make the rest of the logic much simpler. Have you considered if there's a way to arrange the intervals first that might help streamline your merging process?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Minimum Coin Change",
+        "description": "You are given an integer array coins representing coins of different denominations and an integer amount. Return the fewest number of coins that you need to make up that amount."
+      },
+      "student_input": {
+        "current_code": "def coin_change(coins, amount):\n    def dfs(rem):\n        if rem == 0: return 0\n        if rem < 0: return float('inf')\n        res = float('inf')\n        for coin in coins:\n            res = min(res, 1 + dfs(rem - coin))\n        return res\n    ans = dfs(amount)\n    return ans if ans != float('inf') else -1"
+      },
+      "ai_mentor_hint": "That's a great start! Your recursive structure correctly identifies the base cases and how to explore different coin choices. You're thinking along the right lines with `dfs`!\n\nAs you trace through your `dfs` function, especially for larger `amount`s, consider what happens if the same `rem` value is encountered multiple times during the recursion. Are you recalculating anything unnecessarily?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Longest Increasing Subsequence",
+        "description": "Given an integer array nums, return the length of the longest strictly increasing subsequence."
+      },
+      "student_input": {
+        "current_code": "def length_of_lis(nums):\n    def solve(curr, prev_idx):\n        if curr == len(nums): return 0\n        take = 0\n        if prev_idx == -1 or nums[curr] > nums[prev_idx]:\n            take = 1 + solve(curr + 1, curr)\n        skip = solve(curr + 1, prev_idx)\n        return max(take, skip)\n    return solve(0, -1)"
+      },
+      "ai_mentor_hint": "Your recursive approach correctly identifies the choices at each step and the conditions for including an element. That's a great start! As you think about how this function executes, have you considered if you might be solving the same smaller problems multiple times?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Edit Distance",
+        "description": "Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2."
+      },
+      "student_input": {
+        "current_code": "def min_distance(word1, word2):\n    def solve(i, j):\n        if i == len(word1): return len(word2) - j\n        if j == len(word2): return len(word1) - i\n        if word1[i] == word2[j]: return solve(i + 1, j + 1)\n        return 1 + min(solve(i+1, j), solve(i, j+1), solve(i+1, j+1))\n    return solve(0, 0)"
+      },
+      "ai_mentor_hint": "Your recursive logic looks quite insightful and correctly handles the base cases and the different operations. For larger inputs, do you notice any patterns in the `solve(i, j)` calls that might lead to redundant computations?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Valid Anagram",
+        "description": "Given two strings s and t, return true if t is an anagram of s, and false otherwise."
+      },
+      "student_input": {
+        "current_code": "def is_anagram(s, t):\n    return sorted(s) == sorted(t)"
+      },
+      "ai_mentor_hint": "That's a very clever approach! Your current solution using `sorted()` is actually a great way to tackle this problem. Can you explain why comparing the sorted versions of the strings tells you if they are anagrams?"
+    },
+    {
+      "test_category": "Dedicated Hint Request",
+      "problem_context": {
+        "title": "Find the Duplicate Number",
+        "description": "Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive. There is only one repeated number, return it without modifying the array using constant space."
+      },
+      "student_input": {
+        "current_code": "def find_duplicate(nums):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] == nums[j]:\n                return nums[i]"
+      },
+      "ai_mentor_hint": "That's a good start! Your current code successfully finds the duplicate and already uses constant space, which is excellent given the problem constraints.\n\nHave you considered how the specific range of the integers, from 1 to `n`, might be useful in finding the duplicate without having to compare every number to every other number?"
+    }
+  ]
+}
