@@ -1,0 +1,223 @@
+.panelContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.providerSelector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+}
+
+.select {
+    padding: 4px 8px;
+    background: var(--background-hover);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+        border-color: var(--primary);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+    }
+}
+
+.sectionsContainer {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--background);
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--background);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 3px;
+
+        &:hover {
+            background: var(--primary-light);
+        }
+    }
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border);
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--background);
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: left;
+
+    &:hover {
+        background: var(--background-hover);
+    }
+
+    &:active {
+        background: var(--background);
+    }
+}
+
+.sectionHeaderCollapsed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--background-hover);
+        color: var(--text);
+    }
+}
+
+.toggleIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.chatSection {
+    flex: 1;
+    min-height: 200px;
+
+    > :last-child {
+        flex: 1;
+    }
+}
+
+.referencesList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 16px;
+}
+
+.referenceItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: var(--background-hover);
+    border-radius: 4px;
+    font-size: 12px;
+    overflow: hidden;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background: var(--primary-light);
+        opacity: 0.8;
+    }
+}
+
+.referenceBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 4px;
+    background: var(--primary);
+    color: white;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.referenceTitle {
+    flex: 1;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .providerSelector {
+        width: 100%;
+
+        select {
+            flex: 1;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .panelContainer {
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .title {
+        font-size: 14px;
+    }
+}

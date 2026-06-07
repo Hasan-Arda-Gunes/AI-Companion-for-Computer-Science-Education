@@ -1,0 +1,307 @@
+## Requirement IDs
+- FR-1.1.1.1: Write, edit, save code in web IDE
+- FR-1.1.1.2: Select programming language
+- FR-1.1.1.3: Toggle editor themes
+- FR-1.1.2.1: Request Socratic Hint
+- FR-1.1.2.2: View Evolution Path
+- FR-1.1.2.3: Access progress dashboard by subject
+- FR-1.2.1.1: Compile/execute code in sandbox
+- FR-1.2.1.2: Validate with hidden tests
+- FR-1.2.1.3: Terminate executions over 2 seconds
+- FR-1.2.2.1: Analyze algorithmic complexity (Big-O)
+- FR-1.2.2.2: Generate Refactor Challenge for sub-optimal code
+- FR-1.2.2.3: Evaluate clean code quality metrics
+- FR-1.2.2.4: Provide Socratic (non-direct-answer) feedback
+- NFR-2.1.1: Feedback latency within 5 seconds
+- NFR-2.1.2: 99.9% availability
+- NFR-2.2.1: Sandbox network/filesystem isolation
+- NFR-2.2.2: GDPR/KVKK encryption compliance
+- NFR-2.3.1: Cross-browser responsiveness
+- NFR-2.3.2: WCAG 2.1 AA accessibility support
+
+## Meeting-Derived Inputs
+- M1-01: Comparative analysis of similar platforms should influence feature and UX decisions.
+- M1-02: Question generation should support LLM mode with hard-coded fallback.
+- M1-03: Demo scope includes execution, evaluation, error analysis, and general hints.
+- M2-01: Hybrid question bank is required (AI-generated + teacher manual upload).
+- M2-02: Dedicated Teacher/Admin interface is required for question management.
+- M2-03: Authentication and completed-question history persistence are required.
+- M2-04: Adopt proven interaction patterns from AlgoCademy where suitable.
+- M3-01: Explore advanced instructor workflows (auto test-case generation, question quality feedback).
+- M3-02: Explore multi-class management and student-to-multiple-classes relationships.
+- M3-03: Explore talent/topic mapping and adaptive next-question selection.
+- M3-04: Define governance for selectable LLM model permissions.
+- M3-05: Research Figma Make export workflow into project design system.
+
+## MVP
+- [ ] FEAT-001: Web IDE workspace (write, edit, save)
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: None
+  - Acceptance Criteria: Users can create, edit, and save code in a persistent web editor.
+  - Requirement IDs: FR-1.1.1.1
+  - Notes: Include save confirmation and draft recovery UX.
+- [ ] FEAT-002: Language selection and run controls
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-001
+  - Acceptance Criteria: Users can choose Python/Java/C++ and run submissions from the same workspace.
+  - Requirement IDs: FR-1.1.1.2
+  - Notes: Backend should return language-specific execution results.
+- [ ] FEAT-003: Theme toggle integration with editor and app shell
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-001
+  - Acceptance Criteria: Users can switch themes and changes persist across sessions.
+  - Requirement IDs: FR-1.1.1.3
+  - Notes: Use theme tokens from src/styles/theme.css.
+- [ ] FEAT-004: Execution result panel (sandbox status, tests, timeout)
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-002
+  - Acceptance Criteria: UI shows compile/run output, hidden test summary, and timeout termination message.
+  - Requirement IDs: FR-1.2.1.1, FR-1.2.1.2, FR-1.2.1.3, NFR-2.2.1
+  - Notes: Requires backend sandbox API.
+- [ ] FEAT-005: Socratic feedback and hint panel
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-004
+  - Acceptance Criteria: Users can request Socratic hints; responses guide without directly giving final solution.
+  - Requirement IDs: FR-1.1.2.1, FR-1.2.2.4
+  - Notes: Add prompt guardrails for no direct final answers.
+- [ ] FEAT-006: Evolution Path compare view
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-005
+  - Acceptance Criteria: Users can compare initial and optimized solutions side-by-side with change rationale.
+  - Requirement IDs: FR-1.1.2.2
+  - Notes: Include revision timeline markers.
+- [ ] FEAT-007: Code quality and optimization insights card
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-004
+  - Acceptance Criteria: UI displays Big-O analysis, clean code metrics, and refactor challenge when needed.
+  - Requirement IDs: FR-1.2.2.1, FR-1.2.2.2, FR-1.2.2.3
+  - Notes: Requires evaluator API payload contract.
+- [ ] FEAT-008: Subject progress dashboard
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-006
+  - Acceptance Criteria: Dashboard tracks progress by subjects such as Arrays, Linked Lists, and Graphs.
+  - Requirement IDs: FR-1.1.2.3
+  - Notes: Start with per-subject completion and accuracy.
+- [ ] FEAT-016: Student authentication and session flow
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-001
+  - Acceptance Criteria: Users can sign in/out and maintain secure authenticated sessions across protected routes.
+  - Requirement IDs: M2-03, NFR-2.2.2
+  - Notes: Meeting 2 action marked complete at architecture level; frontend integration still tracked here.
+- [ ] FEAT-017: Completed question history and persistence UI
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-016, FEAT-008
+  - Acceptance Criteria: Users can view solved questions, timestamps, outcomes, and revisit attempts.
+  - Requirement IDs: M2-03, FR-1.1.2.3
+  - Notes: Must align with GDPR/KVKK constraints.
+- [ ] FEAT-018: Question solving flow with source badge (AI vs Manual)
+  - Status: Planned
+  - Milestone: MVP
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-001
+  - Acceptance Criteria: Student-facing question pages indicate whether a question is AI-generated or teacher-provided.
+  - Requirement IDs: M2-01
+  - Notes: Full teacher management remains in V1.
+
+## V1
+- [ ] FEAT-009: Feedback latency and loading UX budget
+  - Status: Planned
+  - Milestone: V1
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-005
+  - Acceptance Criteria: User-facing feedback responses are returned within 5 seconds for target scenarios.
+  - Requirement IDs: NFR-2.1.1
+  - Notes: Includes optimistic loading states and timeout fallback messaging.
+- [ ] FEAT-010: Cross-browser compatibility hardening
+  - Status: Planned
+  - Milestone: V1
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-001
+  - Acceptance Criteria: Core workflows function consistently on Chrome, Firefox, and Safari.
+  - Requirement IDs: NFR-2.3.1
+  - Notes: Add browser-specific test checklist.
+- [ ] FEAT-011: Accessibility compliance pass (WCAG 2.1 AA)
+  - Status: Planned
+  - Milestone: V1
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-008
+  - Acceptance Criteria: Keyboard navigation, semantic labels, and high-contrast support meet WCAG 2.1 AA targets.
+  - Requirement IDs: NFR-2.3.2
+  - Notes: Include audit report artifacts.
+- [ ] FEAT-012: Privacy controls and encrypted history UX
+  - Status: Planned
+  - Milestone: V1
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-001
+  - Acceptance Criteria: Users can view privacy terms and stored project history is handled under encrypted data policy.
+  - Requirement IDs: NFR-2.2.2
+  - Notes: Frontend relies on compliant backend services.
+- [ ] FEAT-019: Teacher/Admin portal shell and role-based navigation
+  - Status: Planned
+  - Milestone: V1
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-016
+  - Acceptance Criteria: Authorized instructors can access a dedicated portal with teacher-only routes and menus.
+  - Requirement IDs: M2-02
+  - Notes: Includes role-aware layout and access guards.
+- [ ] FEAT-020: Hybrid question bank management (AI + manual upload)
+  - Status: Planned
+  - Milestone: V1
+  - Priority: High
+  - Owner: Team
+  - Depends on: FEAT-019
+  - Acceptance Criteria: Teachers can create, upload, edit, and publish questions from both manual and AI-assisted workflows.
+  - Requirement IDs: M2-01, M2-02
+  - Notes: Meeting 2 architecture drafted; implement management UX in this phase.
+- [ ] FEAT-021: LLM question generation with hard-coded fallback handling
+  - Status: Planned
+  - Milestone: V1
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-020
+  - Acceptance Criteria: If AI generation fails, UI transparently falls back to curated hard-coded questions without blocking workflow.
+  - Requirement IDs: M1-02
+  - Notes: Include clear fallback reason states.
+- [ ] FEAT-022: Benchmark-informed UX refinements (AlgoCademy-inspired)
+  - Status: Planned
+  - Milestone: V1
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-001, FEAT-008
+  - Acceptance Criteria: Target flows incorporate documented interaction patterns validated from benchmark research.
+  - Requirement IDs: M1-01, M2-04
+  - Notes: Keep design language aligned with project theme and accessibility rules.
+
+## Future
+- [ ] FEAT-013: Availability/status experience and incident banner
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Low
+  - Owner: Team
+  - Depends on: FEAT-004
+  - Acceptance Criteria: Users can see service health status and outage communication states.
+  - Requirement IDs: NFR-2.1.2
+  - Notes: Driven by operations telemetry integration.
+- [ ] FEAT-014: Personalized weak-topic recommendations
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-008
+  - Acceptance Criteria: Dashboard suggests practice tasks based on historical weak areas.
+  - Requirement IDs: FR-1.1.2.3
+  - Notes: Enhancement of baseline dashboard.
+- [ ] FEAT-015: Mentor persona modes (strict reviewer, supportive coach)
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Low
+  - Owner: Team
+  - Depends on: FEAT-005
+  - Acceptance Criteria: Users can switch coaching tone/style while preserving Socratic feedback constraints.
+  - Requirement IDs: FR-1.2.2.4
+  - Notes: Keep educational guardrails consistent.
+- [ ] FEAT-023: Multi-class instructor dashboard and aggregated class insights
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-019, FEAT-008
+  - Acceptance Criteria: Instructors can view multiple classes and monitor aggregated performance metrics per class.
+  - Requirement IDs: M3-02
+  - Notes: Includes filters by class, topic, and completion trend.
+- [ ] FEAT-024: Class membership management (students in multiple classes)
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-023
+  - Acceptance Criteria: Instructors can manually assign students to one or more classes and view membership overlaps.
+  - Requirement IDs: M3-02
+  - Notes: Requires corresponding backend relation model.
+- [ ] FEAT-025: Instructor-side AI test-case generation assistant
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Low
+  - Owner: Team
+  - Depends on: FEAT-020
+  - Acceptance Criteria: Teachers can request suggested edge-case test suites for uploaded questions.
+  - Requirement IDs: M3-01
+  - Notes: Marked exploratory until feasibility is validated.
+- [ ] FEAT-026: Instructor feedback loop on question quality and difficulty
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Low
+  - Owner: Team
+  - Depends on: FEAT-020
+  - Acceptance Criteria: System presents quality/difficulty diagnostics for teacher-authored questions with actionable guidance.
+  - Requirement IDs: M3-01
+  - Notes: Should not override instructor control.
+- [ ] FEAT-027: Talent/topic mapping and skill deficiency insights
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-008, FEAT-017
+  - Acceptance Criteria: Dashboard highlights recurring conceptual gaps (e.g., recursion, memory management) from submission patterns.
+  - Requirement IDs: M3-03
+  - Notes: Needs explainable insight cards.
+- [ ] FEAT-028: Adaptive next-question strategy selector
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Medium
+  - Owner: Team
+  - Depends on: FEAT-020, FEAT-027
+  - Acceptance Criteria: Platform can route next question by predefined curriculum, dynamic AI recommendation, or instructor-defined set.
+  - Requirement IDs: M3-03
+  - Notes: Expose strategy source clearly to users.
+- [ ] FEAT-029: LLM model governance and permission controls
+  - Status: Planned
+  - Milestone: Future
+  - Priority: Low
+  - Owner: Team
+  - Depends on: FEAT-019
+  - Acceptance Criteria: Authorized roles can view/select configured LLM provider/model options in settings.
+  - Requirement IDs: M3-04
+  - Notes: Permission boundaries must be explicit.
+
+
+## Glossary
+- Code Evolution: Multi-stage process of refining code from working solution to optimized, clean, professional solution.
+- Socratic Feedback: Guided questioning approach that promotes independent reasoning instead of direct answers.
+- Sandbox: Isolated execution environment for untrusted user code.
