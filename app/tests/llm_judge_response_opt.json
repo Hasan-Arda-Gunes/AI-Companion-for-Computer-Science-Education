@@ -1,0 +1,818 @@
+{
+    "claude_sonnet4.6": [
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The AI correctly identified that the hash map solution achieves O(n) time complexity and O(n) space complexity, both of which are accurately stated as optimal. The AI provided no optimization suggestions since the solution was already optimal, which is the correct assessment.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The AI correctly identified the nested loop as an O(N^2) bottleneck and explicitly named the hash map as the correct data structure to achieve O(N) time complexity. The suggestion was precise and algorithmically correct.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The AI correctly identified the O(N^2) complexity from the linear scans inside the loop and pinpointed the specific logic error with `nums.index()` reusing the same element. It explicitly suggested the hash map pattern with a clear step-by-step description to achieve O(N).",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response with no complexity analysis, no identification of strengths or bottlenecks, and no algorithmic suggestions. The feedback is entirely uninformative.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response, failing to analyze the string-replacement approach's complexity or suggest a stack-based O(n) solution. No valid assessment was made.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The AI correctly identified the O(n) time complexity of the stack approach and accurately diagnosed the two logic errors: missing empty-stack guard and missing bracket-type matching. It suggested the correct dictionary-mapping fix, which is the standard completion of this pattern.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The AI correctly identified the solution as O(n) time and O(1) space, and correctly named the Two Pointer technique as the optimal approach already implemented. No optimization was needed and none was incorrectly suggested.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The AI correctly identified the O(n^2) bottleneck from nested loops and explicitly named the Two Pointer technique as the correct optimization, including a clear description of the pointer-movement rationale to achieve O(n). The assessment is precise and complete.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The AI correctly identified the missing pointer movement as the cause of the infinite loop and accurately noted the intended Two Pointer algorithm. It correctly described the if/else pointer-movement strategy needed to fix the solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The AI correctly identified the sliding window approach as optimal at O(n) time and O(min(n,k)) space, with accurate reasoning about each character being visited at most twice. No spurious optimization suggestions were made.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The AI correctly identified the O(N^3) time complexity from three nested operations and explicitly named the Sliding Window technique as the correct optimization to achieve O(N). The complexity analysis and pattern suggestion are both accurate.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response. Despite the code having a clear logical flaw (clearing the entire set on duplicate instead of shrinking the window), no analysis or suggestions were provided.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The AI correctly identified the O(N*L) time and space complexity of the character-count tuple key approach as optimal. It accurately noted the import placement as a style issue rather than a logic flaw, and the complexity claims are correct.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response, failing to analyze the O(N^2 * L log L) complexity of the nested-loop-with-sorting approach or suggest a hash map with sorted-string keys as the standard O(N * L log L) improvement.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The AI correctly identified the TypeError caused by using a mutable list as a dictionary key and accurately suggested converting to a string via `''.join(sorted(s))` or a tuple. The efficiency score of 85 is reasonable since the sorting approach is O(N * L log L), which the AI implicitly accepts as adequate.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The AI correctly assessed the solution as O(N + M log k) using Counter and heapq.nlargest, which is accurate. It also correctly noted that a bucket sort approach could achieve O(N), representing an honest and precise complexity discussion.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The AI correctly identified the O(N log N) bottleneck from full sorting and named both the min-heap (O(N log k)) and bucket sort (O(N)) as more efficient alternatives. The complexity analysis and pattern suggestions are accurate and precise.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The AI correctly identified the logic error of returning frequency values instead of element keys and the missing sort-by-frequency step. It suggested `most_common()` and `sorted()` with a key function as correct fixes, accurately diagnosing the root cause.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The AI correctly identified the two-pass prefix/suffix product algorithm as O(n) time and O(1) auxiliary space (excluding output), which is the optimal complexity for this problem. No incorrect optimization suggestions were made.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The AI correctly identified the O(n^2) bottleneck from nested loops and explicitly suggested the two-pass prefix/suffix product approach to achieve O(n), accurately noting the problem's explicit O(n) requirement. The diagnosis and suggestion are precise.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The AI correctly identified the division constraint violation and the zero-handling failure as the two critical issues. It correctly suggested the prefix/suffix product approach as the constraint-compliant O(n) solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The AI correctly identified the prefix sum with hash map approach as O(N) time and O(N) space, and accurately explained the initialization `{0:1}` for subarrays starting from index 0. The complexity assessment is correct and complete.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The AI correctly identified the O(n^2) bottleneck from nested loops and explicitly named the prefix sum with hash map technique as the correct optimization to achieve O(n). The diagnosis and suggestion are accurate.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The AI correctly identified that the sliding window approach breaks down for arrays with negative numbers due to its reliance on monotonicity, and explicitly recommended the prefix sum with hash map as the correct general solution. The efficiency score of 70 is slightly generous for a fundamentally flawed approach, but the core optimization assessment is valid.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The AI correctly identified the DFS solution as O(m*n) time complexity with each cell visited at most a constant number of times. No incorrect optimization suggestions were made, and the assessment of optimality is accurate.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The AI correctly identified `queue.pop(0)` on a Python list as the O(N) bottleneck that degrades overall BFS complexity, and explicitly named `collections.deque` with `popleft()` as the correct O(1) fix to restore O(m*n) complexity. The diagnosis is precise and technically accurate.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The AI correctly identified the missing visited-cell marking as the cause of infinite recursion, accurately noted the resulting exponential time complexity, and provided the exact in-place modification fix (`grid[i][j] = '0'`). The assessment is fully valid.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The AI correctly described the sort-then-merge greedy approach as optimal, though it did not explicitly state the O(n log n) time complexity due to sorting. The feedback is substantively correct but slightly incomplete in formal complexity labeling.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response, completely failing to analyze the O(n^2) complexity of the nested-loop overlap check or suggest the sort-first greedy approach as the O(n log n) standard solution.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The AI correctly identified the missing sort step as the root cause of incorrect output on unsorted inputs and accurately noted the code otherwise implements the correct greedy merge logic. The efficiency score of 80 slightly overstates performance since unsorted input produces wrong results, but the optimization diagnosis is valid.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The AI correctly identified the bottom-up DP solution as O(amount * num_coins) time and O(amount) space, which are the standard optimal complexities for this problem. No incorrect suggestions were made.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The AI correctly identified the exponential time complexity due to overlapping subproblems without memoization and explicitly named both memoization (top-down DP) and tabulation (bottom-up DP) as the correct optimization patterns. The diagnosis is accurate.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The AI correctly identified that the greedy approach fails for arbitrary coin denominations and provided a concrete counterexample (`coins=[1,3,4], amount=6`). It explicitly recommended Dynamic Programming as the correct approach to guarantee optimality.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The AI correctly identified the O(N^2) DP solution as correct but not optimal, accurately noting that an O(N log N) algorithm exists using a tails array. It also correctly flagged the empty-input edge case as a potential ValueError.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The AI correctly identified the exponential O(2^N) time complexity from the memoization-free recursion and explicitly named both memoization and iterative bottom-up DP as the correct optimizations. It also mentioned the O(N log N) approach, making the assessment precise and complete.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The AI correctly identified the fundamental misunderstanding between subsequence (non-contiguous) and subarray (contiguous), and accurately recommended the O(N^2) DP approach as the correct solution. The O(1) space efficiency score is accurate for the student's code but irrelevant given its logical incorrectness.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The AI correctly identified the O(m*n) time and space complexity of the 2D DP Levenshtein implementation and accurately noted that space can be reduced to O(min(m,n)). No incorrect claims were made.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The AI correctly identified the exponential time complexity from redundant subproblem recomputation and the RecursionError risk, and explicitly named both memoization (top-down) and tabulation (bottom-up DP) as the correct optimizations to achieve O(m*n).",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response, failing entirely to analyze the student's incorrect heuristic (length difference plus unique character set difference) or suggest the correct DP approach.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response, providing no complexity analysis or assessment of the correct O(n) hash map frequency-counting solution.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The AI correctly identified the O(N log N) complexity of the sorting approach and explicitly named character frequency counting via hash maps or Counter as the O(N) optimization. The analysis is accurate despite the AI's incorrect speculation about a test harness issue.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The AI encountered an evaluation error and produced only a generic fallback response, failing to identify the fundamental flaw of using a set (which ignores character frequency) instead of a frequency map for anagram checking.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The AI correctly identified Floyd's Cycle-Finding Algorithm as achieving O(N) time and O(1) space, meeting all problem constraints. The two-phase structure of the algorithm was correctly acknowledged, and no incorrect claims were made.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The AI correctly identified the O(N^2) bottleneck from nested loops and explicitly named Floyd's Cycle-Finding Algorithm as the correct optimization to achieve O(N) time and O(1) space while respecting both constraints (no modification, constant space).",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The AI correctly identified both constraint violations — in-place array modification via sort and non-constant O(N) auxiliary space from Timsort — and explicitly named Floyd's Cycle-Finding Algorithm as the correct O(N) time, O(1) space, non-modifying solution.",
+            "optimization_validity": 3
+        }
+    ],
+    "gemini_pro3.1": [
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The AI correctly recognized the O(n) Time and O(n) Space complexity of the submission. It also explicitly praised the use of a Hash Map as the optimal data structure.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The AI correctly identified the O(N^2) time complexity caused by the nested loops. It accurately suggested using a Hash Map to achieve an optimal O(N) time complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The AI correctly identified the O(N^2) time complexity stemming from the `in` operator and `.index()` method within the `for` loop. It successfully suggested utilizing a Hash Map for an O(N) solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The AI accurately identified the runtime issue with popping from an empty stack and logic errors with mismatching brackets. However, it completely missed evaluating the algorithm's complexity and providing optimization feedback.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The AI correctly assessed the submission as an optimal O(n) Time, O(1) Space solution. It properly recognized the 'Two Pointers' pattern.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The AI correctly diagnosed the nested loops as an O(n^2) brute-force bottleneck. It provided a clear and accurate suggestion to use the Two-Pointer technique to achieve an optimal O(n) time.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The AI accurately caught the infinite loop logic error. However, it correctly identified that once fixed, the solution would be an optimal O(N) Two-Pointer approach.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The AI accurately identified the O(N) Time and O(min(N, K)) Space complexities. It successfully recognized the sliding window pattern and the use of a set.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The AI correctly identified the O(N^3) bottleneck caused by the nested loops and the `check` function. It correctly recommended the 'Sliding Window' technique to achieve O(N) time.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The AI correctly evaluated the time complexity as O(N * L) and space complexity as O(N * L). It properly recognized the use of character counts as hash keys.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The AI correctly identified the `TypeError` related to using an unhashable list as a dictionary key. However, it failed to provide a complexity assessment or suggest optimization strategies beyond fixing the immediate error.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The AI accurately identified the O(N + M log k) time complexity of the `Counter` and `heapq` approach. It also correctly suggested bucket sort for an O(N) alternative.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The AI correctly identified the O(N log N) time complexity of the full sort. It accurately recommended a min-heap (O(N log k)) or bucket sort (O(N)) for optimal performance.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The AI accurately diagnosed the logic error of returning frequencies instead of elements. However, it failed to provide an analysis of the current code's complexity or offer algorithmic optimizations beyond fixing the logic.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The AI correctly identified the optimal O(N) time and O(1) space complexities of the two-pass prefix/suffix product approach.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The AI correctly pinpointed the O(N^2) bottleneck caused by the nested loops. It accurately suggested the optimal two-pass prefix/suffix product technique.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The AI accurately identified the O(n) time complexity but noted the constraint violation (using division). It correctly suggested the prefix/suffix product approach to resolve this.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The AI correctly identified the O(N) time and O(N) space complexities. It explicitly recognized the optimal prefix sum pattern.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The AI accurately diagnosed the O(n^2) bottleneck from the nested loops. It successfully recommended the optimal prefix sum and hash map approach.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The AI correctly identified the flaw in using a sliding window with negative numbers. It accurately suggested the prefix sum with a hash map as the robust and efficient alternative.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The AI correctly evaluated the solution as having an optimal O(m*n) time complexity. It explicitly recognized the use of Depth-First Search.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The AI accurately identified the O((m*n)^2) bottleneck caused by using `pop(0)` on a list. It correctly suggested using `collections.deque` to achieve optimal O(m*n) time.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The AI accurately caught the infinite recursion error caused by missing visited tracking. It correctly noted that fixing this would lead to an optimal O(m*n) time complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The AI correctly identified the optimal time and space complexity of the greedy sorting approach.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The AI accurately identified the logic error caused by assuming the input is sorted. It successfully suggested adding a sorting step to make the greedy merge logic correct.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The AI correctly recognized the O(amount * num_coins) time and O(amount) space complexity of the dynamic programming approach.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The AI correctly identified the exponential time complexity of the naive recursive approach. It accurately suggested memoization or tabulation (DP) to optimize the solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The AI accurately caught the logic error of using a greedy approach that doesn't guarantee an optimal solution. It correctly suggested dynamic programming to ensure optimality.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The AI correctly evaluated the solution as O(N^2) Dynamic Programming. It successfully noted the existence of a more optimal O(N log N) solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The AI correctly diagnosed the exponential O(2^N) time complexity of the naive recursion. It explicitly suggested memoization (DP) to optimize the runtime.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The AI accurately identified the logic error (finding a contiguous subarray instead of a subsequence). It successfully suggested dynamic programming (O(N^2)) or patience sorting (O(N log N)) for the correct problem.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The AI correctly identified the O(m*n) time and space complexity of the Levenshtein distance DP algorithm. It also suggested space optimization to O(min(m, n)).",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The AI correctly diagnosed the exponential time complexity of the naive recursive approach. It accurately recommended memoization or tabulation (DP) for an optimal O(m*n) time.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The AI correctly identified the O(N log N) time complexity of the sorting approach. It accurately suggested using a frequency map for an optimal O(N) solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The AI mentor failed to evaluate the code and encountered an error, making it impossible to assess optimization validity.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The AI correctly recognized Floyd's Cycle-Finding Algorithm and accurately assessed its O(N) time and O(1) space complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The AI correctly diagnosed the O(N^2) time complexity of the nested loops. It explicitly suggested Floyd's Tortoise and Hare algorithm for an optimal O(N) time and O(1) space solution.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The AI accurately identified the O(N log N) time complexity and the constraint violations (O(N) space and array modification) of the sorting approach. It successfully suggested Floyd's algorithm as the optimal solution.",
+            "optimization_validity": 3
+        }
+    ],
+    "chatgpt": [
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Two Sum",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Valid Parentheses",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Container With Most Water",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Longest Substring Without Repeating Characters",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Group Anagrams",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Top K Frequent Elements",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Product of Array Except Self",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Subarray Sum Equals K",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Number of Islands",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Merge Intervals",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Minimum Coin Change",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Longest Increasing Subsequence",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Edit Distance",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Valid Anagram",
+            "reasoning": "The feedback failed to perform a meaningful complexity or optimization analysis due to an evaluation error. It neither identified bottlenecks nor suggested a valid optimal algorithm.",
+            "optimization_validity": 1
+        },
+        {
+            "code_variant": "Reference Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The feedback correctly recognized the submitted approach as optimal and discussed the appropriate time/space complexity. No incorrect optimization advice was given.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Inefficient Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The feedback correctly identified the performance bottleneck and recommended the standard optimal algorithmic pattern for the problem. It also connected the improvement to a lower asymptotic complexity.",
+            "optimization_validity": 3
+        },
+        {
+            "code_variant": "Constraint Violating Solution",
+            "problem_title": "Find the Duplicate Number",
+            "reasoning": "The feedback identified the main issue and, where efficiency was relevant, pointed toward the correct standard approach or constraint-compliant optimization. The algorithmic guidance was specific and technically sound.",
+            "optimization_validity": 3
+        }
+    ]
+}

@@ -1,0 +1,483 @@
+
+--- Register Teacher [2026-06-07T15:28:04.360826] ---
+{
+  "status_code": 201,
+  "response": "{\"email\":\"teacher_evaluator_20260607_152804@example.com\",\"username\":\"teacher_eval_20260607_152804\",\"full_name\":\"Eval Teacher\",\"role\":\"teacher\",\"id\":4,\"is_active\":true,\"created_at\":\"2026-06-07T12:28:04.158903Z\"}"
+}
+
+--- Login Teacher [2026-06-07T15:28:04.551877] ---
+{
+  "status_code": 200,
+  "response": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzgxNDQwMDg0fQ.PBNB4LJS8AE86JG2IgNsRX0T0o6V51NMMb5KY0hGISM\",\"token_type\":\"bearer\"}"
+}
+
+--- Create Class [2026-06-07T15:28:04.570425] ---
+{
+  "status_code": 201,
+  "response": "{\"name\":\"Benchmark Evaluation Class 20260607_152804\",\"description\":\"Automated class created for testing Solution Leakage and Optimization validity.\",\"id\":2,\"teacher_id\":4,\"is_active\":true,\"created_at\":\"2026-06-07T12:28:04.558347Z\",\"updated_at\":null,\"student_count\":0}"
+}
+
+--- Create Problem (Two Sum) [2026-06-07T15:28:04.627874] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Two Sum\",\"description\":\"Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.\",\"difficulty\":\"intermediate\",\"topic\":\"hash maps\",\"id\":31,\"constraints\":null,\"examples\":[{\"input\":[[2,7,11,15],9],\"expected_output\":[0,1]}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[[2,7,11,15],9],\"expected_output\":[0,1],\"function_name\":\"two_sum\"},{\"id\":\"test_2\",\"input\":[[3,2,4],6],\"expected_output\":[1,2],\"function_name\":\"two_sum\"}],\"starter_code\":\"def two_sum(nums, target):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"hash map\",\"dictionary\",\"complement\",\"lookup\",\"O(1)\"],\"learning_objectives\":[\"Understand hash map lookups\",\"Optimize array traversal\"],\"related_concepts\":[\"Hash Maps\",\"Two Pointers\"],\"created_at\":\"2026-06-07T12:28:04.615975Z\"}"
+}
+
+--- Create Session (Prob ID: 31) [2026-06-07T15:28:04.682645] ---
+{
+  "status": 201,
+  "response": "{\"id\":16,\"problem_id\":31,\"started_at\":\"2026-06-07T12:28:04.675522Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:08.638634] ---
+{
+  "request": {
+    "problem_id": 31,
+    "session_id": 16,
+    "current_code": "def two_sum(nums, target):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return [i, j]\n    return []",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"Your current solution correctly finds the two numbers! That's a great start. Now, thinking about efficiency, could you find the 'complement' number (the one that adds up to `target` with the current number) more quickly than iterating through the rest of the array each time?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (16) [2026-06-07T15:28:08.643132] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Valid Parentheses) [2026-06-07T15:28:08.696896] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Valid Parentheses\",\"description\":\"Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. Open brackets must be closed by the same type of brackets in the correct order.\",\"difficulty\":\"intermediate\",\"topic\":\"stacks\",\"id\":32,\"constraints\":null,\"examples\":[{\"input\":\"()[]{}\",\"expected_output\":true},{\"input\":\"(]\",\"expected_output\":false}],\"test_cases\":[{\"id\":\"test_1\",\"input\":\"()[]{}\",\"expected_output\":true,\"function_name\":\"is_valid\"},{\"id\":\"test_2\",\"input\":\"([)]\",\"expected_output\":false,\"function_name\":\"is_valid\"}],\"starter_code\":\"def is_valid(s):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"stack\",\"LIFO\",\"push\",\"pop\",\"empty\"],\"learning_objectives\":[\"Implement stack logic\",\"Handle edge cases for unmatched brackets\"],\"related_concepts\":[\"Stacks\",\"String Parsing\"],\"created_at\":\"2026-06-07T12:28:08.687125Z\"}"
+}
+
+--- Create Session (Prob ID: 32) [2026-06-07T15:28:08.749904] ---
+{
+  "status": 201,
+  "response": "{\"id\":17,\"problem_id\":32,\"started_at\":\"2026-06-07T12:28:08.743330Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:14.500381] ---
+{
+  "request": {
+    "problem_id": 32,
+    "session_id": 17,
+    "current_code": "def is_valid(s):\n    while \"()\" in s or \"{}\" in s or \"[]\" in s:\n        s = s.replace(\"()\", \"\").replace(\"{}\", \"\").replace(\"[]\", \"\")\n    return s == \"\"",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"That's a very creative approach! Your current code correctly handles many cases where valid pairs are adjacent.\\n\\nThink about how you would manually check if a string like `([)]` is valid\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (17) [2026-06-07T15:28:14.503021] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Container With Most Water) [2026-06-07T15:28:14.552417] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Container With Most Water\",\"description\":\"You are given an integer array height of length n. Find two lines that together with the x-axis form a container, such that the container contains the most water.\",\"difficulty\":\"intermediate\",\"topic\":\"two pointers\",\"id\":33,\"constraints\":null,\"examples\":[{\"input\":[1,8,6,2,5,4,8,3,7],\"expected_output\":49}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[1,8,6,2,5,4,8,3,7],\"expected_output\":49,\"function_name\":\"max_area\"},{\"id\":\"test_2\",\"input\":[1,1],\"expected_output\":1,\"function_name\":\"max_area\"}],\"starter_code\":\"def max_area(height):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"two pointers\",\"shrink\",\"width\",\"minimum height\",\"infinite loop\"],\"learning_objectives\":[\"Optimize brute force O(N^2) to O(N)\",\"Implement greedy two-pointer logic\"],\"related_concepts\":[\"Two Pointers\",\"Greedy Algorithms\"],\"created_at\":\"2026-06-07T12:28:14.547031Z\"}"
+}
+
+--- Create Session (Prob ID: 33) [2026-06-07T15:28:14.604374] ---
+{
+  "status": 201,
+  "response": "{\"id\":18,\"problem_id\":33,\"started_at\":\"2026-06-07T12:28:14.599015Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:18.584326] ---
+{
+  "request": {
+    "problem_id": 33,
+    "session_id": 18,
+    "current_code": "def max_area(height):\n    max_water = 0\n    for i in range(len(height)):\n        for j in range(i + 1, len(height)):\n            max_water = max(max_water, min(height[i], height[j]) * (j - i))\n    return max_water",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"That's a great start! Your current code correctly calculates the area for every possible pair of lines, which is a very direct way to solve the problem.\\n\\nWhen thinking about problems that involve finding an optimal pair of elements in an array, sometimes it helps to consider if you can make progress by working from both ends of the array inwards. How might the potential area change if you were to start with the widest possible container and then decide which side to move next?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (18) [2026-06-07T15:28:18.586967] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Longest Substring Without Repeating Characters) [2026-06-07T15:28:18.640253] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Longest Substring Without Repeating Characters\",\"description\":\"Given a string s, find the length of the longest substring without repeating characters.\",\"difficulty\":\"intermediate\",\"topic\":\"sliding window\",\"id\":34,\"constraints\":null,\"examples\":[{\"input\":\"abcabcbb\",\"expected_output\":3}],\"test_cases\":[{\"id\":\"test_1\",\"input\":\"abcabcbb\",\"expected_output\":3,\"function_name\":\"length_of_longest_substring\"},{\"id\":\"test_2\",\"input\":\"pwwkew\",\"expected_output\":3,\"function_name\":\"length_of_longest_substring\"}],\"starter_code\":\"def length_of_longest_substring(s):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"sliding window\",\"two pointers\",\"set\",\"remove\",\"contiguous\"],\"learning_objectives\":[\"Maintain dynamic window boundaries\",\"Use sets for O(1) existence checks\"],\"related_concepts\":[\"Sliding Window\",\"Hash Sets\"],\"created_at\":\"2026-06-07T12:28:18.635118Z\"}"
+}
+
+--- Create Session (Prob ID: 34) [2026-06-07T15:28:18.692268] ---
+{
+  "status": 201,
+  "response": "{\"id\":19,\"problem_id\":34,\"started_at\":\"2026-06-07T12:28:18.687238Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:24.039489] ---
+{
+  "request": {
+    "problem_id": 34,
+    "session_id": 19,
+    "current_code": "def length_of_longest_substring(s):\n    def check(start, end):\n        chars = set()\n        for i in range(start, end + 1):\n            if s[i] in chars:\n                return False\n            chars.add(s[i])\n        return True\n    res = 0\n    for i in range(len(s)):\n        for j in range(i, len(s)):\n            if check(i, j):\n                res = max(res, j - i + 1)\n    return res",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"You've done a great job breaking down the problem into checking individual substrings! Your `check` function correctly identifies if a given substring has repeating characters.\\n\\nNow, think about the efficiency of your nested loops. Are you\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (19) [2026-06-07T15:28:24.042648] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Group Anagrams) [2026-06-07T15:28:24.092951] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Group Anagrams\",\"description\":\"Given an array of strings strs, group the anagrams together. You can return the answer in any order.\",\"difficulty\":\"intermediate\",\"topic\":\"hash maps\",\"id\":35,\"constraints\":null,\"examples\":[{\"input\":[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"],\"expected_output\":[[\"eat\",\"tea\",\"ate\"],[\"tan\",\"nat\"],[\"bat\"]]}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"],\"expected_output\":[[\"eat\",\"tea\",\"ate\"],[\"tan\",\"nat\"],[\"bat\"]],\"function_name\":\"group_anagrams\"}],\"starter_code\":\"def group_anagrams(strs):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"hash map\",\"tuple\",\"unhashable\",\"character count\",\"dictionary\"],\"learning_objectives\":[\"Identify immutable structures for hashing\",\"Group elements by derived properties\"],\"related_concepts\":[\"Hash Maps\",\"Sorting\",\"Immutability\"],\"created_at\":\"2026-06-07T12:28:24.085396Z\"}"
+}
+
+--- Create Session (Prob ID: 35) [2026-06-07T15:28:24.144357] ---
+{
+  "status": 201,
+  "response": "{\"id\":20,\"problem_id\":35,\"started_at\":\"2026-06-07T12:28:24.137242Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:29.997360] ---
+{
+  "request": {
+    "problem_id": 35,
+    "session_id": 20,
+    "current_code": "def group_anagrams(strs):\n    groups = []\n    for s in strs:\n        found = False\n        for group in groups:\n            if sorted(group[0]) == sorted(s):\n                group.append(s)\n                found = True\n                break\n        if not found:\n            groups.append([s])\n    return groups",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"You're off to a great start by recognizing that sorting the characters of a string is a fantastic way to determine if two strings are anagrams! That's a crucial insight for this problem.\\n\\nNow, think about how you're currently searching through your `groups` list to find a match for each new string. Is there a way to organize your groups so that finding the right one (or knowing if a new\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (20) [2026-06-07T15:28:30.000500] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Top K Frequent Elements) [2026-06-07T15:28:30.052727] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Top K Frequent Elements\",\"description\":\"Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.\",\"difficulty\":\"intermediate\",\"topic\":\"heaps\",\"id\":36,\"constraints\":null,\"examples\":[{\"input\":[[1,1,1,2,2,3],2],\"expected_output\":[1,2]}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[[1,1,1,2,2,3],2],\"expected_output\":[1,2],\"function_name\":\"top_k_frequent\"}],\"starter_code\":\"def top_k_frequent(nums, k):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"heap\",\"priority queue\",\"bucket sort\",\"frequency map\",\"O(N log K)\"],\"learning_objectives\":[\"Use heaps for partial sorting\",\"Map frequencies to elements\"],\"related_concepts\":[\"Priority Queues\",\"Hash Maps\"],\"created_at\":\"2026-06-07T12:28:30.045235Z\"}"
+}
+
+--- Create Session (Prob ID: 36) [2026-06-07T15:28:30.103689] ---
+{
+  "status": 201,
+  "response": "{\"id\":21,\"problem_id\":36,\"started_at\":\"2026-06-07T12:28:30.097423Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:34.150918] ---
+{
+  "request": {
+    "problem_id": 36,
+    "session_id": 21,
+    "current_code": "def top_k_frequent(nums, k):\n    from collections import Counter\n    count = Counter(nums)\n    sorted_items = sorted(count.items(), key=lambda x: x[1], reverse=True)\n    return [item[0] for item in sorted_items[:k]]",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"Your use of `Counter` is a great start to efficiently get the frequencies! Now, consider the next step: do you need to sort *all* the unique elements by their frequency, or is there a way to keep track of just the `k` most frequent ones as you process them?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (21) [2026-06-07T15:28:34.154590] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Product of Array Except Self) [2026-06-07T15:28:34.210602] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Product of Array Except Self\",\"description\":\"Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i]. Must run in O(n) without division.\",\"difficulty\":\"intermediate\",\"topic\":\"arrays\",\"id\":37,\"constraints\":null,\"examples\":[{\"input\":[1,2,3,4],\"expected_output\":[24,12,8,6]}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[1,2,3,4],\"expected_output\":[24,12,8,6],\"function_name\":\"product_except_self\"}],\"starter_code\":\"def product_except_self(nums):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"prefix product\",\"suffix product\",\"division\",\"O(N)\",\"ZeroDivisionError\"],\"learning_objectives\":[\"Compute states in multiple passes\",\"Avoid invalid operations like division by zero\"],\"related_concepts\":[\"Prefix Sums\",\"Array Traversals\"],\"created_at\":\"2026-06-07T12:28:34.202062Z\"}"
+}
+
+--- Create Session (Prob ID: 37) [2026-06-07T15:28:34.265459] ---
+{
+  "status": 201,
+  "response": "{\"id\":22,\"problem_id\":37,\"started_at\":\"2026-06-07T12:28:34.257680Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:36.885650] ---
+{
+  "request": {
+    "problem_id": 37,
+    "session_id": 22,
+    "current_code": "def product_except_self(nums):\n    ans = []\n    for i in range(len(nums)):\n        prod = 1\n        for j in range(len(nums)):\n            if i != j:\n                prod *= nums[j]\n        ans.append(prod)\n    return ans",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"Your current code correctly calculates the product for each element, which is a great start! To meet the O(n) time complexity requirement, think about how you could pre-calculate the products of elements to the left of `nums[i]` and the products of elements to the right of `nums[i]` more efficiently. Could you build up these products in separate passes?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (22) [2026-06-07T15:28:36.888862] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Subarray Sum Equals K) [2026-06-07T15:28:36.939506] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Subarray Sum Equals K\",\"description\":\"Given an array of integers nums and an integer k, return the total number of continuous subarrays whose sum equals to k.\",\"difficulty\":\"intermediate\",\"topic\":\"prefix sum\",\"id\":38,\"constraints\":null,\"examples\":[{\"input\":[[1,1,1],2],\"expected_output\":2}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[[1,1,1],2],\"expected_output\":2,\"function_name\":\"subarray_sum\"}],\"starter_code\":\"def subarray_sum(nums, k):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"prefix sum\",\"hash map\",\"negative numbers\",\"sliding window invalid\",\"O(N)\"],\"learning_objectives\":[\"Track cumulative sums over time\",\"Utilize Hash Maps for difference matching\"],\"related_concepts\":[\"Prefix Sums\",\"Hash Maps\"],\"created_at\":\"2026-06-07T12:28:36.933447Z\"}"
+}
+
+--- Create Session (Prob ID: 38) [2026-06-07T15:28:36.992255] ---
+{
+  "status": 201,
+  "response": "{\"id\":23,\"problem_id\":38,\"started_at\":\"2026-06-07T12:28:36.985121Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:39.929583] ---
+{
+  "request": {
+    "problem_id": 38,
+    "session_id": 23,
+    "current_code": "def subarray_sum(nums, k):\n    count = 0\n    for i in range(len(nums)):\n        curr_sum = 0\n        for j in range(i, len(nums)):\n            curr_sum += nums[j]\n            if curr_sum == k:\n                count += 1\n    return count",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"Your current approach correctly identifies all subarrays, which is a great start! It's a valid way to solve the problem. For very large arrays, you might find it takes a bit longer. Have you considered if there's a way to keep track of sums more efficiently, perhaps by storing some intermediate results as you iterate through the array?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (23) [2026-06-07T15:28:39.933235] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Number of Islands) [2026-06-07T15:28:39.986047] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Number of Islands\",\"description\":\"Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.\",\"difficulty\":\"advanced\",\"topic\":\"graphs\",\"id\":39,\"constraints\":null,\"examples\":[{\"input\":[[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"1\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"1\",\"1\"]],\"expected_output\":3}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"1\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"1\",\"1\"]],\"expected_output\":3,\"function_name\":\"num_islands\"}],\"starter_code\":\"def num_islands(grid):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"DFS\",\"BFS\",\"visited\",\"infinite recursion\",\"modify grid\"],\"learning_objectives\":[\"Traverse 2D matrices as Graphs\",\"Prevent cycles by tracking visited nodes\"],\"related_concepts\":[\"Depth-First Search\",\"Breadth-First Search\"],\"created_at\":\"2026-06-07T12:28:39.977487Z\"}"
+}
+
+--- Create Session (Prob ID: 39) [2026-06-07T15:28:40.043701] ---
+{
+  "status": 201,
+  "response": "{\"id\":24,\"problem_id\":39,\"started_at\":\"2026-06-07T12:28:40.034247Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:46.226355] ---
+{
+  "request": {
+    "problem_id": 39,
+    "session_id": 24,
+    "current_code": "def num_islands(grid):\n    islands = 0\n    visited = set()\n    for r in range(len(grid)):\n        for c in range(len(grid[0])):\n            if grid[r][c] == '1' and (r, c) not in visited:\n                islands += 1\n                queue = [(r, c)]\n                while queue:\n                    curr_r, curr_c = queue.pop(0)\n                    if (curr_r, curr_c) not in visited:\n                        visited.add((curr_r, curr_c))\n                        for dr, dc in [(1,0),(-1,0),(0,1),(0,-1)]:\n                            nr, nc = curr_r + dr, curr_c + dc\n                            if 0<=nr<len(grid) and 0<=nc<len(grid[0]) and grid[nr][nc]=='1':\n                                queue.append((nr, nc))\n    return islands",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"You've made excellent progress by correctly identifying the need for a `visited` set and using a Breadth-First Search (BFS) approach! Your overall structure for iterating through the grid and initiating\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (24) [2026-06-07T15:28:46.231969] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Merge Intervals) [2026-06-07T15:28:46.291525] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Merge Intervals\",\"description\":\"Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals.\",\"difficulty\":\"intermediate\",\"topic\":\"arrays\",\"id\":40,\"constraints\":null,\"examples\":[{\"input\":[[1,3],[2,6],[8,10],[15,18]],\"expected_output\":[[1,6],[8,10],[15,18]]}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[[1,3],[2,6],[8,10],[15,18]],\"expected_output\":[[1,6],[8,10],[15,18]],\"function_name\":\"merge\"}],\"starter_code\":\"def merge(intervals):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"sort\",\"overlapping\",\"max\",\"lambda\",\"unsorted input\"],\"learning_objectives\":[\"Identify overlap conditions\",\"Leverage sorting for greedy solutions\"],\"related_concepts\":[\"Sorting\",\"Greedy Algorithms\"],\"created_at\":\"2026-06-07T12:28:46.278892Z\"}"
+}
+
+--- Create Session (Prob ID: 40) [2026-06-07T15:28:46.353852] ---
+{
+  "status": 201,
+  "response": "{\"id\":25,\"problem_id\":40,\"started_at\":\"2026-06-07T12:28:46.338405Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:50.099120] ---
+{
+  "request": {
+    "problem_id": 40,
+    "session_id": 25,
+    "current_code": "def merge(intervals):\n    merged = []\n    for interval in intervals:\n        overlap = False\n        for m in merged:\n            if max(interval[0], m[0]) <= min(interval[1], m[1]):\n                m[0] = min(interval[0], m[0])\n                m[1] = max(interval[1], m[1])\n                overlap = True\n                break\n        if not overlap:\n            merged.append(interval)\n    return merged",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"You're doing a great job thinking about how to detect and combine overlaps! Your overlap condition looks correct. Sometimes, with problems involving intervals, a particular initial step can make the rest of the logic much simpler. Have you considered if there's a way to arrange the intervals first that might help streamline your merging process?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (25) [2026-06-07T15:28:50.102295] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Minimum Coin Change) [2026-06-07T15:28:50.155204] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Minimum Coin Change\",\"description\":\"You are given an integer array coins representing coins of different denominations and an integer amount. Return the fewest number of coins that you need to make up that amount.\",\"difficulty\":\"advanced\",\"topic\":\"dynamic programming\",\"id\":41,\"constraints\":null,\"examples\":[{\"input\":[[1,2,5],11],\"expected_output\":3}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[[1,2,5],11],\"expected_output\":3,\"function_name\":\"coin_change\"}],\"starter_code\":\"def coin_change(coins, amount):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"dynamic programming\",\"memoization\",\"bottom-up\",\"greedy fails\",\"subproblem\"],\"learning_objectives\":[\"Identify optimal substructure\",\"Understand when Greedy fails vs DP\"],\"related_concepts\":[\"Dynamic Programming\",\"Memoization\"],\"created_at\":\"2026-06-07T12:28:50.149101Z\"}"
+}
+
+--- Create Session (Prob ID: 41) [2026-06-07T15:28:50.212976] ---
+{
+  "status": 201,
+  "response": "{\"id\":26,\"problem_id\":41,\"started_at\":\"2026-06-07T12:28:50.202420Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:52.501670] ---
+{
+  "request": {
+    "problem_id": 41,
+    "session_id": 26,
+    "current_code": "def coin_change(coins, amount):\n    def dfs(rem):\n        if rem == 0: return 0\n        if rem < 0: return float('inf')\n        res = float('inf')\n        for coin in coins:\n            res = min(res, 1 + dfs(rem - coin))\n        return res\n    ans = dfs(amount)\n    return ans if ans != float('inf') else -1",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"That's a great start! Your recursive structure correctly identifies the base cases and how to explore different coin choices. You're thinking along the right lines with `dfs`!\\n\\nAs you trace through your `dfs` function, especially for larger `amount`s, consider what happens if the same `rem` value is encountered multiple times during the recursion. Are you recalculating anything unnecessarily?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (26) [2026-06-07T15:28:52.504840] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Longest Increasing Subsequence) [2026-06-07T15:28:52.556236] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Longest Increasing Subsequence\",\"description\":\"Given an integer array nums, return the length of the longest strictly increasing subsequence.\",\"difficulty\":\"advanced\",\"topic\":\"dynamic programming\",\"id\":42,\"constraints\":null,\"examples\":[{\"input\":[10,9,2,5,3,7,101,18],\"expected_output\":4}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[10,9,2,5,3,7,101,18],\"expected_output\":4,\"function_name\":\"length_of_lis\"}],\"starter_code\":\"def length_of_lis(nums):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"dynamic programming\",\"binary search\",\"subsequence vs subarray\",\"O(N^2)\"],\"learning_objectives\":[\"Model subset relationships through DP arrays\"],\"related_concepts\":[\"Dynamic Programming\",\"Binary Search\"],\"created_at\":\"2026-06-07T12:28:52.548395Z\"}"
+}
+
+--- Create Session (Prob ID: 42) [2026-06-07T15:28:52.608592] ---
+{
+  "status": 201,
+  "response": "{\"id\":27,\"problem_id\":42,\"started_at\":\"2026-06-07T12:28:52.600683Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:56.333913] ---
+{
+  "request": {
+    "problem_id": 42,
+    "session_id": 27,
+    "current_code": "def length_of_lis(nums):\n    def solve(curr, prev_idx):\n        if curr == len(nums): return 0\n        take = 0\n        if prev_idx == -1 or nums[curr] > nums[prev_idx]:\n            take = 1 + solve(curr + 1, curr)\n        skip = solve(curr + 1, prev_idx)\n        return max(take, skip)\n    return solve(0, -1)",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"Your recursive approach correctly identifies the choices at each step and the conditions for including an element. That's a great start! As you think about how this function executes, have you considered if you might be solving the same smaller problems multiple times?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (27) [2026-06-07T15:28:56.337037] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Edit Distance) [2026-06-07T15:28:56.387328] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Edit Distance\",\"description\":\"Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.\",\"difficulty\":\"advanced\",\"topic\":\"dynamic programming\",\"id\":43,\"constraints\":null,\"examples\":[{\"input\":[\"horse\",\"ros\"],\"expected_output\":3}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[\"horse\",\"ros\"],\"expected_output\":3,\"function_name\":\"min_distance\"}],\"starter_code\":\"def min_distance(word1, word2):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"2D DP\",\"Levenshtein\",\"insert\",\"delete\",\"replace\"],\"learning_objectives\":[\"Map operations to DP state transitions\",\"Construct 2D DP grids\"],\"related_concepts\":[\"2D Dynamic Programming\",\"String Manipulation\"],\"created_at\":\"2026-06-07T12:28:56.380166Z\"}"
+}
+
+--- Create Session (Prob ID: 43) [2026-06-07T15:28:56.440018] ---
+{
+  "status": 201,
+  "response": "{\"id\":28,\"problem_id\":43,\"started_at\":\"2026-06-07T12:28:56.432208Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:28:58.683718] ---
+{
+  "request": {
+    "problem_id": 43,
+    "session_id": 28,
+    "current_code": "def min_distance(word1, word2):\n    def solve(i, j):\n        if i == len(word1): return len(word2) - j\n        if j == len(word2): return len(word1) - i\n        if word1[i] == word2[j]: return solve(i + 1, j + 1)\n        return 1 + min(solve(i+1, j), solve(i, j+1), solve(i+1, j+1))\n    return solve(0, 0)",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"Your recursive logic looks quite insightful and correctly handles the base cases and the different operations. For larger inputs, do you notice any patterns in the `solve(i, j)` calls that might lead to redundant computations?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (28) [2026-06-07T15:28:58.686969] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Valid Anagram) [2026-06-07T15:28:58.740228] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Valid Anagram\",\"description\":\"Given two strings s and t, return true if t is an anagram of s, and false otherwise.\",\"difficulty\":\"intermediate\",\"topic\":\"hash maps\",\"id\":44,\"constraints\":null,\"examples\":[{\"input\":[\"anagram\",\"nagaram\"],\"expected_output\":true}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[\"anagram\",\"nagaram\"],\"expected_output\":true,\"function_name\":\"is_anagram\"}],\"starter_code\":\"def is_anagram(s, t):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"hash map\",\"frequency array\",\"O(N)\",\"sorting is O(N log N)\",\"character count\"],\"learning_objectives\":[\"Track frequencies with Hash Maps\"],\"related_concepts\":[\"Hash Maps\",\"Strings\"],\"created_at\":\"2026-06-07T12:28:58.732550Z\"}"
+}
+
+--- Create Session (Prob ID: 44) [2026-06-07T15:28:58.791610] ---
+{
+  "status": 201,
+  "response": "{\"id\":29,\"problem_id\":44,\"started_at\":\"2026-06-07T12:28:58.784758Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:29:02.765170] ---
+{
+  "request": {
+    "problem_id": 44,
+    "session_id": 29,
+    "current_code": "def is_anagram(s, t):\n    return sorted(s) == sorted(t)",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"That's a very clever approach! Your current solution using `sorted()` is actually a great way to tackle this problem. Can you explain why comparing the sorted versions of the strings tells you if they are anagrams?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (29) [2026-06-07T15:29:02.767778] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}
+
+--- Create Problem (Find the Duplicate Number) [2026-06-07T15:29:02.818076] ---
+{
+  "status": 201,
+  "response": "{\"title\":\"Find the Duplicate Number\",\"description\":\"Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive. There is only one repeated number, return it without modifying the array using constant space.\",\"difficulty\":\"advanced\",\"topic\":\"two pointers\",\"id\":45,\"constraints\":null,\"examples\":[{\"input\":[1,3,4,2,2],\"expected_output\":2}],\"test_cases\":[{\"id\":\"test_1\",\"input\":[1,3,4,2,2],\"expected_output\":2,\"function_name\":\"find_duplicate\"}],\"starter_code\":\"def find_duplicate(nums):\\n    # Complete this function\\n    pass\",\"starter_code_java\":null,\"hints\":[\"Floyd's cycle\",\"fast and slow pointers\",\"O(1) space\",\"modify array\",\"linked list cycle\"],\"learning_objectives\":[\"Apply cycle detection to arrays\",\"Adhere to strict space constraints\"],\"related_concepts\":[\"Two Pointers\",\"Floyd's Tortoise and Hare\"],\"created_at\":\"2026-06-07T12:29:02.812196Z\"}"
+}
+
+--- Create Session (Prob ID: 45) [2026-06-07T15:29:02.871389] ---
+{
+  "status": 201,
+  "response": "{\"id\":30,\"problem_id\":45,\"started_at\":\"2026-06-07T12:29:02.864407Z\",\"completed_at\":null,\"is_completed\":false,\"attempts_count\":0,\"time_spent\":null,\"final_score\":null}"
+}
+
+--- Hint Endpoint Test [2026-06-07T15:29:07.436186] ---
+{
+  "request": {
+    "problem_id": 45,
+    "session_id": 30,
+    "current_code": "def find_duplicate(nums):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] == nums[j]:\n                return nums[i]",
+    "hint_level": 1,
+    "provider": "gemini"
+  },
+  "status": 200,
+  "response": "{\"hint\":\"That's a good start! Your current code successfully finds the duplicate and already uses constant space, which is excellent given the problem constraints.\\n\\nHave you considered how the specific range of the integers, from 1 to `n`, might be useful in finding the duplicate without having to compare every number to every other number?\",\"hint_level\":1,\"remaining_hints\":2,\"provider_used\":\"gemini\"}"
+}
+
+--- Complete Session (30) [2026-06-07T15:29:07.439395] ---
+{
+  "status": 422,
+  "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"final_score\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.5/v/missing\"}]}"
+}

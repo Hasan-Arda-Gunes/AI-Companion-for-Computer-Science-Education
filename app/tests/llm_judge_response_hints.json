@@ -1,0 +1,233 @@
+{
+  "claude_sonnet4.6": [
+    {
+      "problem_title": "Two Sum",
+      "reasoning": "The hint correctly identifies the inefficiency and introduces the concept of a 'complement' without naming the data structure (hash map). It prompts the student to think about a faster lookup method, which is a solid Socratic nudge.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Valid Parentheses",
+      "reasoning": "The hint cleverly uses a concrete counterexample (`([)]`) to guide the student toward discovering the flaw in their approach on their own. However, the hint appears to be cut off mid-sentence, leaving it incomplete and slightly less effective than intended.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Container With Most Water",
+      "reasoning": "The hint introduces the two-pointer concept by framing it as 'working from both ends inward' and asks which side to move — this is quite close to spelling out the algorithm's decision logic. A student with basic algorithmic literacy could almost directly translate this into code.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Longest Substring Without Repeating Characters",
+      "reasoning": "The hint is cut off mid-sentence ('Are you'), making it incomplete and actionably useless. Even the partial content only gestures vaguely at efficiency without pointing toward any concept like sliding window.",
+      "hint_specificity": 1
+    },
+    {
+      "problem_title": "Group Anagrams",
+      "reasoning": "The hint is also cut off mid-sentence, which prevents it from delivering its intended conceptual nudge toward using a dictionary/hash map. The partial content validates the sorting insight but fails to guide the student toward the efficiency improvement.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Top K Frequent Elements",
+      "reasoning": "The hint correctly validates the Counter usage and then asks whether sorting all elements is necessary, subtly pointing toward a heap or partial-sort strategy. It prompts the student to think without naming the data structure, which is a well-balanced Socratic question.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Product of Array Except Self",
+      "reasoning": "The hint explicitly describes the two-pass prefix/suffix product strategy — left products and right products in separate passes — which is essentially the full algorithmic solution described in plain English. Very little independent thinking is left for the student.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Subarray Sum Equals K",
+      "reasoning": "The hint only vaguely mentions 'storing intermediate results,' which points loosely toward prefix sums but without enough specificity to be truly actionable. It doesn't connect to the key insight about how prefix sum differences can identify subarrays summing to k.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Number of Islands",
+      "reasoning": "The hint is cut off mid-sentence and provides no conceptual direction whatsoever beyond complimenting the student's existing correct approach. It fails to address the actual inefficiency (using `queue.pop(0)` instead of a deque, or the redundant visited check).",
+      "hint_specificity": 1
+    },
+    {
+      "problem_title": "Merge Intervals",
+      "reasoning": "The hint skillfully avoids naming sorting explicitly while strongly implying it through 'arrange the intervals first,' prompting the student to think about why ordering would help. This is a well-calibrated Socratic hint that leaves the key insight for the student to discover.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Minimum Coin Change",
+      "reasoning": "The hint precisely targets the overlapping subproblems issue by asking the student to trace what happens when the same `rem` is encountered multiple times, which is the exact insight needed to motivate memoization. It guides without naming the technique.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Longest Increasing Subsequence",
+      "reasoning": "The hint correctly identifies the overlapping subproblems issue and prompts the student to notice it, but it is fairly generic — the same phrasing could apply to almost any recursive DP problem. It doesn't help the student think about how the specific state `(curr, prev_idx)` can be memoized.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Edit Distance",
+      "reasoning": "Similar to the LIS hint, it correctly points to redundant computations but remains too generic to be distinctly actionable for this specific problem. A stronger hint would reference the two-index state space to guide the student toward a memoization table.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Valid Anagram",
+      "reasoning": "The student's solution is already correct and arguably optimal for the problem as stated, so prompting the student to explain *why* it works is a reasonable pedagogical response. However, this functions more as a comprehension check than a hint, making its score hard to place on this scale — it is neither unhelpful nor truly Socratic about improvement.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Find the Duplicate Number",
+      "reasoning": "The hint correctly validates the constant space achievement and then nudges the student to think about the significance of the [1, n] range constraint — the key insight that unlocks Floyd's cycle detection. It is well-targeted without revealing the algorithm.",
+      "hint_specificity": 3
+    }
+  ],
+  "chatgpt": [
+    {
+      "problem_title": "Two Sum",
+      "reasoning": "The hint correctly acknowledges the student's correct solution and gently introduces the idea of complements and optimization. However, it leans slightly toward the solution by explicitly naming the key optimization strategy (hashing/complements) without forcing deeper reasoning.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Valid Parentheses",
+      "reasoning": "The hint prompts the student to reason about an edge case but does not guide them toward the core concept of stack-based matching. It is somewhat vague and stops short of directing them toward the correct data structure.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Container With Most Water",
+      "reasoning": "The hint correctly steers the student toward the two-pointer approach from both ends, which is the key insight. However, it is somewhat leading because it explicitly suggests starting from the widest container and narrowing inward.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Longest Substring Without Repeating Characters",
+      "reasoning": "The hint begins well by pointing out inefficiency but is cut off mid-question and fails to guide the student toward the sliding window insight. As a result, it is too incomplete to be actionable.",
+      "hint_specificity": 1
+    },
+    {
+      "problem_title": "Group Anagrams",
+      "reasoning": "The hint effectively points toward improving lookup efficiency by organizing groups differently, implicitly nudging toward a hashmap-based grouping strategy, but it is slightly incomplete and cuts off before fully clarifying the structure.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Top K Frequent Elements",
+      "reasoning": "The hint appropriately questions whether full sorting is necessary and encourages thinking about maintaining only the top k elements, which aligns well with heap or bucket optimization without giving a direct method.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Product of Array Except Self",
+      "reasoning": "The hint correctly guides the student toward prefix and suffix product decomposition, but it is quite direct in describing the exact approach structure (two passes), making it closer to giving away the solution.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Subarray Sum Equals K",
+      "reasoning": "The hint appropriately suggests storing intermediate results and improving efficiency without naming prefix sums explicitly. It stays somewhat high-level but still actionable.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Number of Islands",
+      "reasoning": "The hint acknowledges correct BFS usage but is cut off before offering any conceptual direction or improvement suggestion, making it incomplete and not useful for progression.",
+      "hint_specificity": 1
+    },
+    {
+      "problem_title": "Merge Intervals",
+      "reasoning": "The hint nudges the student toward sorting intervals first, which is the key insight, but it strongly implies the exact improvement needed, reducing the amount of independent reasoning required.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Minimum Coin Change",
+      "reasoning": "The hint correctly identifies redundant subproblem recomputation in recursion and implicitly points toward memoization, but it does not explicitly reveal the technique, maintaining good Socratic balance.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Longest Increasing Subsequence",
+      "reasoning": "The hint appropriately asks about repeated subproblems in recursion, guiding toward dynamic programming without naming it or giving implementation details, maintaining a good balance.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Edit Distance",
+      "reasoning": "The hint correctly points out redundant recursive calls and overlapping subproblems, nudging toward memoization/DP, but it is slightly generic compared to other hints that are more targeted.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Valid Anagram",
+      "reasoning": "The hint does not provide an actual nudge toward improvement or deeper understanding and instead asks the student to justify an already correct approach, making it more reflective than instructive.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Find the Duplicate Number",
+      "reasoning": "The hint appropriately points to using the constrained value range as a key insight but does not push toward a specific strategy like cycle detection or marking, keeping it moderately guided.",
+      "hint_specificity": 3
+    }
+  ],
+  "gemini_3.1pro": [
+    {
+      "problem_title": "Two Sum",
+      "reasoning": "The hint effectively introduces the concept of a 'complement' without explicitly mentioning dictionaries or hash maps. This prompts the student to think about faster lookup methods for that specific value.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Valid Parentheses",
+      "reasoning": "Asking the student to manually evaluate a string is slightly too high-level and does not directly point them toward using a stack data structure. It identifies a general testing method but lacks actionable conceptual direction.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Container With Most Water",
+      "reasoning": "The mentor perfectly hints at the two-pointer approach by suggesting working from both ends inwards. It provides just enough heuristic guidance without giving away the exact logic of moving the shorter pointer.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Longest Substring Without Repeating Characters",
+      "reasoning": "The hint simply tells the student to think about efficiency, which is entirely generic and unhelpful. Additionally, the thought is cut off and provides no actionable next steps.",
+      "hint_specificity": 1
+    },
+    {
+      "problem_title": "Group Anagrams",
+      "reasoning": "While it nudges the student to think about organizing their data differently, the suggestion is quite vague and gets cut off before delivering a core insight. It fails to adequately point towards using hash maps for efficient group lookups.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Top K Frequent Elements",
+      "reasoning": "The mentor effectively challenges the necessity of sorting the entire array by asking if only the 'k' elements can be tracked. This brilliantly guides the student toward discovering the heap or priority queue optimization on their own.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Product of Array Except Self",
+      "reasoning": "The hint is overly prescriptive by explicitly telling the student to pre-calculate products to the left and right in separate passes. It outlines the exact algorithmic steps, leaving almost no conceptual problem-solving for the student.",
+      "hint_specificity": 4
+    },
+    {
+      "problem_title": "Subarray Sum Equals K",
+      "reasoning": "Suggesting the storage of 'intermediate results' is a step in the right direction but remains too vague for this specific problem. It lacks the conceptual hook needed to lead the student to the prefix sum and hash map technique.",
+      "hint_specificity": 2
+    },
+    {
+      "problem_title": "Number of Islands",
+      "reasoning": "This response offers pure encouragement and summarizes what the student has already done before abruptly cutting off. It provides absolutely no hint or direction on how to improve the inefficient queue operations.",
+      "hint_specificity": 1
+    },
+    {
+      "problem_title": "Merge Intervals",
+      "reasoning": "Asking if there is a way to 'arrange' the intervals first is an excellent Socratic nudge towards sorting. It identifies the critical missing preliminary step without explicitly handing over the sorting logic.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Minimum Coin Change",
+      "reasoning": "The mentor accurately identifies the core issue of recalculating the same states in the recursive tree. Asking if the student is recalculating anything unnecessarily perfectly sets up the discovery of memoization.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Longest Increasing Subsequence",
+      "reasoning": "By asking if smaller problems are being solved multiple times, the AI effectively guides the student toward dynamic programming. It identifies the exact conceptual flaw in a brute-force recursive approach.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Edit Distance",
+      "reasoning": "The hint correctly targets the overlapping subproblems inherent in the student's unoptimized recursive solution. It prompts the student to look for redundant computations, acting as a great catalyst for introducing memoization.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Valid Anagram",
+      "reasoning": "Since the student's solution is already functional, asking them to explain why their approach works is a solid pedagogical technique. It reinforces their conceptual understanding without unnecessarily complicating their working code.",
+      "hint_specificity": 3
+    },
+    {
+      "problem_title": "Find the Duplicate Number",
+      "reasoning": "Highlighting the specific mathematical constraints of the problem is the perfect breadcrumb. It encourages the student to exploit this property for an optimized solution without giving away the cycle detection approach.",
+      "hint_specificity": 3
+    }
+  ]
+}
