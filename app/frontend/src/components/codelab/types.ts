@@ -14,8 +14,7 @@ export type CodeLabHeaderData = {
 export type ProblemExample = {
   id: string
   input: string
-  output: string
-  explanation?: string
+  expected_output: string
 }
 
 export type ProblemTestCase = {

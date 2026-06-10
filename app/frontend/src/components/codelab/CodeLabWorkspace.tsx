@@ -67,10 +67,10 @@ export function CodeLabWorkspace({
     const editorInstanceKey = `${editor.defaultLanguageId}:${editor.codeTemplates[editor.defaultLanguageId] ?? ''}`
 
     useEffect(() => {
-        if (!latestSubmission) {
+        if (!latestSubmission && isFeedbackDialogOpen) {
             setIsFeedbackDialogOpen(false)
         }
-    }, [latestSubmission])
+    }, [latestSubmission, isFeedbackDialogOpen])
 
     useEffect(() => {
         if (!activeHandle) {
@@ -227,14 +227,7 @@ export function CodeLabWorkspace({
                                     onMouseDown={() => setActiveHandle('console')}
                                     className="relative h-2 shrink-0 cursor-row-resize bg-border/50 transition-colors hover:bg-primary/60"
                                 >
-                                    <button
-                                        type="button"
-                                        onMouseDown={(event) => event.stopPropagation()}
-                                        onClick={() => setConsoleCollapsed(true)}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-border bg-card px-2 py-0.5 text-[11px] font-medium text-muted-foreground hover:border-primary/40 hover:text-primary"
-                                    >
-                                        Hide Console
-                                    </button>
+
                                 </div>
                                 <div className="min-h-0" style={{ height: `${100 - editorHeight}%` }}>
                                     <SubmissionResultsPanel

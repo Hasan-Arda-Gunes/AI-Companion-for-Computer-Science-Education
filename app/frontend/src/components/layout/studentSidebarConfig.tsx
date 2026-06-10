@@ -6,7 +6,7 @@ import type {
 
 export const defaultStudentSidebarBrand: StudentSidebarBrand = {
     title: 'AIMentor',
-    subtitle: 'Code Evolution',
+    subtitle: 'Student',
 }
 
 export const defaultStudentSidebarProfile: StudentProfile = {
@@ -55,6 +55,8 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
             </svg>
         ),
     },
+    /* Placeholder for future features */
+    /*
     {
         id: 'achievements',
         label: 'Achievements',
@@ -66,6 +68,7 @@ export const defaultStudentSidebarNavItems: StudentSidebarItem[] = [
             </svg>
         ),
     },
+    */
     {
         id: 'settings',
         label: 'Settings',

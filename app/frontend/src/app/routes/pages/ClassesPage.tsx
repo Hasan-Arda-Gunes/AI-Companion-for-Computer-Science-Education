@@ -15,6 +15,8 @@ import {
     removeStudentFromClass,
 } from '../../../features/classes/api/classesApi'
 import type { ClassDetails, ClassSummary } from '../../../features/classes/types'
+import { getUserById, getUserByUsername, searchUsersByPartialUsername } from '../../../features/users/api/usersApi'
+import type { User } from '../../../features/auth/types'
 
 export function ClassesPage() {
     const navigate = useNavigate()
@@ -33,7 +35,75 @@ export function ClassesPage() {
 
     const [newClassName, setNewClassName] = useState('')
     const [newClassDescription, setNewClassDescription] = useState('')
-    const [studentIdInput, setStudentIdInput] = useState('')
+    const [studentSearchInput, setStudentSearchInput] = useState('')
+    const [suggestions, setSuggestions] = useState<User[]>([])
+    const [isSearchingSuggestions, setIsSearchingSuggestions] = useState(false)
+    const [showSuggestions, setShowSuggestions] = useState(false)
+    const [selectedStudent, setSelectedStudent] = useState<User | null>(null)
+
+    useEffect(() => {
+        const query = studentSearchInput.trim()
+        if (!query) {
+            setSuggestions([])
+            setIsSearchingSuggestions(false)
+            return
+        }
+
+        if (selectedStudent && (selectedStudent.username === query || `${selectedStudent.full_name} (${selectedStudent.username})` === query)) {
+            return
+        }
+
+        const fetchSuggestions = async () => {
+            setIsSearchingSuggestions(true)
+            try {
+                const results: User[] = []
+                
+                const parsedId = Number(query)
+                if (Number.isInteger(parsedId) && parsedId > 0) {
+                    try {
+                        const userById = await getUserById(parsedId)
+                        if (userById && userById.role === 'student') {
+                            results.push(userById)
+                        }
+                    } catch {
+                        // User not found by ID
+                    }
+                }
+
+                const partialUsers = await searchUsersByPartialUsername(query)
+                for (const u of partialUsers) {
+                    if (u.role === 'student' && !results.some(r => r.id === u.id)) {
+                        results.push(u)
+                    }
+                }
+
+                const enrolledStudentIds = new Set(selectedDetails?.students.map(s => s.id) ?? [])
+                const unenrolledStudents = results.filter(u => !enrolledStudentIds.has(u.id))
+
+                setSuggestions(unenrolledStudents)
+            } catch {
+                setSuggestions([])
+            } finally {
+                setIsSearchingSuggestions(false)
+            }
+        }
+
+        const timer = setTimeout(() => {
+            void fetchSuggestions()
+        }, 300)
+
+        return () => clearTimeout(timer)
+    }, [studentSearchInput, selectedDetails, selectedStudent])
+
+    useEffect(() => {
+        const handleDocumentClick = () => {
+            setShowSuggestions(false)
+        }
+        document.addEventListener('click', handleDocumentClick)
+        return () => {
+            document.removeEventListener('click', handleDocumentClick)
+        }
+    }, [])
 
     useEffect(() => {
         const handleBeforeUnload = () => {
@@ -142,16 +212,49 @@ export function ClassesPage() {
             return
         }
 
-        const parsedId = Number(studentIdInput)
-        if (!Number.isFinite(parsedId) || parsedId <= 0) {
-            setActionError('Enter a valid student ID.')
+        const query = studentSearchInput.trim()
+        if (!query) {
+            setActionError('Please enter a student username or ID.')
             return
         }
 
+        let studentId: number | null = null
+        let studentLabel = ''
+
         try {
-            await addStudentToClass(selectedClassId, { student_id: parsedId })
-            setStudentIdInput('')
-            setActionMessage(`Added student #${parsedId}.`)
+            if (selectedStudent) {
+                studentId = selectedStudent.id
+                studentLabel = selectedStudent.username
+            } else {
+                const parsedId = Number(query)
+                if (Number.isInteger(parsedId) && parsedId > 0) {
+                    const studentUser = await getUserById(parsedId)
+                    if (studentUser.role !== 'student') {
+                        setActionError('Only users with student role can be added to a class.')
+                        return
+                    }
+                    studentId = studentUser.id
+                    studentLabel = studentUser.username
+                } else {
+                    const studentUser = await getUserByUsername(query)
+                    if (studentUser.role !== 'student') {
+                        setActionError('Only users with student role can be added to a class.')
+                        return
+                    }
+                    studentId = studentUser.id
+                    studentLabel = studentUser.username
+                }
+            }
+
+            if (!studentId) {
+                setActionError('Could not find student.')
+                return
+            }
+
+            await addStudentToClass(selectedClassId, { student_id: studentId })
+            setStudentSearchInput('')
+            setSelectedStudent(null)
+            setActionMessage(`Added student "${studentLabel}" to class.`)
             await loadClassDetails(selectedClassId)
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to add student'
@@ -206,6 +309,7 @@ export function ClassesPage() {
         <DashboardLayout
             title="Classes"
             subtitle="Review enrolled classes, manage rosters, and keep sessions organized."
+            showHeader={false}
             sidebar={
                 <RoleAwareSidebar
                     className="hidden lg:flex"
@@ -360,13 +464,51 @@ export function ClassesPage() {
                                     {selectedDetails ? (
                                         <div className="border-t border-border pt-3">
                                             <h4 className="text-sm font-semibold text-foreground">Add student</h4>
-                                            <div className="mt-2 flex flex-wrap items-center gap-2">
-                                                <input
-                                                    value={studentIdInput}
-                                                    onChange={(event) => setStudentIdInput(event.target.value)}
-                                                    placeholder="Student ID"
-                                                    className="min-w-45 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
-                                                />
+                                            <div 
+                                                className="mt-2 flex items-center gap-2 relative"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <div className="relative flex-1 min-w-45">
+                                                    <input
+                                                        value={studentSearchInput}
+                                                        onChange={(event) => {
+                                                            setStudentSearchInput(event.target.value)
+                                                            setShowSuggestions(true)
+                                                            setSelectedStudent(null)
+                                                        }}
+                                                        onFocus={() => setShowSuggestions(true)}
+                                                        placeholder="Student username or ID"
+                                                        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary"
+                                                    />
+                                                    
+                                                    {showSuggestions && studentSearchInput.trim() && (
+                                                        <div className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto z-50 rounded-md border border-border bg-card p-1 shadow-lg">
+                                                            {isSearchingSuggestions ? (
+                                                                <div className="px-3 py-2 text-xs text-muted-foreground">Searching students...</div>
+                                                            ) : suggestions.length === 0 ? (
+                                                                <div className="px-3 py-2 text-xs text-muted-foreground">No matching students found</div>
+                                                            ) : (
+                                                                suggestions.map((student) => (
+                                                                    <button
+                                                                        key={student.id}
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setStudentSearchInput(`${student.full_name} (${student.username})`)
+                                                                            setSelectedStudent(student)
+                                                                            setShowSuggestions(false)
+                                                                        }}
+                                                                        className="w-full text-left rounded px-3 py-2 text-sm text-foreground hover:bg-secondary/40 transition-colors"
+                                                                    >
+                                                                        <div className="font-medium">{student.full_name}</div>
+                                                                        <div className="text-xs text-muted-foreground">
+                                                                            @{student.username} • ID: {student.id}
+                                                                        </div>
+                                                                    </button>
+                                                                ))
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => void handleAddStudent()}

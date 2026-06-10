@@ -245,15 +245,15 @@
   - Acceptance Criteria: Instructors can view multiple classes and monitor aggregated performance metrics per class.
   - Requirement IDs: M3-02
   - Notes: Includes filters by class, topic, and completion trend.
-- [ ] FEAT-024: Class membership management (students in multiple classes)
-  - Status: Planned
+- [x] FEAT-024: Class membership management (students in multiple classes)
+  - Status: Done
   - Milestone: Future
   - Priority: Medium
   - Owner: Team
   - Depends on: FEAT-023
   - Acceptance Criteria: Instructors can manually assign students to one or more classes and view membership overlaps.
   - Requirement IDs: M3-02
-  - Notes: Requires corresponding backend relation model.
+  - Notes: Adding search-based student enrollment by username or ID to frontend class assignment.
 - [ ] FEAT-025: Instructor-side AI test-case generation assistant
   - Status: Planned
   - Milestone: Future

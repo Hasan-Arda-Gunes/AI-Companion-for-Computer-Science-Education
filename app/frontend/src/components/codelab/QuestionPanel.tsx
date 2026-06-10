@@ -16,8 +16,7 @@ export function QuestionPanel({ question, useInternalScroll = true }: QuestionPa
                 '',
                 '```',
                 `Input: ${example.input}`,
-                `Output: ${example.output}`,
-                ...(example.explanation ? [`Explanation: ${example.explanation}`] : []),
+                `Output: ${example.expected_output}`,
                 '```',
             ]
 
