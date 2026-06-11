@@ -9,9 +9,9 @@ const sampleQuestion: QuestionData = {
     title: 'Two Sum',
     description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.',
     examples: [
-        { id: 'ex-1', input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'nums[0] + nums[1] == 9' },
-        { id: 'ex-2', input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
-        { id: 'ex-3', input: 'nums = [3,3], target = 6', output: '[0,1]' },
+        { id: 'ex-1', input: 'nums = [2,7,11,15], target = 9', expected_output: '[0,1]' },
+        { id: 'ex-2', input: 'nums = [3,2,4], target = 6', expected_output: '[1,2]' },
+        { id: 'ex-3', input: 'nums = [3,3], target = 6', expected_output: '[0,1]' },
     ],
     testCases: [
         { id: 'tc-1', input: 'nums = [2,7,11,15], target = 9', expectedOutput: '[0,1]', functionName: 'two_sum' },

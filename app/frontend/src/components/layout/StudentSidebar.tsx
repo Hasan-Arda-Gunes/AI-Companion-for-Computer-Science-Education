@@ -64,7 +64,10 @@ export function StudentSidebar({
     const collapsedWidth = 'clamp(4.75rem, 7.5vw, 5.25rem)'
 
     const resolvedClassName = useMemo(
-        () => ['relative flex h-full min-h-screen flex-col overflow-visible border-r border-sidebar-border bg-sidebar py-6', className ?? ''].join(' ').trim(),
+        () => [
+            'sticky top-0 flex h-screen flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar py-6',
+            className ?? ''
+        ].join(' ').trim(),
         [className],
     )
 
@@ -266,7 +269,7 @@ export function StudentSidebar({
                             </div>
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-lg font-semibold text-foreground">{profile.name}</p>
-                                <p className="text-sm text-muted-foreground">{profile.meta}</p>
+                                {/* <p className="text-sm text-muted-foreground">{profile.meta}</p> */}
                             </div>
                         </div>
                     </motion.div>

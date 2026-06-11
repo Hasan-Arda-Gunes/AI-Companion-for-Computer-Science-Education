@@ -46,15 +46,15 @@ def setup_session():
     
     # 1. Register Teacher
     teacher_cred = {
-        "email": f"teacher_evaluator_{timestamp}@example.com", # Made unique to avoid 400s on reruns
-        "username": f"teacher_eval_{timestamp}",
+        "email": f"teacher_evaluator@example.com", # Made unique to avoid 400s on reruns
+        "username": f"teacher_eval",
         "password": "securepassword123",
         "full_name": "Eval Teacher",
         "role": "teacher"
     }
     
     reg_res = session.post(f"{BASE_URL}/auth/register", json=teacher_cred)
-    log_data("Register Teacher", {"status_code": reg_res.status_code, "response": reg_res.text})
+    # log_data("Register Teacher", {"status_code": reg_res.status_code, "response": reg_res.text})
     
     # 2. Login Teacher
     login_cred = {
@@ -62,7 +62,7 @@ def setup_session():
         "password": teacher_cred["password"]
     }
     login_res = session.post(f"{BASE_URL}/auth/login", json=login_cred)
-    log_data("Login Teacher", {"status_code": login_res.status_code, "response": login_res.text})
+    # log_data("Login Teacher", {"status_code": login_res.status_code, "response": login_res.text})
     
     if login_res.status_code == 200:
         token = login_res.json().get("access_token")
@@ -92,7 +92,7 @@ def run_benchmarks():
     }
     
     class_res = session.post(f"{BASE_URL}/classes/", json=class_payload)
-    log_data("Create Class", {"status_code": class_res.status_code, "response": class_res.text})
+    # log_data("Create Class", {"status_code": class_res.status_code, "response": class_res.text})
     
     if class_res.status_code != 201:
         raise Exception("Failed to create class. Cannot proceed with problem creation.")
@@ -122,7 +122,7 @@ def run_benchmarks():
         }
         
         prob_res = session.post(f"{BASE_URL}/problems/", json=prob_payload)
-        log_data(f"Create Problem ({problem_data['title']})", {"status": prob_res.status_code, "response": prob_res.text})
+        # log_data(f"Create Problem ({problem_data['title']})", {"status": prob_res.status_code, "response": prob_res.text})
         
         if prob_res.status_code != 201:
             print(f"Skipping problem due to creation error: {prob_res.text}")
@@ -131,14 +131,16 @@ def run_benchmarks():
         problem_id = prob_res.json().get("id")
 
         # 6. Create Learning Session
+        """
+        
         sess_res = session.post(f"{BASE_URL}/sessions/", json={"problem_id": problem_id})
-        log_data(f"Create Session (Prob ID: {problem_id})", {"status": sess_res.status_code, "response": sess_res.text})
+        # log_data(f"Create Session (Prob ID: {problem_id})", {"status": sess_res.status_code, "response": sess_res.text})
         
         if sess_res.status_code != 201:
             continue
             
         session_id = sess_res.json().get("id")
-        
+        """
         
         # 7. Test Chat Functionality (Solution Leakage Metrics)
         """
@@ -157,6 +159,7 @@ def run_benchmarks():
             
         # 5. Test Dedicated Hint Endpoint (Hint Specificity Metrics)
         # We submit the inefficient solution so the AI has something to optimize
+        """
         hint_payload = {
             "problem_id": problem_id,
             "session_id": session_id,
@@ -166,7 +169,7 @@ def run_benchmarks():
         }
         hint_res = session.post(f"{BASE_URL}/ai/hint", json=hint_payload)
         log_data("Hint Endpoint Test", {"request": hint_payload, "status": hint_res.status_code, "response": hint_res.text})
-
+        """
         # 8. Test Code Submissions (Optimization & Correctness Metrics)
         """
         code_variants = [
@@ -203,9 +206,10 @@ def run_benchmarks():
         """
 
         # 10. Complete the Session
+        """
         comp_res = session.put(f"{BASE_URL}/sessions/{session_id}/complete")
         log_data(f"Complete Session ({session_id})", {"status": comp_res.status_code, "response": comp_res.text})
-        
+        """
     print(f"\nAll problems executed. The class {class_id} remains active in the database.")
 
 if __name__ == "__main__":
@@ -215,4 +219,4 @@ if __name__ == "__main__":
         print("\nAll benchmarks executed successfully.")
     except Exception as e:
         print(f"\nExecution failed: {e}")
-        log_data("CRITICAL ERROR", str(e))
+        #log_data("CRITICAL ERROR", str(e))

@@ -16,15 +16,29 @@ export function InstructorAllQuestionsPage() {
     const [topicValue, setTopicValue] = useState('')
     const [classValue, setClassValue] = useState<number | ''>('')
     const [classes, setClasses] = useState<ClassSummary[]>([])
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalProblems, setTotalProblems] = useState(0)
+    const PAGE_SIZE = 20
+    const [appliedFilters, setAppliedFilters] = useState<{
+        search?: string
+        difficulty?: ProblemDifficulty
+        topic?: string
+        class_id?: number
+    }>({})
 
     const fetchProblems = useCallback(
-        async (params?: { search?: string; difficulty?: ProblemDifficulty; topic?: string; class_id?: number }) => {
+        async (page: number, filters?: { search?: string; difficulty?: ProblemDifficulty; topic?: string; class_id?: number }) => {
             setIsLoading(true)
             setErrorMessage(null)
 
             try {
-                const response = await listProblems(params)
+                const response = await listProblems({
+                    page,
+                    page_size: PAGE_SIZE,
+                    ...filters,
+                })
                 setProblems(response.problems ?? [])
+                setTotalProblems(response.total ?? 0)
             } catch (error) {
                 const message = error instanceof Error ? error.message : 'Failed to load problems'
                 setErrorMessage(message)
@@ -49,16 +63,17 @@ export function InstructorAllQuestionsPage() {
     }, [])
 
     useEffect(() => {
-        void fetchProblems()
-    }, [fetchProblems])
+        void fetchProblems(currentPage, appliedFilters)
+    }, [currentPage, appliedFilters, fetchProblems])
 
     const handleApplyFilters = () => {
-        void fetchProblems({
+        setAppliedFilters({
             search: searchValue.trim() || undefined,
             difficulty: difficultyValue || undefined,
             topic: topicValue.trim() || undefined,
             class_id: classValue ? Number(classValue) : undefined,
         })
+        setCurrentPage(1)
     }
 
     const handleClearFilters = () => {
@@ -66,6 +81,8 @@ export function InstructorAllQuestionsPage() {
         setDifficultyValue('')
         setTopicValue('')
         setClassValue('')
+        setAppliedFilters({})
+        setCurrentPage(1)
     }
 
     return (
@@ -147,7 +164,10 @@ export function InstructorAllQuestionsPage() {
 
                 {!isLoading && !errorMessage ? (
                     <section className="rounded-xl border border-border bg-card p-4">
-                        <div className="mb-3 text-sm text-muted-foreground">Total loaded: {problems.length}</div>
+                        <div className="mb-3 text-sm text-muted-foreground">
+                            Showing {problems.length > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0} -{' '}
+                            {Math.min(currentPage * PAGE_SIZE, totalProblems)} of {totalProblems} questions
+                        </div>
                         <div className="space-y-3">
                             {problems.map((problem) => (
                                 <button
@@ -177,6 +197,84 @@ export function InstructorAllQuestionsPage() {
                                 <p className="text-sm text-muted-foreground">No problems found.</p>
                             ) : null}
                         </div>
+
+                        {/* Pagination controls */}
+                        {(() => {
+                            const totalPages = Math.ceil(totalProblems / PAGE_SIZE)
+                            if (totalPages <= 1) return null
+
+                            const getPageNumbers = () => {
+                                const pages = []
+                                const range = 2
+                                for (let i = 1; i <= totalPages; i++) {
+                                    if (i === 1 || i === totalPages || (i >= currentPage - range && i <= currentPage + range)) {
+                                        pages.push(i)
+                                    } else if (pages[pages.length - 1] !== '...') {
+                                        pages.push('...')
+                                    }
+                                }
+                                return pages
+                            }
+
+                            return (
+                                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
+                                    <div className="text-sm text-muted-foreground">
+                                        Showing <span className="font-medium text-foreground">{((currentPage - 1) * PAGE_SIZE) + 1}</span> to{' '}
+                                        <span className="font-medium text-foreground">
+                                            {Math.min(currentPage * PAGE_SIZE, totalProblems)}
+                                        </span>{' '}
+                                        of <span className="font-medium text-foreground">{totalProblems}</span> results
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            type="button"
+                                            disabled={currentPage === 1}
+                                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                            className="inline-flex items-center justify-center rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-secondary/40 disabled:opacity-50 disabled:pointer-events-none"
+                                        >
+                                            Previous
+                                        </button>
+                                        <div className="flex items-center space-x-1">
+                                            {getPageNumbers().map((page, index) => {
+                                                if (page === '...') {
+                                                    return (
+                                                        <span
+                                                            key={`ellipsis-${index}`}
+                                                            className="inline-flex h-9 w-9 items-center justify-center text-sm text-muted-foreground"
+                                                        >
+                                                            ...
+                                                        </span>
+                                                    )
+                                                }
+                                                return (
+                                                    <button
+                                                        key={page}
+                                                        type="button"
+                                                        onClick={() => setCurrentPage(Number(page))}
+                                                        className={[
+                                                            'inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors',
+                                                            currentPage === page
+                                                                ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                                                                : 'border border-border bg-background text-foreground hover:bg-secondary/40',
+                                                        ].join(' ')}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={currentPage === totalPages}
+                                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                            className="inline-flex items-center justify-center rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-secondary/40 disabled:opacity-50 disabled:pointer-events-none"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })()}
                     </section>
                 ) : null}
             </div>
